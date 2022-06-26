@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="vonage ml-transformers test">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta itemprop="description" content="vonage ml-transformers test">
+    <meta itemprop="image" content="./images/vonage.png">
+    <meta itemprop="name" content="vonage ml-transformers">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+    <meta http-equiv="origin-trial" content="AuKHz2ifylDpZfg7iawfCDGtilbLT+tg9CCbVG4PNSxRA1v2NtYGRKAKctmE4Us42+t1lZ3IkPO9s5/VlHy/rwIAAABgeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJmZWF0dXJlIjoiVW5yZXN0cmljdGVkU2hhcmVkQXJyYXlCdWZmZXIiLCJleHBpcnkiOjE2NTg4Nzk5OTl9">
+    <base target="_blank">
+
+    <title>Vonage ML Transformers</title>
+
+    <link rel="icon" sizes="192x192" href="./images/vonage.png">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./css/main.css"/>
+
+</head>
+
+<body>
+
+<div id="container"> 
+    <p>This is a sample application to test Vonage ML Transformers along with Vonage Media Processor features. </p>
+    <p><a href="https://github.com/w3c/mediacapture-insertable-streams">Insertable Streams</a></p>
+    <p><a href="https://github.com/Vonage/media-processor">Vonage Media Processor</a></p>
+    <p><a href="https://github.com/Vonage/ml-transformers">Vonage ML Transformers</a></p>
+
+    <span id="outputVideoContainer"></span>
+    <div class="box">
+      <span>Source:</span>
+      <select id="sourceSelector" disabled>
+          <option selected value="stop">(stopped)</option>
+          <option value="camera">Camera</option>
+      </select>
+    </div>
+
+    <div class="box">
+        <span>type:</span>
+        <select id="typeSelector" enabled>
+            <option selected value="face_detection">face detection</option>
+            <option value="face_mesh">face mesh</option>
+            <option value="hands">hands</option>
+            <option value="holistic">holistic</option>
+            <option value="objectron">objectron</option>
+            <option value="selfie_segmentation">selfie segmentation</option>
+        </select>
+    </div>
+
+    <p>View the console to see logging.</p>
+
+</div>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>
