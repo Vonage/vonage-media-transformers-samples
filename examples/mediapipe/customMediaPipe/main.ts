@@ -1,49 +1,50 @@
 import CameraSource from '../../common/js/camera-source'
-import { isSupported } from '@vonage/ml-transformers'
-import {MediaProcessor, MediaProcessorConnector, setVonageMetadata} from '@vonage/media-processor'
-import MediapipeTransformer from './js/mediapipeTransformer';
+import { isSupported, MediaPipeModelType } from '@vonage/ml-transformers'
+import {setVonageMetadata, MediaProcessorConnectorInterface, MediaProcessorConnector} from '@vonage/media-processor'
+import MediaProcessorHelperMain from './js/MediaProcessorHelperMain'
+import MediaProcessorHelperWorker from './js/MediaProcessorHelperWorker'
+import { MediapipeMediaProcessorInterface } from './js/MediapipeInterfaces';
 
 async function main() {
   try {
     await isSupported();
   } catch(e) {
-    console.log(e);
-    alert('Something bad happened: ' + e);
-    return;
+    throw('Something bad happened: ' + e);
   }
 
-  const sourceSelector: any =document.getElementById('sourceSelector');
-  const typeSelector: any = document.getElementById("typeSelector")
+  const sourceSelector: any =document.getElementById('sourceSelector')
+  const typeSelector: any = document.getElementById('typeSelector')
+  const processSelector: any = document.getElementById('processSelector')
 
   let videoSource_: CameraSource = new CameraSource()
 
-
   async function updatePipelineSource() {
-    const sourceType = sourceSelector.options[sourceSelector.selectedIndex].value;
-    const typeType = typeSelector.options[typeSelector.selectedIndex].value
+    const sourceType = sourceSelector.options[sourceSelector.selectedIndex].value
+    const mediapipeType = typeSelector.options[typeSelector.selectedIndex].value
+    const processType = processSelector.options[processSelector.selectedIndex].value
 
     setVonageMetadata({appId: '123', sourceType: 'test'})
     
-    
     if(sourceType === 'stop'){
       await videoSource_.stopMediaProcessorConnector()
-      return;
     }else if(sourceType === 'camera'){
-      let mediaProcessor: MediaProcessor = new MediaProcessor()
-      let transformer: MediapipeTransformer = new MediapipeTransformer()
-      transformer.init(typeType).then( () => {
-        let arr: Array<Transformer> = []
-        arr.push(transformer)
-        mediaProcessor.setTransformers(arr).then(() => {
-          let connector: MediaProcessorConnector = new MediaProcessorConnector(mediaProcessor)
-          videoSource_.setMediaProcessorConnector(connector).then( () => {
-          }).catch(e => {
-            throw e
-          })
+      let processor: MediapipeMediaProcessorInterface
+      
+      if(processType === 'main'){
+        processor = new MediaProcessorHelperMain()
+      } else if(processType === 'worker') {
+        processor = new MediaProcessorHelperWorker()
+      } else {
+        throw "process is not supported"
+      }
+
+      processor.init(mediapipeType as MediaPipeModelType).then( () => {
+        const connector: MediaProcessorConnectorInterface = new MediaProcessorConnector(processor)
+        videoSource_.setMediaProcessorConnector(connector).catch(e => {
+          throw e
         })
-      }).catch(e => {
-        throw e
       })
+      
     }
   }
   sourceSelector.oninput = updatePipelineSource;

@@ -1,0 +1,82 @@
+
+import {MediaProcessor, MediaProcessorConnector} from '@vonage/media-processor'
+import {MediaPipeModelType, SelfieSegmentationResults} from '@vonage/ml-transformers'
+import { MediaPipeFullResults, MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface } from './MediapipeInterfaces'
+import MediapipeObject from './MediapipeObject'
+import MediapipeTransformer from './mediapipeTransformer'
+import {FacemashExtras} from './FacemashHelper'
+import {HandsExtras} from './HandsHelper'
+import { HolisticExrtas } from './HolisticHelper'
+import { ObjectronExtras } from './ObjectronHelper'
+
+class MediaProcessorHelperMain implements MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface{
+    mediaProcessor_: MediaProcessor
+    mediaipeTransformer_: MediapipeTransformer
+    mediapipe_: MediapipeObject
+    modelType_?: MediaPipeModelType
+
+    constructor(){
+        this.mediaProcessor_ = new MediaProcessor()
+        this.mediaipeTransformer_ = new MediapipeTransformer()
+        this.mediapipe_ = new MediapipeObject()
+    }
+
+    onResult(result: MediaPipeFullResults): void {
+        if(this.modelType_ === 'selfie_segmentation'){
+            let selfieResult = result.mediaPipeResults as SelfieSegmentationResults
+            this.mediaipeTransformer_.onResult(selfieResult.segmentationMask as ImageBitmap)
+        }else{
+            result.facemashExtras = FacemashExtras()
+            result.handsExtras = HandsExtras()
+            result.holisticExrtas = HolisticExrtas()
+            result.objectronExtras = ObjectronExtras()
+            this.mediaipeTransformer_.onResult(result)
+        }
+    }
+
+    init(modelType: MediaPipeModelType): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.modelType_ = modelType
+            this.mediapipe_.init(modelType, this).then(() =>{
+                this.mediaipeTransformer_.init(modelType, this.mediapipe_).then( () =>{
+                    this.mediaProcessor_.setTransformers([this.mediaipeTransformer_]).then(() => {
+                        resolve()
+                    }).catch(e => {
+                        reject(e)
+                    })
+                }).catch(e => {
+                    reject(e)
+                })
+            }).catch(e => {
+                reject(e)
+            })
+            
+        })
+    }
+
+    transform(readable: ReadableStream<any>, writable: WritableStream<any>): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.mediaProcessor_.transform(readable, writable).then( () => {
+                resolve()
+            }).catch(e => {
+                reject(e)
+            })
+        })
+    }
+
+    destroy(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.mediaProcessor_.destroy().then(() => {
+                this.mediapipe_.mediapipeHelper_?.close().then( () => {
+                    resolve
+                }).catch(e => {
+                    reject(e)
+                })
+            }).catch(e => {
+                reject(e)
+            })
+        })
+    }
+}
+
+export default MediaProcessorHelperMain
