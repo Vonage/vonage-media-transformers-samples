@@ -1,0 +1,144 @@
+body {
+  background: black;
+}
+
+/** Video Layout **/
+#layoutContainer {
+  min-width: 100vw;
+  min-height: 90vh;
+  background-color: black;
+  position: relative;
+}
+
+#layoutContainer > * {
+  transition-property: all;
+  transition-duration: 0.5s;
+}
+
+/** Action Buttons **/
+#zoom, #brightness {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 16px;
+}
+
+#zoom div,
+#brightness div  {
+  margin-top: 8px;
+}
+
+button {
+  all: unset;
+  background-color: rgb(212, 7, 7);
+  width: 130px;
+  height: 44px;
+  padding: 0px 4px;
+  border-radius: 8px;
+  text-align: center;
+  vertical-align: top;
+  margin-bottom: 8px;
+}
+button.enable{
+  background-color: rgb(23, 227, 23);
+}
+#brightnessLevel.is-shown,
+#widthPadding.is-shown,
+#heightPadding.is-shown,
+#fixedRatio.is-shown,
+#autoBrightness.is-shown {
+  display: block;
+}
+#brightnessLevel,
+#widthPadding,
+#heightPadding,
+#fixedRatio,
+#autoBrightness {
+  display: none;
+}
+label {
+  padding-left: 8px;
+  display: block;
+}
+#fixedRatio label,
+#autoBrightness label {
+  display: inline-block;
+}
+
+/** Pop Over **/
+#popOverWrapper {
+  position: relative;
+  margin-top: 16px;
+  display: inline-block;
+}
+#popOverTitle {
+  background-color: rgb(12, 62, 198);
+  color: white;
+  margin-left: 16px;
+}
+#popOverContent {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  left: 0px;
+  bottom: 42px;
+  transform: translate(0, 10px);
+  background-color: #bfbfbf;
+  padding: 24px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+  width: 312px;
+  border-radius: 8px;
+}
+#popOverContent:before {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  left: 20%;
+  bottom: -20px;
+  border-style: solid;
+  border-width: 10px;
+  border-color: #bfbfbf transparent transparent transparent;
+  transition-duration: 0.3s;
+  transition-property: transform;
+}
+#popOverContent.is-shown {
+  z-index: 10;
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -20px);
+  transition: all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97);
+}
+
+/** Loader **/
+#loader {
+  display: none;
+}
+#loader.is-loading {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  z-index: 20;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: white;
+  opacity: 0.7;
+}
+#loader:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 6px solid #000;
+  border-color: #000 transparent #000 transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+  margin: 300px auto;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
