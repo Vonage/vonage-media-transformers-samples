@@ -6,10 +6,7 @@ import { MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface, Med
 import {getVonageMetadata} from '@vonage/media-processor'
 import MediapipeObject from './MediapipeObject';
 import Emittery from 'emittery' 
-import {FacemashExtras} from './FacemashHelper'
-import { HandsExtras } from './HandsHelper';
-import { HolisticExrtas } from './HolisticHelper';
-import { ObjectronExtras } from './ObjectronHelper';
+
 
 class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface {
     worker_: any
@@ -23,10 +20,6 @@ class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, Me
     }
 
     onResult(result: MediaPipeFullResults): void {
-        result.facemashExtras = FacemashExtras()
-        result.handsExtras = HandsExtras()
-        result.holisticExrtas = HolisticExrtas()
-        result.objectronExtras = ObjectronExtras()
         if(this.modelType_ === 'selfie_segmentation'){
             let selfieResult = result.mediaPipeResults as SelfieSegmentationResults
             this.worker_.postMessage({

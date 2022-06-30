@@ -4,10 +4,6 @@ import {MediaPipeModelType, SelfieSegmentationResults} from '@vonage/ml-transfor
 import { MediaPipeFullResults, MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface } from './MediapipeInterfaces'
 import MediapipeObject from './MediapipeObject'
 import MediapipeTransformer from './mediapipeTransformer'
-import {FacemashExtras} from './FacemashHelper'
-import {HandsExtras} from './HandsHelper'
-import { HolisticExrtas } from './HolisticHelper'
-import { ObjectronExtras } from './ObjectronHelper'
 
 class MediaProcessorHelperMain implements MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface{
     mediaProcessor_: MediaProcessor
@@ -26,10 +22,6 @@ class MediaProcessorHelperMain implements MediapipeMediaProcessorInterface, Medi
             let selfieResult = result.mediaPipeResults as SelfieSegmentationResults
             this.mediaipeTransformer_.onResult(selfieResult.segmentationMask as ImageBitmap)
         }else{
-            result.facemashExtras = FacemashExtras()
-            result.handsExtras = HandsExtras()
-            result.holisticExrtas = HolisticExrtas()
-            result.objectronExtras = ObjectronExtras()
             this.mediaipeTransformer_.onResult(result)
         }
     }

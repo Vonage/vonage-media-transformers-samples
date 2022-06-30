@@ -4,10 +4,16 @@ import { MediaPipeModelType,
     HandsResults,
     HolisticResults,
     ObjectronResults,
-    SelfieSegmentationResults} from '@vonage/ml-transformers'
+    VonageFacemash,
+    VonageHands,
+    VonageHolistic,
+    VonageObjectron,
+    VonagePose, 
+    PoseResults} from '@vonage/ml-transformers'
 import { NormalizedLandmark, Data } from '@mediapipe/drawing_utils'
 import { MediapipePorcessInterface, MediapipeResultsListnerInterface, MediaPipeFullResults } from './MediapipeInterfaces'
-import './DrawingUtilsHelper'
+//@ts-ignore
+import VonageDrawingUtils from './DrawingUtilsHelper'
 
 class MediapipeTransformer implements MediapipeResultsListnerInterface {
     mediapipePorcess_?: MediapipePorcessInterface
@@ -18,10 +24,9 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
     resultCtx_?: OffscreenCanvasRenderingContext2D
 
     modelType_?: MediaPipeModelType
-
     constructor(){
         this.resultCanvas_ = new OffscreenCanvas(1, 1)
-        let ctx = this.resultCanvas_.getContext('2d', {alpha: false, desynchronized: true})
+        let ctx = this.resultCanvas_.getContext('2d')
         if(ctx){
             this.resultCtx_ = ctx
         }else {
@@ -65,8 +70,8 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         })
     }
 
-    processFrame(image: ImageBitmap, timestamp: number, controller: TransformStreamDefaultController): void{
-        this.mediapipePorcess_?.onSend(image).then( () => { 
+    async processFrame(image: ImageBitmap, timestamp: number, controller: TransformStreamDefaultController){
+        await this.mediapipePorcess_?.onSend(image).then(() =>{
             if((this.mediapipeResult_ || this.mediapipeSelfieResult_) && this.resultCtx_){
                 this.resultCtx_.save()
                 this.resultCtx_.clearRect(0, 0, this.resultCanvas_.width, this.resultCanvas_.height)
@@ -93,6 +98,8 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
                     this.drawObjectron()
                 } else if(this.modelType_ === 'selfie_segmentation'){
                     this.drawSelfie(image)
+                } else if(this.modelType_ === 'pose'){
+                    this.drawPose()
                 }
                 this.resultCtx_.restore()
                 // @ts-ignore
@@ -100,9 +107,11 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             }else {
                 controller.enqueue(new VideoFrame(image, {timestamp, alpha: 'discard'}))
             }
-            image.close()
         }).catch(e => {
-            throw e
+            console.error(e)
+            controller.enqueue(new VideoFrame(image, {timestamp, alpha: 'discard'}))
+        }).finally( () => {
+            image.close()
         })
     }
 
@@ -110,15 +119,17 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         let results = this.mediapipeResult_?.mediaPipeResults as FaceDetectionResults
         if (results.detections.length > 0) {
             
-            drawRectangle(
+            VonageDrawingUtils.drawRectangle(
                 this.resultCtx_, 
                 results.detections[0].boundingBox,
-                {color: 'blue', lineWidth: 4, fillColor: '#00000000'})
+                {color: 'blue', lineWidth: 4, fillColor: '#00000000'}
+            )
             
-            drawLandmarks(
+            VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_,
                 results.detections[0].landmarks, 
-                {color: 'red', radius: 5})
+                {color: 'red', radius: 5}
+            )
         }
     }
 
@@ -127,57 +138,66 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         if (results.multiFaceLandmarks) {
             for (const landmarks of results.multiFaceLandmarks) {
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    this.mediapipeResult_?.facemashExtras?.FACEMESH_TESSELATION,
-                    {color: '#C0C0C070', lineWidth: 1});
+                    VonageFacemash.FACEMESH_TESSELATION,
+                    {color: '#C0C0C070', lineWidth: 1}
+                )
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    this.mediapipeResult_?.facemashExtras?.FACEMESH_RIGHT_EYE,
-                    {color: '#FF3030'});
+                    VonageFacemash.FACEMESH_RIGHT_EYE,
+                    {color: '#FF3030'}
+                )
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_,
                     landmarks, 
-                    this.mediapipeResult_?.facemashExtras?.FACEMESH_RIGHT_EYEBROW,
-                    {color: '#FF3030'});
+                    VonageDrawingUtils.FACEMESH_RIGHT_EYEBROW,
+                    {color: '#FF3030'}
+                )
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    this.mediapipeResult_?.facemashExtras?.FACEMESH_LEFT_EYE,
-                    {color: '#30FF30'});
+                    VonageFacemash.FACEMESH_LEFT_EYE,
+                    {color: '#30FF30'}
+                )
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    this.mediapipeResult_?.facemashExtras?.FACEMESH_LEFT_EYEBROW,
-                    {color: '#30FF30'});
+                    VonageFacemash.FACEMESH_LEFT_EYEBROW,
+                    {color: '#30FF30'}
+                )
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
-                    landmarks, this.mediapipeResult_?.facemashExtras?.FACEMESH_FACE_OVAL,
-                    {color: '#E0E0E0'});
+                    VonageFacemash.FACEMESH_FACE_OVAL,
+                    {color: '#E0E0E0'}
+                )
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
-                    landmarks, this.mediapipeResult_?.facemashExtras?.FACEMESH_LIPS, 
-                    {color: '#E0E0E0'});
+                    VonageFacemash.FACEMESH_LIPS, 
+                    {color: '#E0E0E0'}
+                )
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks,
-                    this.mediapipeResult_?.facemashExtras?.FACEMESH_RIGHT_IRIS,
-                    {color: '#FF3030'});
+                    VonageFacemash.FACEMESH_RIGHT_IRIS,
+                    {color: '#FF3030'}
+                )
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    this.mediapipeResult_?.facemashExtras?.FACEMESH_LEFT_IRIS,
-                    {color: '#30FF30'});  
+                    VonageFacemash.FACEMESH_LEFT_IRIS,
+                    {color: '#30FF30'}
+                )
             }
         }
     }
@@ -190,21 +210,22 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
                 const isRightHand = classification.label === 'Right';
                 const landmarks = results.multiHandLandmarks[index];
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    this.mediapipeResult_?.handsExtras?.HAND_CONNECTIONS,
-                    {color: isRightHand ? '#00FF00' : '#FF0000'});
+                    VonageHands.HAND_CONNECTIONS,
+                    {color: isRightHand ? '#00FF00' : '#FF0000'}
+                )
                 
-                drawLandmarks(
+                VonageDrawingUtils.drawLandmarks(
                     this.resultCtx_, 
                     landmarks, {
                     color: isRightHand ? '#00FF00' : '#FF0000',
                     fillColor: isRightHand ? '#FF0000' : '#00FF00',
                     radius: (data: Data) => {
-                        return lerp(data.from!.z!, -0.15, .1, 10, 1);
+                        return VonageDrawingUtils.lerp(data.from!.z!, -0.15, .1, 10, 1);
                     }
-                });
+                })
             }
         }
     }
@@ -232,75 +253,78 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             return
         }
         this.resultCtx_.lineWidth = 5;
-        if(!this.mediapipeResult_?.holisticExrtas){
-            return
-        }
         if (results.poseLandmarks) {
-            drawConnectors(
+            VonageDrawingUtils.drawConnectors(
                 this.resultCtx_, 
                 results.poseLandmarks, 
-                this.mediapipeResult_.holisticExrtas.POSE_CONNECTIONS,
-                {color: 'white'})
+                VonageHolistic.POSE_CONNECTIONS,
+                {color: 'white'}
+            )
             
-            drawLandmarks(
+            VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_,
-                Object.values(this.mediapipeResult_.holisticExrtas.POSE_LANDMARKS_LEFT)
+                Object.values(VonageHolistic.POSE_LANDMARKS_LEFT)
                 .map((index: any) => results.poseLandmarks[index]),
-                {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(255,138,0)'})
+                {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(255,138,0)'}
+            )
 
-            drawLandmarks(
+            VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_, 
-                Object.values(this.mediapipeResult_.holisticExrtas.POSE_LANDMARKS_RIGHT)
+                Object.values(VonageHolistic.POSE_LANDMARKS_RIGHT)
                 .map((index: any) => results.poseLandmarks[index]),
-                {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(0,217,231)'})            
+                {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(0,217,231)'}
+            )
         }
         
         if (results.rightHandLandmarks) {
             this.resultCtx_.strokeStyle = 'white';
             this.connect([[
-                    results.poseLandmarks[this.mediapipeResult_.holisticExrtas.POSE_LANDMARKS.RIGHT_ELBOW],
+                    results.poseLandmarks[VonageHolistic.POSE_LANDMARKS.RIGHT_ELBOW],
                     results.rightHandLandmarks[0]
-                ]]);
+                ]]
+            )
             
-            drawConnectors(
+            VonageDrawingUtils.drawConnectors(
                 this.resultCtx_,  
                 results.rightHandLandmarks, 
-                this.mediapipeResult_.holisticExrtas.HAND_CONNECTIONS,
-                {color: 'white'});
+                VonageHolistic.HAND_CONNECTIONS,
+                {color: 'white'}
+            )
 
-            
-            drawLandmarks(
+            VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_, 
                 results.rightHandLandmarks, {
                 color: 'white',
                 fillColor: 'rgb(0,217,231)',
                 lineWidth: 2,
                 radius: (data: Data) => {
-                    return lerp(data.from!.z!, -0.15, .1, 10, 1);
+                    return VonageDrawingUtils.lerp(data.from!.z!, -0.15, .1, 10, 1);
                 }
             })
         }
         if (results.leftHandLandmarks) {
             this.resultCtx_.strokeStyle = 'white';
             this.connect([[
-                    results.poseLandmarks[this.mediapipeResult_.holisticExrtas.POSE_LANDMARKS.LEFT_ELBOW],
+                    results.poseLandmarks[VonageHolistic.POSE_LANDMARKS.LEFT_ELBOW],
                     results.leftHandLandmarks[0]
-                ]]);
+                ]]
+            )
             
-            drawConnectors(
+            VonageDrawingUtils.drawConnectors(
                 this.resultCtx_,  
                 results.leftHandLandmarks, 
-                this.mediapipeResult_.holisticExrtas.HAND_CONNECTIONS,
-                {color: 'white'});
+                VonageHolistic.HAND_CONNECTIONS,
+                {color: 'white'}
+            )
 
-            drawLandmarks(
+            VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_, 
                 results.leftHandLandmarks, {
                 color: 'white',
                 fillColor: 'rgb(255,138,0)',
                 lineWidth: 2,
                 radius: (data: Data) => {
-                    return lerp(data.from!.z!, -0.15, .1, 10, 1);
+                    return VonageDrawingUtils.lerp(data.from!.z!, -0.15, .1, 10, 1);
                 }
             })
         }
@@ -312,16 +336,18 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             for (const detectedObject of results.objectDetections) {
                 const landmarks = detectedObject.keypoints.map(x => x.point2d);
                 
-                drawConnectors(
+                VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    this.mediapipeResult_?.objectronExtras?.BOX_CONNECTIONS, 
-                    {color: '#FF0000'});
+                    VonageObjectron.BOX_CONNECTIONS, 
+                    {color: '#FF0000'}
+                )
                 
-                drawLandmarks(
+                VonageDrawingUtils.drawLandmarks(
                     this.resultCtx_, 
                     [landmarks[0]], 
-                    {color: '#FFFFFF'});
+                    {color: '#FFFFFF'}
+                )
             }
         }
     }
@@ -356,6 +382,39 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         this.resultCtx_.globalCompositeOperation = 'destination-over'
         this.resultCtx_.fillStyle = '#0000FF7F';
         this.resultCtx_.fillRect(0, 0, this.resultCanvas_.width, this.resultCanvas_.height);
+    }
+
+    drawPose():void{
+        let results = this.mediapipeResult_?.mediaPipeResults as PoseResults        
+        if (results.poseLandmarks && this.resultCtx_) {
+            VonageDrawingUtils.drawConnectors(
+                this.resultCtx_, 
+                results.poseLandmarks, 
+                VonagePose.POSE_CONNECTIONS,
+                {visibilityMin: 0.65, color: 'white'}
+            )
+
+            VonageDrawingUtils.drawLandmarks(
+                this.resultCtx_,
+                Object.values(VonagePose.POSE_LANDMARKS_LEFT)
+                    .map( (index: any) => results.poseLandmarks[index]),
+                {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(255,138,0)'}
+            )
+
+            VonageDrawingUtils.drawLandmarks(
+                this.resultCtx_,
+                Object.values(VonagePose.POSE_LANDMARKS_RIGHT)
+                    .map( (index: any) => results.poseLandmarks[index]),
+                {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(0,217,231)'}
+            )
+
+            VonageDrawingUtils.drawLandmarks(
+                this.resultCtx_,
+                Object.values(VonagePose.POSE_LANDMARKS_NEUTRAL)
+                    .map( (index: any) => results.poseLandmarks[index]),
+                {visibilityMin: 0.65, color: 'white', fillColor: 'white'}
+            )
+          }
     }
     async flush() {
        

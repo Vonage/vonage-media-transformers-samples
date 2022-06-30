@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vonage/ml-transformers": "2.0.3",
+    "@vonage/ml-transformers": "3.0.0",
     "@mediapipe/drawing_utils": "0.3.1620248257"
   },
   "devDependencies": {

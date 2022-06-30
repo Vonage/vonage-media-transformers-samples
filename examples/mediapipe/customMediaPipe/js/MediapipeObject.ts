@@ -1,4 +1,4 @@
-import { MediapipeHelper, MediaPipeModelType, MediapipeConfig, MediaPipeResults, FaceDetectionOptions, FaceMeshOptions, HandsOptions, HolisticOptions, ObjectronOptions, SelfieSegmentationOptions } from "@vonage/ml-transformers"
+import { MediapipeHelper, MediaPipeModelType, MediapipeConfig, MediaPipeResults, FaceDetectionOptions, FaceMeshOptions, HandsOptions, HolisticOptions, ObjectronOptions, SelfieSegmentationOptions, PoseOptions } from "@vonage/ml-transformers"
 import { MediapipePorcessInterface, MediapipeResultsListnerInterface, MediaPipeFullResults } from "./MediapipeInterfaces"
 
 class MediapipeObject implements MediapipePorcessInterface{
@@ -52,7 +52,12 @@ class MediapipeObject implements MediapipePorcessInterface{
                 selfieMode: false,
                 modelSelection: 1
             }
-        } 
+        } else if (modelType === 'pose'){
+            (option as PoseOptions) = {
+                selfieMode: false,
+                modelComplexity: 1
+            }
+        }
         return option
     }
 
@@ -64,8 +69,7 @@ class MediapipeObject implements MediapipePorcessInterface{
                 mediaPipeModelConfigArray:[{
                     listener: (result: MediaPipeResults) : void => {
                         let fullResult: MediaPipeFullResults = {
-                            mediaPipeResults: result,
-                            facemashExtras: undefined
+                            mediaPipeResults: result
                         }
                         this.mediapipeListener_?.onResult(fullResult)
                     },
