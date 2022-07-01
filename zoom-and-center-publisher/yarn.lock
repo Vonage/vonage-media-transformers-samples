@@ -27,6 +27,11 @@
   resolved "https://registry.yarnpkg.com/@mediapipe/objectron/-/objectron-0.4.1636596145.tgz#8d548eb0a0b638f95b87ee16c3d1c96d2da4bd5e"
   integrity sha512-82Ue+loxBVjzUj4OkpW9U29QurZaT86hvoFfOmktwfOhjoxax7COvliAzANlkryM0HN+vCc8Nkcznk6fAcxYDw==
 
+"@mediapipe/pose@0.5.1635988162":
+  version "0.5.1635988162"
+  resolved "https://registry.yarnpkg.com/@mediapipe/pose/-/pose-0.5.1635988162.tgz#905e626cb07bce86c692d8ec057f04558ddd26fe"
+  integrity sha512-t0dpl+iG/MTPtPPxEYHyVWo+X7G+qgYUYaB4y9pxavQRNzuQQeHeSmUnT+A8qOKnuB0ccxgyrrFmGUaaL0F3wQ==
+
 "@mediapipe/selfie_segmentation@0.1.1632777926":
   version "0.1.1632777926"
   resolved "https://registry.yarnpkg.com/@mediapipe/selfie_segmentation/-/selfie_segmentation-0.1.1632777926.tgz#67d37a53b0de89efc4a0e3b63332a4da3a6ad9c8"
@@ -79,16 +84,17 @@
     typescript-optional "3.0.0-alpha.3"
     uuid "~8.3.2"
 
-"@vonage/ml-transformers@^2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@vonage/ml-transformers/-/ml-transformers-2.0.3.tgz#e0a61982644da65276303e18f71f380b7880fe71"
-  integrity sha512-mb+HR1AJvogYJ710ZcRuyjbhLcMRpBGpDNOaSLPha2Kx4/NLD6ZpaiyHdGbX+s34Jaz3Dvu5ozSXFY3RmTrSyg==
+"@vonage/ml-transformers@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@vonage/ml-transformers/-/ml-transformers-3.0.0.tgz#419fe63d75ec13d8378b4af7ad964ccd266be6b8"
+  integrity sha512-SvOy7QBpYBrMqNhq6Kne6o8u4O1hViLSeychUuqK32N10EqQ5pPcOn0kF803GLfd537sBT8jzQddBPtbJNOmyw==
   dependencies:
     "@mediapipe/face_detection" "0.4.1646425229"
     "@mediapipe/face_mesh" "0.4.1633559619"
     "@mediapipe/hands" "0.4.1646424915"
     "@mediapipe/holistic" "0.5.1635989137"
     "@mediapipe/objectron" "0.4.1636596145"
+    "@mediapipe/pose" "0.5.1635988162"
     "@mediapipe/selfie_segmentation" "0.1.1632777926"
     "@types/dom-mediacapture-transform" "^0.1.2"
     "@types/emscripten" "^1.39.6"

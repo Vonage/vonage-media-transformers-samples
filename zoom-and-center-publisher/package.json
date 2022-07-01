@@ -14,7 +14,7 @@
   "dependencies": {
     "@mediapipe/face_detection": "^0.4.1646425229",
     "@vonage/media-processor": "^1.2.7",
-    "@vonage/ml-transformers": "^2.0.3",
+    "@vonage/ml-transformers": "^3.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
