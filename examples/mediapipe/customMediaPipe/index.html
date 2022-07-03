@@ -32,12 +32,20 @@
             border-radius: 4px;
             height: 100%;
             object-fit: cover;
+            border: 1px solid var(--vvd-color-neutral-30);
         }
         
-        .previewvideo{
+        .previewvideodiv{
             aspect-ratio: 1;
             width: 100%;
             background-image: url(images/vonage.png);
+            border-radius: 4px;
+            height: 100%;
+            object-fit: cover;
+            border: 1px solid var(--vvd-color-neutral-30);
+        }
+        .previewvideo{
+            width: 100%;
             border-radius: 4px;
             height: 100%;
             object-fit: cover;
@@ -70,10 +78,10 @@
         <vwc-card class="maincard" elevation="0">
             <div slot="main" gutters="xs" class="maincardlayout">
                 <vwc-layout column-basis="block" gutters="xs">
-                    <vwc-text font-face="subtitle-2" class="headline">Source</vwc-text>
+                    <vwc-text font-face="subtitle-2" class="headline" tight>Source</vwc-text>
                     <video id="source_video" class="sourecevideo"></video>
                     <vwc-layout column-spacing="md" style="--layout-grid-template-columns: 1fr 1fr;">
-                        <vwc-text font-face="subtitle-2" tight>Camera Source</vwc-text>
+                        <vwc-text font-face="subtitle-2" tight>Show Results</vwc-text>
                         <vwc-switch id="cameraswitch" style="justify-self: end;"></vwc-switch>
                         <vwc-text font-face="subtitle-2" tight>Type</vwc-text>
                         <vwc-select dense="" id="typeSelector">
@@ -189,8 +197,10 @@
                     </vwc-layout>
                 </vwc-layout>
                 <vwc-layout column-basis="block" gutters="xs">
-                    <vwc-text font-face="subtitle-2" class="headline">Preview</vwc-text>
-                    <video id="priview_video" class="previewvideo"></video>
+                    <vwc-text font-face="subtitle-2" class="headline" tight>Preview</vwc-text>
+                    <div class="previewvideodiv">
+                      <video id="priview_video" class="previewvideo"></video>
+                    </div>
                     <vwc-button
                       connotation="cta"
                       label="View code in GitHub"
