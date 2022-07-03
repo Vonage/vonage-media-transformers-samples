@@ -1,4 +1,4 @@
-import {MediaProcessor, setVonageMetadata, MediaProcessorConnector} from '@vonage/media-processor'
+import {MediaProcessor, setVonageMetadata} from '@vonage/media-processor'
 import { MediaPipeModelType } from '@vonage/ml-transformers'
 import { MediapipePorcessInterface } from './MediapipeInterfaces'
 import MediapipeTransformer from './mediapipeTransformer'
@@ -39,6 +39,30 @@ if( 'function' === typeof importScripts) {
             mediapipePorcess_ = new MediapipePorcess()
             mediaipeTransformer_.init(modelType, mediapipePorcess_).then( () => {
                 mediaProcessor_ = new MediaProcessor()
+                mediaProcessor_.on('error', e => {
+                    postMessage({
+                        operation: 'mediaProcessor',
+                        type: 'error',
+                        info: e
+                    })
+                })
+
+                mediaProcessor_.on('pipelineInfo', i => {
+                    postMessage({
+                        operation: 'mediaProcessor',
+                        type: 'pipelineInfo',
+                        info: i
+                    })
+                })
+
+                mediaProcessor_.on('warn', w => {
+                    postMessage({
+                        operation: 'mediaProcessor',
+                        type: 'warn',
+                        info: w
+                    })
+                })
+
                 mediaProcessor_.setTransformers([mediaipeTransformer_]).then( () => {
                     postMessage({
                         operation: 'init',

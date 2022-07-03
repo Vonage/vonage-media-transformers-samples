@@ -1,6 +1,7 @@
 
-import {MediaProcessor, MediaProcessorConnector} from '@vonage/media-processor'
+import {MediaProcessor, EventDataMap} from '@vonage/media-processor'
 import {MediaPipeModelType, SelfieSegmentationResults} from '@vonage/ml-transformers'
+import Emittery from 'emittery'
 import { MediaPipeFullResults, MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface } from './MediapipeInterfaces'
 import MediapipeObject from './MediapipeObject'
 import MediapipeTransformer from './mediapipeTransformer'
@@ -60,7 +61,7 @@ class MediaProcessorHelperMain implements MediapipeMediaProcessorInterface, Medi
         return new Promise<void>((resolve, reject) => {
             this.mediaProcessor_.destroy().then(() => {
                 this.mediapipe_.mediapipeHelper_?.close().then( () => {
-                    resolve
+                    resolve()
                 }).catch(e => {
                     reject(e)
                 })
@@ -68,6 +69,10 @@ class MediaProcessorHelperMain implements MediapipeMediaProcessorInterface, Medi
                 reject(e)
             })
         })
+    }
+
+    getEventEmitter(): Emittery<EventDataMap>{
+        return this.mediaProcessor_
     }
 }
 

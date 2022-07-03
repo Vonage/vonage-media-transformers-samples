@@ -1,67 +1,217 @@
-<!DOCTYPE html>
 <html>
 <head>
+	<style>
+        body{
+            margin: 0px;
+        }
+        .headline {
+            text-align: center;
+        }
 
-    <meta charset="utf-8">
-    <meta name="description" content="vonage ml-transformers test">
-    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
-    <meta itemprop="description" content="vonage ml-transformers test">
-    <meta itemprop="image" content="./images/vonage.png">
-    <meta itemprop="name" content="vonage ml-transformers">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta id="theme-color" name="theme-color" content="#ffffff">
-    <meta http-equiv="origin-trial" content="AuKHz2ifylDpZfg7iawfCDGtilbLT+tg9CCbVG4PNSxRA1v2NtYGRKAKctmE4Us42+t1lZ3IkPO9s5/VlHy/rwIAAABgeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJmZWF0dXJlIjoiVW5yZXN0cmljdGVkU2hhcmVkQXJyYXlCdWZmZXIiLCJleHBpcnkiOjE2NTg4Nzk5OTl9">
-    <base target="_blank">
+        vwc-top-app-bar img {
+            margin-left: 16px
+        }
 
-    <title>Vonage ML Transformers</title>
+        .maincard{
+            margin: 10 auto;
+            width: 1134px;
+            height: fit-content;
+            display: block;
+        }
 
-    <link rel="icon" sizes="192x192" href="./images/vonage.png">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="./css/main.css"/>
+        .maincardlayout{
+            display: grid;
+            grid-template-columns: 454px 674px;
+            overflow: hidden;
+        }
 
+        .sourecevideo{
+            aspect-ratio: 1;
+            width: 100%;
+            background: white;
+            border-radius: 4px;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .previewvideo{
+            aspect-ratio: 1;
+            width: 100%;
+            background-image: url(images/vonage.png);
+            border-radius: 4px;
+            height: 100%;
+            object-fit: cover;
+        }
+	</style>
+
+	<script type="module">
+            import "@vonage/vwc-top-app-bar";
+            import "@vonage/vwc-layout";
+            import "@vonage/vwc-text";
+            import "@vonage/vwc-banner";
+            import "@vonage/vwc-card";
+            import "@vonage/vwc-switch";
+            import "@vonage/vwc-select";
+            import "@vonage/vwc-list/vwc-list-item";
+	</script>
+  <title>MediaPipe sample</title>
+  <link rel="icon" href="https://vonage-client-media-samples.s3.amazonaws.com/vonage.png">
 </head>
-
 <body>
+<vwc-top-app-bar alternate>
+	<img slot="navigationIcon" height="24" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQI9k8NKq3KoOs1VkwSYwPwwQbisiS_K-0jtBUyml13k7EBy8Aekz7G7I1vqceWf5kEQ&usqp=CAU"/>
+	<div>
+        <vwc-banner open connotation="info" message="Vonage MediaPipe integration sample application"></vwc-banner>
+		<vwc-layout gutters="xs" column-basis="block">
+            <vwc-text font-face="title-1" class="headline" tight>This example shows the use of this MediaPipe models:</vwc-text>
+            <vwc-text font-face="subtitle-2" class="headline" tight>Face Detection/Face Mash/Hands/Holistic/Objectron (Cup)/Pose/Selfie Segmentation</vwc-text>
+		</vwc-layout>
 
-<div id="container"> 
-    <p>This is a sample application to test Vonage ML Transformers along with Vonage Media Processor features. </p>
-    <p><a href="https://github.com/w3c/mediacapture-insertable-streams">Insertable Streams</a></p>
-    <p><a href="https://github.com/Vonage/media-processor">Vonage Media Processor</a></p>
-    <p><a href="https://github.com/Vonage/ml-transformers">Vonage ML Transformers</a></p>
-
-    <span id="outputVideoContainer"></span>
-    <div class="box">
-      <span>Source:</span>
-      <select id="sourceSelector" disabled>
-          <option selected value="stop">(stopped)</option>
-          <option value="camera">Camera</option>
-      </select>
-    </div>
-
-    <div class="box">
-        <span>type:</span>
-        <select id="typeSelector" enabled>
-            <option selected value="face_detection">Face Detection</option>
-            <option value="face_mesh">Face Mesh</option>
-            <option value="hands">Hands</option>
-            <option value="pose">Pose</option>
-            <option value="holistic">Holistic</option>
-            <option value="objectron">Objectron</option>
-            <option value="selfie_segmentation">Selfie Segmentation</option>
-        </select>
-    </div>
-
-    <div class="box">
-        <span>process:</span>
-        <select id="processSelector" enabled>
-            <option selected value="main">main</option>
-            <option value="worker">worker</option>
-        </select>
-    </div>
-
-    <p>View the console to see logging.</p>
-
-</div>
+        <vwc-card class="maincard" elevation="0">
+            <div slot="main" gutters="xs" class="maincardlayout">
+                <vwc-layout column-basis="block" gutters="xs">
+                    <vwc-text font-face="subtitle-2" class="headline">Source</vwc-text>
+                    <video id="source_video" class="sourecevideo"></video>
+                    <vwc-layout column-spacing="md" style="--layout-grid-template-columns: 1fr 1fr;">
+                        <vwc-text font-face="subtitle-2" tight>Camera Source</vwc-text>
+                        <vwc-switch id="cameraswitch" style="justify-self: end;"></vwc-switch>
+                        <vwc-text font-face="subtitle-2" tight>Type</vwc-text>
+                        <vwc-select dense="" id="typeSelector">
+                            <vwc-list-item
+                              disabled=""
+                              selected=""
+                              value="Choose_an_item"
+                              mwc-list-item=""
+                              tabindex="0"
+                              aria-disabled="true"
+                              role="option"
+                              aria-selected="true"
+                            >
+                              Choose MediaPipe module
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="face_detection"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Face Detection
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="face_mesh"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Face Mesh
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="hands"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Hands
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="holistic"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Holistic
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="objectron"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Objectron (Cup)
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="pose"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Pose
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="selfie_segmentation"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Selfie Segmentation
+                            </vwc-list-item>
+                          </vwc-select>
+                          <vwc-text font-face="subtitle-2" tight>Process</vwc-text>
+                        <vwc-select dense="" id="processSelector">
+                            <vwc-list-item
+                              disabled=""
+                              selected=""
+                              value="Choose_an_item"
+                              mwc-list-item=""
+                              tabindex="0"
+                              aria-disabled="true"
+                              role="option"
+                              aria-selected="true"
+                            >
+                              Choose Process
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="main"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Main
+                            </vwc-list-item>
+                            <vwc-list-item
+                              value="worker"
+                              mwc-list-item=""
+                              tabindex="-1"
+                              aria-disabled="false"
+                              role="option"
+                            >
+                            Worker
+                            </vwc-list-item>
+                          </vwc-select>
+                    </vwc-layout>
+                </vwc-layout>
+                <vwc-layout column-basis="block" gutters="xs">
+                    <vwc-text font-face="subtitle-2" class="headline">Preview</vwc-text>
+                    <video id="priview_video" class="previewvideo"></video>
+                    <vwc-button
+                      connotation="cta"
+                      label="View code in GitHub"
+                      layout="filled"
+                      icon="open-line"
+                      trailingIcon
+                      id="githubButton"
+                    ></vwc-button>
+                    <vwc-button
+                      connotation="cta"
+                      label="Use Vivid"
+                      layout="filled"
+                      icon="open-line"
+                      trailingIcon
+                      id="vividButton"
+                    ></vwc-button>
+                </vwc-layout>
+            </div>
+        </vwc-card>
+	</div >
+</vwc-top-app-bar>
 <script type="module" src="./main.ts"></script>
 </body>
 </html>

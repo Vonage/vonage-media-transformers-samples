@@ -1,22 +1,24 @@
 // @ts-ignore
 import TheWorker from './MediaProcessorHelperThread?worker&inline'
 
-import { MediaPipeModelType, MediaPipeResults, SelfieSegmentationResults } from '@vonage/ml-transformers';
+import { MediaPipeModelType, SelfieSegmentationResults } from '@vonage/ml-transformers';
 import { MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface, MediaPipeFullResults } from './MediapipeInterfaces';
-import {getVonageMetadata} from '@vonage/media-processor'
+import {getVonageMetadata, EventDataMap, PipelineInfoData} from '@vonage/media-processor'
 import MediapipeObject from './MediapipeObject';
 import Emittery from 'emittery' 
-
 
 class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface {
     worker_: any
     mediapipe_: MediapipeObject
     innerEmittery_: Emittery
     modelType_?: MediaPipeModelType
+    processorEmittery_: Emittery<EventDataMap>
+
     constructor() {
         this.worker_ = new TheWorker()
         this.mediapipe_ = new MediapipeObject()
         this.innerEmittery_ = new Emittery()
+        this.processorEmittery_ = new Emittery()
     }
 
     onResult(result: MediaPipeFullResults): void {
@@ -27,6 +29,7 @@ class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, Me
                 info: selfieResult.segmentationMask
             }, [selfieResult.segmentationMask])
         }else{
+
             this.worker_.postMessage({
                 operation: 'onResults',
                 info: JSON.stringify(result)
@@ -44,6 +47,18 @@ class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, Me
                 this.innerEmittery_.emit('destroy', msg.data)
             } else if(msg.data.operation === 'send'){
                 this.mediapipe_.onSend(msg.data.info)
+            } else if(msg.data.operation === 'mediaProcessor'){
+                if(msg.data.type === 'error'){
+                    this.processorEmittery_.emit('error', msg.data.info)
+                } else if(msg.data.type === 'pipelineInfo'){
+                    let info: PipelineInfoData = msg.data.info
+                    if(info.message === 'pipeline_ended' || info.message === 'pipeline_ended_with_error'){
+                        this.worker_.terminate()
+                    }
+                    this.processorEmittery_.emit('pipelineInfo', msg.data.info)
+                } else if(msg.data.type === 'error'){
+                    this.processorEmittery_.emit('warn', msg.data.info)
+                }
             }
         }
     }
@@ -113,5 +128,10 @@ class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, Me
             })
         })
     }
+
+    getEventEmitter(): Emittery<EventDataMap>{
+        return this.processorEmittery_
+    }
+
 }
 export default MediaProcessorHelperWorker

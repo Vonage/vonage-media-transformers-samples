@@ -4,14 +4,9 @@ import { MediaPipeModelType,
     HandsResults,
     HolisticResults,
     ObjectronResults,
-    VonageFacemash,
-    VonageHands,
-    VonageHolistic,
-    VonageObjectron,
-    VonagePose, 
     PoseResults} from '@vonage/ml-transformers'
 import { NormalizedLandmark, Data } from '@mediapipe/drawing_utils'
-import { MediapipePorcessInterface, MediapipeResultsListnerInterface, MediaPipeFullResults } from './MediapipeInterfaces'
+import { MediapipePorcessInterface, MediapipeResultsListnerInterface, MediaPipeFullResults, ExtraResultsFaceMash, ExtraResultsHands, ExtraResultsHolistic, ExtraResultsObjectron, ExtraResultsPose } from './MediapipeInterfaces'
 //@ts-ignore
 import VonageDrawingUtils from './DrawingUtilsHelper'
 
@@ -135,67 +130,68 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
 
     drawFaceMash():void{
         let results = this.mediapipeResult_?.mediaPipeResults as FaceMeshResults
+        let extra = this.mediapipeResult_?.extraResults as ExtraResultsFaceMash
         if (results.multiFaceLandmarks) {
             for (const landmarks of results.multiFaceLandmarks) {
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    VonageFacemash.FACEMESH_TESSELATION,
+                    extra.FACEMESH_TESSELATION,
                     {color: '#C0C0C070', lineWidth: 1}
                 )
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    VonageFacemash.FACEMESH_RIGHT_EYE,
+                    extra.FACEMESH_RIGHT_EYE,
                     {color: '#FF3030'}
                 )
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_,
                     landmarks, 
-                    VonageDrawingUtils.FACEMESH_RIGHT_EYEBROW,
+                    extra.FACEMESH_RIGHT_EYEBROW,
                     {color: '#FF3030'}
                 )
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    VonageFacemash.FACEMESH_LEFT_EYE,
+                    extra.FACEMESH_LEFT_EYE,
                     {color: '#30FF30'}
                 )
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    VonageFacemash.FACEMESH_LEFT_EYEBROW,
+                    extra.FACEMESH_LEFT_EYEBROW,
                     {color: '#30FF30'}
                 )
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
-                    VonageFacemash.FACEMESH_FACE_OVAL,
+                    extra.FACEMESH_FACE_OVAL,
                     {color: '#E0E0E0'}
                 )
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
-                    VonageFacemash.FACEMESH_LIPS, 
+                    extra.FACEMESH_LIPS, 
                     {color: '#E0E0E0'}
                 )
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks,
-                    VonageFacemash.FACEMESH_RIGHT_IRIS,
+                    extra.FACEMESH_RIGHT_IRIS,
                     {color: '#FF3030'}
                 )
                 
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    VonageFacemash.FACEMESH_LEFT_IRIS,
+                    extra.FACEMESH_LEFT_IRIS,
                     {color: '#30FF30'}
                 )
             }
@@ -204,6 +200,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
 
     drawHands(): void{
         let results = this.mediapipeResult_?.mediaPipeResults as HandsResults
+        let extra = this.mediapipeResult_?.extraResults as ExtraResultsHands
         if (results.multiHandLandmarks && results.multiHandedness) {
             for (let index = 0; index < results.multiHandLandmarks.length; index++) {
                 const classification = results.multiHandedness[index];
@@ -213,7 +210,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    VonageHands.HAND_CONNECTIONS,
+                    extra.HAND_CONNECTIONS,
                     {color: isRightHand ? '#00FF00' : '#FF0000'}
                 )
                 
@@ -249,6 +246,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
 
     drawHolistic(): void {
         let results = this.mediapipeResult_?.mediaPipeResults as HolisticResults
+        let extra = this.mediapipeResult_?.extraResults as ExtraResultsHolistic
         if(!this.resultCtx_){
             return
         }
@@ -257,20 +255,20 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             VonageDrawingUtils.drawConnectors(
                 this.resultCtx_, 
                 results.poseLandmarks, 
-                VonageHolistic.POSE_CONNECTIONS,
+                extra.POSE_CONNECTIONS,
                 {color: 'white'}
             )
             
             VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_,
-                Object.values(VonageHolistic.POSE_LANDMARKS_LEFT)
+                Object.values(extra.POSE_LANDMARKS_LEFT)
                 .map((index: any) => results.poseLandmarks[index]),
                 {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(255,138,0)'}
             )
 
             VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_, 
-                Object.values(VonageHolistic.POSE_LANDMARKS_RIGHT)
+                Object.values(extra.POSE_LANDMARKS_RIGHT)
                 .map((index: any) => results.poseLandmarks[index]),
                 {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(0,217,231)'}
             )
@@ -279,7 +277,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         if (results.rightHandLandmarks) {
             this.resultCtx_.strokeStyle = 'white';
             this.connect([[
-                    results.poseLandmarks[VonageHolistic.POSE_LANDMARKS.RIGHT_ELBOW],
+                    results.poseLandmarks[extra.POSE_LANDMARKS.RIGHT_ELBOW],
                     results.rightHandLandmarks[0]
                 ]]
             )
@@ -287,7 +285,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             VonageDrawingUtils.drawConnectors(
                 this.resultCtx_,  
                 results.rightHandLandmarks, 
-                VonageHolistic.HAND_CONNECTIONS,
+                extra.HAND_CONNECTIONS,
                 {color: 'white'}
             )
 
@@ -305,7 +303,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         if (results.leftHandLandmarks) {
             this.resultCtx_.strokeStyle = 'white';
             this.connect([[
-                    results.poseLandmarks[VonageHolistic.POSE_LANDMARKS.LEFT_ELBOW],
+                    results.poseLandmarks[extra.POSE_LANDMARKS.LEFT_ELBOW],
                     results.leftHandLandmarks[0]
                 ]]
             )
@@ -313,7 +311,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             VonageDrawingUtils.drawConnectors(
                 this.resultCtx_,  
                 results.leftHandLandmarks, 
-                VonageHolistic.HAND_CONNECTIONS,
+                extra.HAND_CONNECTIONS,
                 {color: 'white'}
             )
 
@@ -331,7 +329,8 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
     }
 
     drawObjectron(): void {
-        let results = this.mediapipeResult_?.mediaPipeResults as ObjectronResults        
+        let results = this.mediapipeResult_?.mediaPipeResults as ObjectronResults
+        let extra = this.mediapipeResult_?.extraResults as ExtraResultsObjectron
         if (!!results.objectDetections) {
             for (const detectedObject of results.objectDetections) {
                 const landmarks = detectedObject.keypoints.map(x => x.point2d);
@@ -339,7 +338,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
                 VonageDrawingUtils.drawConnectors(
                     this.resultCtx_, 
                     landmarks, 
-                    VonageObjectron.BOX_CONNECTIONS, 
+                    extra.BOX_CONNECTIONS, 
                     {color: '#FF0000'}
                 )
                 
@@ -380,44 +379,47 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         )
 
         this.resultCtx_.globalCompositeOperation = 'destination-over'
-        this.resultCtx_.fillStyle = '#0000FF7F';
+        this.resultCtx_.fillStyle = '#0000FFFF';
         this.resultCtx_.fillRect(0, 0, this.resultCanvas_.width, this.resultCanvas_.height);
     }
 
     drawPose():void{
-        let results = this.mediapipeResult_?.mediaPipeResults as PoseResults        
+        let results = this.mediapipeResult_?.mediaPipeResults as PoseResults
+        let extra = this.mediapipeResult_?.extraResults as ExtraResultsPose    
         if (results.poseLandmarks && this.resultCtx_) {
             VonageDrawingUtils.drawConnectors(
                 this.resultCtx_, 
                 results.poseLandmarks, 
-                VonagePose.POSE_CONNECTIONS,
+                extra.POSE_CONNECTIONS,
                 {visibilityMin: 0.65, color: 'white'}
             )
 
             VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_,
-                Object.values(VonagePose.POSE_LANDMARKS_LEFT)
+                Object.values(extra.POSE_LANDMARKS_LEFT)
                     .map( (index: any) => results.poseLandmarks[index]),
                 {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(255,138,0)'}
             )
 
             VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_,
-                Object.values(VonagePose.POSE_LANDMARKS_RIGHT)
+                Object.values(extra.POSE_LANDMARKS_RIGHT)
                     .map( (index: any) => results.poseLandmarks[index]),
                 {visibilityMin: 0.65, color: 'white', fillColor: 'rgb(0,217,231)'}
             )
 
             VonageDrawingUtils.drawLandmarks(
                 this.resultCtx_,
-                Object.values(VonagePose.POSE_LANDMARKS_NEUTRAL)
+                Object.values(extra.POSE_LANDMARKS_NEUTRAL)
                     .map( (index: any) => results.poseLandmarks[index]),
                 {visibilityMin: 0.65, color: 'white', fillColor: 'white'}
             )
           }
     }
     async flush() {
-       
+       if(this.mediapipeSelfieResult_){
+            this.mediapipeSelfieResult_.close()
+       }
     }
 }
 export default MediapipeTransformer

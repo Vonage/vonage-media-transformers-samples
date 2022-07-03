@@ -8,11 +8,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mediapipe/drawing_utils": "0.3.1620248257",
     "@vonage/ml-transformers": "3.0.0",
-    "@mediapipe/drawing_utils": "0.3.1620248257"
+    "@vonage/vivid": "^2.34.1"
   },
   "devDependencies": {
-    "vite": "2.9.12",
-    "typescript": "4.7.4"
+    "typescript": "4.7.4",
+    "vite": "2.9.12"
   }
 }
