@@ -75,7 +75,7 @@ async function main() {
   
   if(githubButtonSelector){
     githubButtonSelector.addEventListener('click', () => {
-      window.open("https://github.com/Vonage/vonage-media-transformers-samples/tree/feature/OW-272/examples/mediapipe/customMediaPipe", '_blank')?.focus();
+      window.open("https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/mediapipe/customMediaPipe", '_blank')?.focus();
     })
   }
 
