@@ -79,84 +79,53 @@
             <div slot="main" gutters="xs" class="maincardlayout">
                 <vwc-layout column-basis="block" gutters="xs">
                     <vwc-text font-face="subtitle-2" class="headline" tight>Source</vwc-text>
-                    <video id="source_video" class="sourecevideo"></video>
+                    <div class="video-wrapper">
+                      <video id="source_video" class="sourecevideo"></video>
+                    </div>
                     <vwc-layout column-spacing="md" style="--layout-grid-template-columns: 1fr 1fr;">
                         <vwc-text font-face="subtitle-2" tight>Show Results</vwc-text>
                         <vwc-switch id="cameraswitch" style="justify-self: end;"></vwc-switch>
                         <vwc-text font-face="subtitle-2" tight>Type</vwc-text>
                         <vwc-select dense="" id="typeSelector">
                             <vwc-list-item
-                              disabled=""
-                              selected=""
+                              disabled
+                              selected
                               value="Choose_an_item"
-                              mwc-list-item=""
-                              tabindex="0"
-                              aria-disabled="true"
-                              role="option"
-                              aria-selected="true"
                             >
                               Choose MediaPipe module
                             </vwc-list-item>
                             <vwc-list-item
                               value="face_detection"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Face Detection
                             </vwc-list-item>
                             <vwc-list-item
                               value="face_mesh"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Face Mesh
                             </vwc-list-item>
                             <vwc-list-item
                               value="hands"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Hands
                             </vwc-list-item>
                             <vwc-list-item
                               value="holistic"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Holistic
                             </vwc-list-item>
                             <vwc-list-item
                               value="objectron"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Objectron (Cup)
                             </vwc-list-item>
                             <vwc-list-item
                               value="pose"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Pose
                             </vwc-list-item>
                             <vwc-list-item
                               value="selfie_segmentation"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Selfie Segmentation
                             </vwc-list-item>
@@ -164,32 +133,19 @@
                           <vwc-text font-face="subtitle-2" tight>Process</vwc-text>
                         <vwc-select dense="" id="processSelector">
                             <vwc-list-item
-                              disabled=""
-                              selected=""
+                              disabled
+                              selected
                               value="Choose_an_item"
-                              mwc-list-item=""
-                              tabindex="0"
-                              aria-disabled="true"
-                              role="option"
-                              aria-selected="true"
                             >
                               Choose Process
                             </vwc-list-item>
                             <vwc-list-item
                               value="main"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Main
                             </vwc-list-item>
                             <vwc-list-item
                               value="worker"
-                              mwc-list-item=""
-                              tabindex="-1"
-                              aria-disabled="false"
-                              role="option"
                             >
                             Worker
                             </vwc-list-item>
