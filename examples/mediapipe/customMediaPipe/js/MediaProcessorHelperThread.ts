@@ -9,15 +9,14 @@ if( 'function' === typeof importScripts) {
         constructor() {
             console.log('MediapipePorcess')
         }
+        
         onSend(data: ImageBitmap): Promise<void> {
             return new Promise<void>((resolve) => {
-                createImageBitmap(data).then( image => {
-                    postMessage({
-                        operation: 'send',
-                        info: image
-                    }, [image])
-                    resolve()
-                })
+                postMessage({
+                    operation: 'send',
+                    info: data
+                }, [data])
+                resolve()
             })
         }
     }
@@ -30,13 +29,14 @@ if( 'function' === typeof importScripts) {
         const {operation} = event.data
 
         if(operation === 'init'){
-            const {metaData, modelType} = event.data
+            const {metaData, modelType, mediapipeConsts} = event.data
             if(metaData){
                 setVonageMetadata(JSON.parse(metaData))
             }
             modelType_ = modelType
             mediaipeTransformer_ = new MediapipeTransformer()
             mediapipePorcess_ = new MediapipePorcess()
+            mediaipeTransformer_.setMediapipeConsts(JSON.parse(mediapipeConsts))
             mediaipeTransformer_.init(modelType, mediapipePorcess_).then( () => {
                 mediaProcessor_ = new MediaProcessor()
                 mediaProcessor_.on('error', e => {

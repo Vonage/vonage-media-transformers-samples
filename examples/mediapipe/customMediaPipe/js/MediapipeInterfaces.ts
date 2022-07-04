@@ -3,7 +3,7 @@ import {MediaPipeModelType, MediaPipeResults} from "@vonage/ml-transformers"
 import {MediaProcessorInterface, EventDataMap} from '@vonage/media-processor'
 import Emittery from 'emittery'
 
-export interface ExtraResultsFaceDetection {
+export interface FaceDetectionConsts {
     FACEDETECTION_LIPS: any
     FACEDETECTION_LEFT_EYE: any
     FACEDETECTION_LEFT_EYEBROW: any
@@ -14,7 +14,7 @@ export interface ExtraResultsFaceDetection {
     FACEDETECTION_TESSELATION: any
 }
 
-export interface ExtraResultsFaceMash {
+export interface FaceMashConsts {
     FACE_GEOMETRY: any
     FACEMESH_LIPS: any
     FACEMESH_LEFT_EYE: any
@@ -28,7 +28,7 @@ export interface ExtraResultsFaceMash {
     FACEMESH_TESSELATION: any
 }
 
-export interface ExtraResultsHolistic {
+export interface HolisticConsts {
     FACE_GEOMETRY: any
     FACEMESH_LIPS: any
     FACEMESH_LEFT_EYE: any
@@ -48,16 +48,16 @@ export interface ExtraResultsHolistic {
     POSE_LANDMARKS_NEUTRAL: any
 }
 
-export interface ExtraResultsHands {
+export interface HandsConsts {
     HAND_CONNECTIONS: any
 }
 
-export interface ExtraResultsObjectron {
+export interface ObjectronConsts {
     BOX_CONNECTIONS: any
     BOX_KEYPOINTS: any
 }
 
-export interface ExtraResultsPose {
+export interface PoseConsts {
     POSE_CONNECTIONS: any
     POSE_LANDMARKS: any
     POSE_LANDMARKS_LEFT: any
@@ -65,12 +65,15 @@ export interface ExtraResultsPose {
     POSE_LANDMARKS_NEUTRAL: any
 }
 
-export type ExtraResults = ExtraResultsFaceDetection | ExtraResultsFaceMash | ExtraResultsHolistic | ExtraResultsHands | ExtraResultsObjectron | ExtraResultsPose
-
-export interface MediaPipeFullResults {
-    mediaPipeResults: MediaPipeResults
-    extraResults?: ExtraResults
+export interface MediapipeConsts {
+    facedetection: FaceDetectionConsts
+    facemash: FaceMashConsts
+    holistic: HolisticConsts
+    hands: HandsConsts
+    objectron: ObjectronConsts
+    pose: PoseConsts
 }
+
 
 export interface MediapipeMediaProcessorInterface extends MediaProcessorInterface {
     init(modelType: MediaPipeModelType): Promise<void>
@@ -78,7 +81,7 @@ export interface MediapipeMediaProcessorInterface extends MediaProcessorInterfac
 }
 
 export interface MediapipeResultsListnerInterface{
-    onResult(result: MediaPipeFullResults): void
+    onResult(result: MediaPipeResults): void
 }
 
 export interface MediapipePorcessInterface{

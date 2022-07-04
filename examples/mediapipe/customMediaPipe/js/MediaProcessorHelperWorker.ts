@@ -1,8 +1,8 @@
 // @ts-ignore
 import TheWorker from './MediaProcessorHelperThread?worker&inline'
 
-import { MediaPipeModelType, SelfieSegmentationResults } from '@vonage/ml-transformers';
-import { MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface, MediaPipeFullResults } from './MediapipeInterfaces';
+import { MediaPipeModelType, MediaPipeResults, SelfieSegmentationResults } from '@vonage/ml-transformers';
+import { MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface } from './MediapipeInterfaces';
 import {getVonageMetadata, EventDataMap, PipelineInfoData} from '@vonage/media-processor'
 import MediapipeObject from './MediapipeObject';
 import Emittery from 'emittery' 
@@ -21,15 +21,14 @@ class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, Me
         this.processorEmittery_ = new Emittery()
     }
 
-    onResult(result: MediaPipeFullResults): void {
+    onResult(result: MediaPipeResults): void {
         if(this.modelType_ === 'selfie_segmentation'){
-            let selfieResult = result.mediaPipeResults as SelfieSegmentationResults
+            let selfieResult = result as SelfieSegmentationResults
             this.worker_.postMessage({
                 operation: 'onResults',
                 info: selfieResult.segmentationMask
             }, [selfieResult.segmentationMask])
         }else{
-
             this.worker_.postMessage({
                 operation: 'onResults',
                 info: JSON.stringify(result)
@@ -79,7 +78,8 @@ class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, Me
                 this.worker_.postMessage({
                     operation: 'init',
                     modelType: modelType, 
-                    metaData: metaData
+                    metaData: metaData,
+                    mediapipeConsts: JSON.stringify(this.mediapipe_.getMediapipeConsts())
                 })
             })
             this.innerEmittery_.once('init').then( data => {

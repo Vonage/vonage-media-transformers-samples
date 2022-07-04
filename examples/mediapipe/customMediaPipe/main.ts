@@ -9,7 +9,7 @@ async function main() {
   try {
     await isSupported();
   } catch(e) {
-    throw('Something bad happened: ' + e);
+    alert('Something bad happened: ' + e);
   }
 
   const cameraswitchSelector: any = document.getElementById('cameraswitch')
@@ -45,10 +45,8 @@ async function main() {
       
       if(processType === 'main'){
         processor = new MediaProcessorHelperMain()
-      } else if(processType === 'worker') {
-        processor = new MediaProcessorHelperWorker()
       } else {
-        throw "process is not supported"
+        processor = new MediaProcessorHelperWorker()
       }
 
       processor.init(mediapipeType as MediaPipeModelType).then( () => {

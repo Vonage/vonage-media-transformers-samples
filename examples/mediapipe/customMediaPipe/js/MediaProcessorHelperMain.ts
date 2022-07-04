@@ -1,8 +1,8 @@
 
 import {MediaProcessor, EventDataMap} from '@vonage/media-processor'
-import {MediaPipeModelType, SelfieSegmentationResults} from '@vonage/ml-transformers'
+import {MediaPipeModelType, MediaPipeResults, SelfieSegmentationResults} from '@vonage/ml-transformers'
 import Emittery from 'emittery'
-import { MediaPipeFullResults, MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface } from './MediapipeInterfaces'
+import { MediapipeMediaProcessorInterface, MediapipeResultsListnerInterface } from './MediapipeInterfaces'
 import MediapipeObject from './MediapipeObject'
 import MediapipeTransformer from './mediapipeTransformer'
 
@@ -16,11 +16,12 @@ class MediaProcessorHelperMain implements MediapipeMediaProcessorInterface, Medi
         this.mediaProcessor_ = new MediaProcessor()
         this.mediaipeTransformer_ = new MediapipeTransformer()
         this.mediapipe_ = new MediapipeObject()
+        this.mediaipeTransformer_.setMediapipeConsts(this.mediapipe_.getMediapipeConsts())
     }
 
-    onResult(result: MediaPipeFullResults): void {
+    onResult(result: MediaPipeResults): void {
         if(this.modelType_ === 'selfie_segmentation'){
-            let selfieResult = result.mediaPipeResults as SelfieSegmentationResults
+            let selfieResult = result as SelfieSegmentationResults
             this.mediaipeTransformer_.onResult(selfieResult.segmentationMask as ImageBitmap)
         }else{
             this.mediaipeTransformer_.onResult(result)
