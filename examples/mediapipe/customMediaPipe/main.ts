@@ -84,9 +84,39 @@ async function main() {
       window.open("https://vivid.vonage.com/?path=/story/introduction-meet-vivid--meet-vivid", '_blank')?.focus();
     })
   }
-  
 
-  cameraswitchSelector.disabled = false;
+  cameraswitchSelector.disabled = true
+  cameraswitchSelector.addEventListener('mouseenter', () => {
+    if(cameraswitchSelector.disabled){
+      var snackbar: any = document.getElementById("disabledHover")
+      if(snackbar){
+        snackbar.show()
+      }
+    }
+  })
+
+  function checkEnableCameraSwitch(){
+    const mediapipeType = typeSelector.value
+    const processType = processSelector.value
+    if(mediapipeType != 'Choose_an_item' && processType != 'Choose_an_item'){
+      var snackbar: any = document.getElementById("disabledHover")
+      if(snackbar){
+        snackbar.close()
+      }
+      cameraswitchSelector.disabled = false
+    }else{
+      cameraswitchSelector.disabled = true
+    }
+  }
+
+  typeSelector.addEventListener('change', () => {
+    checkEnableCameraSwitch()
+  })
+
+  processSelector.addEventListener('change', () => {
+    checkEnableCameraSwitch()
+  })
+
 }
 
 window.onload = main;
