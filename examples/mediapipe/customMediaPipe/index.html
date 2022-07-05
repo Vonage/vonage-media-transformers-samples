@@ -55,6 +55,7 @@
     import "@vonage/vwc-switch";
     import "@vonage/vwc-select";
     import "@vonage/vwc-list/vwc-list-item";
+    import "@vonage/vwc-snackbar";
   </script>
 
   <title>MediaPipe sample</title>
@@ -82,7 +83,7 @@
               <video id="source_video" class="video"></video>
             </div>
             <vwc-layout column-spacing="md" style="--layout-grid-template-columns: 1fr 1fr;">
-              <vwc-text font-face="subtitle-2" tight>Show Results</vwc-text>
+              <vwc-text font-face="subtitle-2" tight>Show Preview</vwc-text>
               <vwc-switch id="cameraswitch" style="justify-self: end;"></vwc-switch>
               <vwc-text font-face="subtitle-2" tight>Type</vwc-text>
               <vwc-select dense="" id="typeSelector">
@@ -139,6 +140,8 @@
           </vwc-layout>
         </div>
       </vwc-card>
+      <vwc-snackbar timeoutms="5000" icon="megaphone-solid" message="Please select both Type and Process"
+        dismissible="true" position="BOTTOM-CENTER" connotation="info" id="disabledHover"></vwc-snackbar>
     </div>
   </vwc-top-app-bar>
   <script type="module" src="./main.ts"></script>
