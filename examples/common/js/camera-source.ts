@@ -48,10 +48,6 @@ class CameraSource {
     });
   }
 
-  getVideoDimension() {
-    return this.videoDimension_;
-  }
-
   async stopMediaProcessorConnector() {
     if(this.mediaProcessorConnector_){
       this.mediaProcessorConnector_.destroy().then(() => {
