@@ -1,7 +1,7 @@
 import { MediaPipeModelType, FaceDetectionResults, MediaPipeResults} from '@vonage/ml-transformers'
 import { MediapipePorcessInterface, MediapipeResultsListnerInterface } from './MediapipeInterfaces'
 
-const FACE_DETECTION_TIME_GAP = 200000;
+const FACE_DETECTION_TIME_GAP = 10;
       
 interface Size {
     width: number
@@ -23,6 +23,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
     aspectRatioState: Boolean;
     aspectRatio: number;
     visibleRectDimension?: any;
+    visibleRectDimensionState?: any;
 
     modelType_?: MediaPipeModelType
     constructor(){
@@ -95,12 +96,21 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         }
 
         if(this.visibleRectDimension){
+            if (this.visibleRectDimensionState.visibleRectX !== this.visibleRectDimension.visibleRectX) this.visibleRectDimensionState.visibleRectX = this.visibleRectDimensionState.visibleRectX > this.visibleRectDimension.visibleRectX ? this.visibleRectDimensionState.visibleRectX - 1 : this.visibleRectDimensionState.visibleRectX + 1;
+            if (this.visibleRectDimensionState.visibleRectY !== this.visibleRectDimension.visibleRectY) this.visibleRectDimensionState.visibleRectY = this.visibleRectDimensionState.visibleRectY > this.visibleRectDimension.visibleRectY ? this.visibleRectDimensionState.visibleRectY - 1 : this.visibleRectDimensionState.visibleRectY + 1;
+            if (this.visibleRectDimensionState.visibleRectWidth !== this.visibleRectDimension.visibleRectWidth) this.visibleRectDimensionState.visibleRectWidth = this.visibleRectDimensionState.visibleRectWidth > this.visibleRectDimension.visibleRectWidth ? this.visibleRectDimensionState.visibleRectWidth - 1 : this.visibleRectDimensionState.visibleRectWidth + 1;
+            if (this.visibleRectDimensionState.visibleRectHeight !== this.visibleRectDimension.visibleRectHeight) this.visibleRectDimensionState.visibleRectHeight = this.visibleRectDimensionState.visibleRectHeight > this.visibleRectDimension.visibleRectHeight ? this.visibleRectDimensionState.visibleRectHeight - 1 : this.visibleRectDimensionState.visibleRectHeight + 1;
+            
+            // if (Math.abs(this.visibleRectDimensionState.visibleRectX - this.visibleRectDimension.visibleRectX) <= 4) this.visibleRectDimensionState.visibleRectX = this.visibleRectDimension.visibleRectX
+            // if (Math.abs(this.visibleRectDimensionState.visibleRectY  - this.visibleRectDimension.visibleRectY) <= 4) this.visibleRectDimensionState.visibleRectY = this.visibleRectDimension.visibleRectY
+            // // if (Math.abs(this.visibleRectDimensionState.visibleRectWidth  - this.visibleRectDimension.visibleRectWidth) <= 2) this.visibleRectDimensionState.visibleRectWidth = this.visibleRectDimension.visibleRectWidth
+            // if (Math.abs(this.visibleRectDimensionState.visibleRectHeight  - this.visibleRectDimension.visibleRectHeight) <= 2) this.visibleRectDimensionState.visibleRectHeight = this.visibleRectDimension.visibleRectHeight
             const resizeFrame = new VideoFrame(image, {
                 visibleRect: {
-                    x: this.visibleRectDimension.visibleRectX,
-                    y: this.visibleRectDimension.visibleRectY,
-                    width: this.visibleRectDimension.visibleRectWidth,
-                    height: this.visibleRectDimension.visibleRectHeight
+                    x: this.visibleRectDimensionState.visibleRectX,
+                    y: this.visibleRectDimensionState.visibleRectY,
+                    width: this.visibleRectDimensionState.visibleRectWidth,
+                    height: this.visibleRectDimensionState.visibleRectHeight
                 },
                 timestamp,
                 alpha: 'discard'
@@ -135,6 +145,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
     calculateDimensions(forceRecalculate = false) {
         let faceDetectionresult = this.mediapipeResult_ as FaceDetectionResults;
 
+        if (!faceDetectionresult.detections[0]) return;
         let newWidth = Math.floor((faceDetectionresult.detections[0].boundingBox.width * this.videoDimension.width) + (this.padding.width*2));
         let newHeight = Math.floor((faceDetectionresult.detections[0].boundingBox.height * this.videoDimension.height) + (this.padding.height*2));
         let newX = Math.floor((faceDetectionresult.detections[0].boundingBox.xCenter * this.videoDimension.width) - (faceDetectionresult.detections[0].boundingBox.width * this.videoDimension.width)/2) - this.padding.width;
@@ -147,8 +158,16 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             newX = Math.floor((faceDetectionresult.detections[0].boundingBox.xCenter * this.videoDimension.width) - (newWidth)/2);
             newX = Math.max(0, newX);
         }
-        
-        if (forceRecalculate || !this.visibleRectDimension || Math.abs(newX - this.visibleRectDimension.visibleRectX) > 70 || Math.abs(newY - this.visibleRectDimension.visibleRectY) > 70 ) {
+        // else {
+        //     if (this.visibleRectDimension && Math.abs(newWidth - this.visibleRectDimension.visibleRectWidth) < 30) {
+        //         newWidth = this.visibleRectDimension.visibleRectWidth
+        //     }
+        //     if (this.visibleRectDimension && Math.abs(newHeight - this.visibleRectDimension.visibleRectHeight) < 30) {
+        //         newHeight = this.visibleRectDimension.visibleRectHeight
+        //     }
+        // } 
+
+        if (forceRecalculate || !this.visibleRectDimension || Math.abs(newX - this.visibleRectDimension.visibleRectX) >  10 || Math.abs(newY - this.visibleRectDimension.visibleRectY) > 10 ) {
             // Ensure x and y is even value
             let visibleRectX = (( newX % 2) === 0) ? newX : (newX + 1);
             let visibleRectY = (( newY % 2) === 0) ? newY : (newY + 1);
@@ -161,6 +180,7 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             visibleRectWidth,
             visibleRectHeight
             }
+            if (!this.visibleRectDimensionState) this.visibleRectDimensionState = this.visibleRectDimension;
         }
     }
 

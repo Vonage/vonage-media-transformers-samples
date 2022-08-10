@@ -68,8 +68,8 @@ async function main() {
           worker.addEventListener('message', ((msg: any) => {
               handleWorkerEvent(msg)
           }))
-          setVonageMetadata({appId: 'MediaPipe Demo', sourceType: 'test'})
           let metaData: String = JSON.stringify(getVonageMetadata())
+          console.log("metadata", metaData)
 
           if(typeof metaData != 'string'){
               metaData = JSON.stringify({})
@@ -104,6 +104,7 @@ async function main() {
   }
 
   function transform(readable: ReadableStream<any>, writable: WritableStream<any>): Promise<void> {
+    console.log("get", getVonageMetadata());
     return new Promise<void>((resolve, reject) => {
         worker.postMessage({
             operation: 'transform',
@@ -141,6 +142,9 @@ async function main() {
   }
 
   function onResult(result: MediaPipeResults) {
+    console.log("resylt", getVonageMetadata())
+    setVonageMetadata({appId: 'MediaPipe Demo', sourceType: 'test', x:result.detections[0].boundingBox.xCenter, y:result.detections[0].boundingBox.yCenter, videoWidth: result.detections[0].boundingBox.width, videoHeight: result.detections[0].boundingBox.height})
+
     worker.postMessage({
       operation: 'onResults',
       info: JSON.stringify(result)
