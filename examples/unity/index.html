@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Insertable Streams Unity</title>
+    <style>
+        .video-wrapper {
+            aspect-ratio: 1.1;
+            background-color: olive;
+            background-size: 100% auto;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <span id="outputVideoContainer"></span>
+    <div class="box">
+      <span>Source:</span>
+      <select id="sourceSelector" >
+          <option selected value="stop">(stopped)</option>
+          <option value="camera">Camera</option>
+          <option value="image">Image</option>
+      </select>
+    </div>
+<div id="container"> 
+    <div class="video-wrapper">
+        <video id="source_video" class="video"></video>
+    </div>
+    <div class="video-wrapper">
+        <video id="priview_video" class="video"></video>
+    </div>
+    </div>
+    <div class="webgl-content">
+        <canvas id="unity-canvas" width=0 height=0></canvas>
+      </div>
+      
+<script type="module" src="./src/main.ts"></script>
+
+</body>
+</html>

@@ -6,7 +6,7 @@ class VideoSink {
   }
 
   setMediaStream(stream: MediaStream): void {
-    if (this.video_) {
+    if (this.video_ && stream!=null) {
       this.video_.srcObject = stream;
       this.video_.play();
     }
