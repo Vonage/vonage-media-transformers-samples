@@ -1,44 +1,50 @@
 import { MediaPipeModelType, FaceDetectionResults, MediaPipeResults} from '@vonage/ml-transformers'
 import { MediapipePorcessInterface, MediapipeResultsListnerInterface } from './MediapipeInterfaces'
 
-const FACE_DETECTION_TIME_GAP = 10;
+const FACE_DETECTION_TIME_GAP = 20000;
       
 interface Size {
     width: number
     height: number
 }
+interface VideoInfo extends Size{
+    frameRate: number
+}
 
 class MediapipeTransformer implements MediapipeResultsListnerInterface {
 
-    mediapipePorcess_?: MediapipePorcessInterface
+    mediapipeProcess_?: MediapipePorcessInterface
     mediapipeResult_?: MediaPipeResults
-    mediapipeSelfieResult_?: ImageBitmap
 
     mediapipeCanvas_: OffscreenCanvas;
     mediapipeCtx_?: OffscreenCanvasRenderingContext2D
 
     faceDetectionlastTimestamp: number;
-    videoDimension: Size;
+    videoInfo: VideoInfo;
     padding: Size;
-    aspectRatioState: Boolean;
-    aspectRatio: number;
     visibleRectDimension?: any;
     visibleRectDimensionState?: any;
+
+    frameMovingSteps?: any;
 
     modelType_?: MediaPipeModelType
     constructor(){
         this.faceDetectionlastTimestamp = 0;
-        this.videoDimension = {
+        this.videoInfo = {
             width: 640,
             height: 480,
+            frameRate: 30
         }
         this.padding = {
-            width: 0,
-            height: 0
+            width: 60,
+            height: 100
         }
-
-        this.aspectRatioState = false; 
-        this.aspectRatio = this.videoDimension.width/this.videoDimension.height;
+        this.frameMovingSteps = {
+            x: 1,
+            y: 1,
+            width: 1,
+            height: 1
+        }
 
         this.mediapipeCanvas_ = new OffscreenCanvas(1, 1)
         let ctx = this.mediapipeCanvas_.getContext('2d', {alpha: false, desynchronized: true})
@@ -51,7 +57,6 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
 
     onResult(result: MediaPipeResults | ImageBitmap): void {
         if(result instanceof ImageBitmap){
-            this.mediapipeSelfieResult_ = result
             return
         }
         let faceDetectionresult = result as FaceDetectionResults
@@ -62,12 +67,11 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         }
     }
     
-    init(modelType: MediaPipeModelType, videoDimension: Size, mediapipePorcess: MediapipePorcessInterface): Promise<void> {
+    init(modelType: MediaPipeModelType, videoInfo: VideoInfo, mediapipePorcess: MediapipePorcessInterface): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this.modelType_ = modelType
-            this.mediapipePorcess_ = mediapipePorcess
-            this.videoDimension = videoDimension
-            this.aspectRatio = this.videoDimension.width/this.videoDimension.height;
+            this.mediapipeProcess_ = mediapipePorcess
+            this.videoInfo = videoInfo
             resolve()
         })
     }
@@ -96,15 +100,16 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
         }
 
         if(this.visibleRectDimension){
-            if (this.visibleRectDimensionState.visibleRectX !== this.visibleRectDimension.visibleRectX) this.visibleRectDimensionState.visibleRectX = this.visibleRectDimensionState.visibleRectX > this.visibleRectDimension.visibleRectX ? this.visibleRectDimensionState.visibleRectX - 1 : this.visibleRectDimensionState.visibleRectX + 1;
-            if (this.visibleRectDimensionState.visibleRectY !== this.visibleRectDimension.visibleRectY) this.visibleRectDimensionState.visibleRectY = this.visibleRectDimensionState.visibleRectY > this.visibleRectDimension.visibleRectY ? this.visibleRectDimensionState.visibleRectY - 1 : this.visibleRectDimensionState.visibleRectY + 1;
-            if (this.visibleRectDimensionState.visibleRectWidth !== this.visibleRectDimension.visibleRectWidth) this.visibleRectDimensionState.visibleRectWidth = this.visibleRectDimensionState.visibleRectWidth > this.visibleRectDimension.visibleRectWidth ? this.visibleRectDimensionState.visibleRectWidth - 1 : this.visibleRectDimensionState.visibleRectWidth + 1;
-            if (this.visibleRectDimensionState.visibleRectHeight !== this.visibleRectDimension.visibleRectHeight) this.visibleRectDimensionState.visibleRectHeight = this.visibleRectDimensionState.visibleRectHeight > this.visibleRectDimension.visibleRectHeight ? this.visibleRectDimensionState.visibleRectHeight - 1 : this.visibleRectDimensionState.visibleRectHeight + 1;
+            if (this.visibleRectDimensionState.visibleRectX !== this.visibleRectDimension.visibleRectX) this.visibleRectDimensionState.visibleRectX = this.visibleRectDimensionState.visibleRectX > this.visibleRectDimension.visibleRectX ? this.visibleRectDimensionState.visibleRectX - this.frameMovingSteps.x : this.visibleRectDimensionState.visibleRectX + this.frameMovingSteps.x ;
+            if (this.visibleRectDimensionState.visibleRectY !== this.visibleRectDimension.visibleRectY) this.visibleRectDimensionState.visibleRectY = this.visibleRectDimensionState.visibleRectY > this.visibleRectDimension.visibleRectY ? this.visibleRectDimensionState.visibleRectY - this.frameMovingSteps.y : this.visibleRectDimensionState.visibleRectY + this.frameMovingSteps.y;
+            if (this.visibleRectDimensionState.visibleRectWidth !== this.visibleRectDimension.visibleRectWidth) this.visibleRectDimensionState.visibleRectWidth = this.visibleRectDimensionState.visibleRectWidth > this.visibleRectDimension.visibleRectWidth ? this.visibleRectDimensionState.visibleRectWidth - this.frameMovingSteps.width : this.visibleRectDimensionState.visibleRectWidth + this.frameMovingSteps.width;
+            if (this.visibleRectDimensionState.visibleRectHeight !== this.visibleRectDimension.visibleRectHeight) this.visibleRectDimensionState.visibleRectHeight = this.visibleRectDimensionState.visibleRectHeight > this.visibleRectDimension.visibleRectHeight ? this.visibleRectDimensionState.visibleRectHeight - this.frameMovingSteps.height : this.visibleRectDimensionState.visibleRectHeight + this.frameMovingSteps.height;
             
-            // if (Math.abs(this.visibleRectDimensionState.visibleRectX - this.visibleRectDimension.visibleRectX) <= 4) this.visibleRectDimensionState.visibleRectX = this.visibleRectDimension.visibleRectX
-            // if (Math.abs(this.visibleRectDimensionState.visibleRectY  - this.visibleRectDimension.visibleRectY) <= 4) this.visibleRectDimensionState.visibleRectY = this.visibleRectDimension.visibleRectY
-            // // if (Math.abs(this.visibleRectDimensionState.visibleRectWidth  - this.visibleRectDimension.visibleRectWidth) <= 2) this.visibleRectDimensionState.visibleRectWidth = this.visibleRectDimension.visibleRectWidth
-            // if (Math.abs(this.visibleRectDimensionState.visibleRectHeight  - this.visibleRectDimension.visibleRectHeight) <= 2) this.visibleRectDimensionState.visibleRectHeight = this.visibleRectDimension.visibleRectHeight
+            if (Math.abs(this.visibleRectDimensionState.visibleRectX - this.visibleRectDimension.visibleRectX) <= this.frameMovingSteps.x) this.visibleRectDimensionState.visibleRectX = this.visibleRectDimension.visibleRectX
+            if (Math.abs(this.visibleRectDimensionState.visibleRectY  - this.visibleRectDimension.visibleRectY) <= this.frameMovingSteps.y) this.visibleRectDimensionState.visibleRectY = this.visibleRectDimension.visibleRectY
+            if (Math.abs(this.visibleRectDimensionState.visibleRectWidth  - this.visibleRectDimension.visibleRectWidth) <= this.frameMovingSteps.width) this.visibleRectDimensionState.visibleRectWidth = this.visibleRectDimension.visibleRectWidth
+            if (Math.abs(this.visibleRectDimensionState.visibleRectHeight  - this.visibleRectDimension.visibleRectHeight) <= this.frameMovingSteps.height) this.visibleRectDimensionState.visibleRectHeight = this.visibleRectDimension.visibleRectHeight
+            
             const resizeFrame = new VideoFrame(image, {
                 visibleRect: {
                     x: this.visibleRectDimensionState.visibleRectX,
@@ -123,9 +128,9 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
     }
 
     mediapipeProcess(image: ImageBitmap): void{
-        if (this.videoDimension.width !== image.width || this.videoDimension.height !== image.height ) {
-            this.videoDimension.width = image.width;
-            this.videoDimension.height = image.height;
+        if (this.videoInfo.width !== image.width || this.videoInfo.height !== image.height ) {
+            this.videoInfo.width = image.width;
+            this.videoInfo.height = image.height;
         }
         this.mediapipeCtx_!.clearRect(0, 0, this.mediapipeCanvas_.width, this.mediapipeCanvas_.height)
         this.mediapipeCtx_?.drawImage(
@@ -139,41 +144,27 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             this.mediapipeCanvas_.width,
             this.mediapipeCanvas_.height
         )
-        this.mediapipePorcess_?.onSend(this.mediapipeCanvas_.transferToImageBitmap())
+        this.mediapipeProcess_?.onSend(this.mediapipeCanvas_.transferToImageBitmap())
     }
     
-    calculateDimensions(forceRecalculate = false) {
+    calculateDimensions() {
         let faceDetectionresult = this.mediapipeResult_ as FaceDetectionResults;
 
         if (!faceDetectionresult.detections[0]) return;
-        let newWidth = Math.floor((faceDetectionresult.detections[0].boundingBox.width * this.videoDimension.width) + (this.padding.width*2));
-        let newHeight = Math.floor((faceDetectionresult.detections[0].boundingBox.height * this.videoDimension.height) + (this.padding.height*2));
-        let newX = Math.floor((faceDetectionresult.detections[0].boundingBox.xCenter * this.videoDimension.width) - (faceDetectionresult.detections[0].boundingBox.width * this.videoDimension.width)/2) - this.padding.width;
+        let newWidth = Math.floor((faceDetectionresult.detections[0].boundingBox.width * this.videoInfo.width) + (this.padding.width*2));
+        let newHeight = Math.floor((faceDetectionresult.detections[0].boundingBox.height * this.videoInfo.height) + (this.padding.height*2));
+        let newX = Math.floor((faceDetectionresult.detections[0].boundingBox.xCenter * this.videoInfo.width) - (faceDetectionresult.detections[0].boundingBox.width * this.videoInfo.width)/2) - this.padding.width;
         newX = Math.max(0, newX);
-        let newY = Math.floor((faceDetectionresult.detections[0].boundingBox.yCenter * this.videoDimension.height) - (faceDetectionresult.detections[0].boundingBox.height * this.videoDimension.height)/2) - this.padding.height;
+        let newY = Math.floor((faceDetectionresult.detections[0].boundingBox.yCenter * this.videoInfo.height) - (faceDetectionresult.detections[0].boundingBox.height * this.videoInfo.height)/2) - this.padding.height;
         newY = Math.max(0, newY);
         
-        if (this.aspectRatioState) {
-            newWidth = this.aspectRatio * newHeight
-            newX = Math.floor((faceDetectionresult.detections[0].boundingBox.xCenter * this.videoDimension.width) - (newWidth)/2);
-            newX = Math.max(0, newX);
-        }
-        // else {
-        //     if (this.visibleRectDimension && Math.abs(newWidth - this.visibleRectDimension.visibleRectWidth) < 30) {
-        //         newWidth = this.visibleRectDimension.visibleRectWidth
-        //     }
-        //     if (this.visibleRectDimension && Math.abs(newHeight - this.visibleRectDimension.visibleRectHeight) < 30) {
-        //         newHeight = this.visibleRectDimension.visibleRectHeight
-        //     }
-        // } 
-
-        if (forceRecalculate || !this.visibleRectDimension || Math.abs(newX - this.visibleRectDimension.visibleRectX) >  10 || Math.abs(newY - this.visibleRectDimension.visibleRectY) > 10 ) {
+        if (!this.visibleRectDimension || Math.abs(newX - this.visibleRectDimension.visibleRectX) >  10 || Math.abs(newY - this.visibleRectDimension.visibleRectY) > 10 ) {
             // Ensure x and y is even value
             let visibleRectX = (( newX % 2) === 0) ? newX : (newX + 1);
             let visibleRectY = (( newY % 2) === 0) ? newY : (newY + 1);
             // Ensure visibleRectWidth and visibleRectHeight fall within videoWidth and videoHeight
-            let visibleRectWidth = (visibleRectX + newWidth) > this.videoDimension.width ? (this.videoDimension.width -  visibleRectX) : newWidth
-            let visibleRectHeight = (visibleRectY + newHeight) > this.videoDimension.height ? (this.videoDimension.height -  visibleRectY) : newHeight
+            let visibleRectWidth = (visibleRectX + newWidth) > this.videoInfo.width ? (this.videoInfo.width -  visibleRectX) : newWidth
+            let visibleRectHeight = (visibleRectY + newHeight) > this.videoInfo.height ? (this.videoInfo.height -  visibleRectY) : newHeight
             this.visibleRectDimension= {
             visibleRectX,
             visibleRectY,
@@ -181,26 +172,15 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             visibleRectHeight
             }
             if (!this.visibleRectDimensionState) this.visibleRectDimensionState = this.visibleRectDimension;
+            else {
+                this.frameMovingSteps= {
+                    x: Math.max(Math.floor(Math.abs(this.visibleRectDimensionState.visibleRectX - this.visibleRectDimension.visibleRectX)/(this.videoInfo.frameRate/5)), 1),
+                    y: Math.max(Math.floor(Math.abs(this.visibleRectDimensionState.visibleRectY - this.visibleRectDimension.visibleRectY)/(this.videoInfo.frameRate/5)),1),
+                    width: Math.max(Math.floor(Math.abs(this.visibleRectDimensionState.visibleRectWidth - this.visibleRectDimension.visibleRectWidth)/(this.videoInfo.frameRate/5)),1),
+                    height: Math.max(Math.floor(Math.abs(this.visibleRectDimensionState.visibleRectHeight - this.visibleRectDimension.visibleRectHeight)/(this.videoInfo.frameRate/5)),1)
+                }
+            }
         }
-    }
-
-    setAspectRatioState(state: boolean) {
-        this.aspectRatioState = state;
-        this.calculateDimensions(true);
-    }
-    setPaddingWidth (width: number) {
-        this.padding.width = width;
-        this.calculateDimensions(true);
-    }
-    setPaddingHeight (height: number) {
-        this.padding.height = height;
-        this.calculateDimensions(true);
-    }
-
-    async flush() {
-       if(this.mediapipeSelfieResult_){
-            this.mediapipeSelfieResult_.close()
-       }
     }
 }
 export default MediapipeTransformer

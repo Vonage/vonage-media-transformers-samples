@@ -5,9 +5,10 @@ import { isSupported, MediaPipeModelType, MediaPipeResults, MediapipeConfig, Med
 import {setVonageMetadata, MediaProcessorConnectorInterface, MediaProcessorConnector, getVonageMetadata, PipelineInfoData, EventDataMap} from '@vonage/media-processor'
 import Emittery from 'emittery' 
 
-interface Size {
+interface VideoInfo {
   width: number
   height: number
+  frameRate: number
 }
 
 async function main() {
@@ -19,12 +20,6 @@ async function main() {
 
   const githubButtonSelector: HTMLElement | null = document.getElementById("githubButton")
   const vividButtonSelector: HTMLElement | null = document.getElementById("vividButton")
-  const aspectRatioSwitch: HTMLElement | null = document.getElementById("aspectRatioSwitch")
-
-  const widthPaddingLabel: HTMLElement | null = document.getElementById("widthPaddingLabel")
-  const widthPaddingInput: HTMLElement | null = document.getElementById("widthPaddingInput")
-  const heightPaddingLabel: HTMLElement | null = document.getElementById("heightPaddingLabel")
-  const heightPaddingInput: HTMLElement | null = document.getElementById("heightPaddingInput")
 
   const modelType: MediaPipeModelType = "face_detection"
   const modelOptions: FaceDetectionOptions = {
@@ -38,20 +33,21 @@ async function main() {
   let videoSource_: CameraSource = new CameraSource()
   let innerEmittery: Emittery = new Emittery();
   let processorEmittery: Emittery<EventDataMap> = new Emittery();
+  let videoInfo: VideoInfo;
 
   await videoSource_.init().then(() => {
+    // @ts-ignore
+    const {width, height, frameRate} = videoSource_.videoTrack_?.getSettings();
+    videoInfo = {
+      width,
+      height,
+      frameRate
+    }
     setMediaProcessor();
   }).catch(e => {
     alert('error initing camera, ' + e )
     return
   })
-
-  // @ts-ignore
-  const {width, height} = videoSource_.videoTrack_?.getSettings();
-  let videoDimension: Size = {
-    width,
-    height
-  }
 
   async function setMediaProcessor() {
     await initializeMediaPipe();
@@ -69,7 +65,6 @@ async function main() {
               handleWorkerEvent(msg)
           }))
           let metaData: String = JSON.stringify(getVonageMetadata())
-          console.log("metadata", metaData)
 
           if(typeof metaData != 'string'){
               metaData = JSON.stringify({})
@@ -89,7 +84,7 @@ async function main() {
               operation: 'init',
               modelType: modelType, 
               metaData: metaData,
-              videoDimension: videoDimension
+              videoInfo: videoInfo
             })
           })
 
@@ -104,7 +99,6 @@ async function main() {
   }
 
   function transform(readable: ReadableStream<any>, writable: WritableStream<any>): Promise<void> {
-    console.log("get", getVonageMetadata());
     return new Promise<void>((resolve, reject) => {
         worker.postMessage({
             operation: 'transform',
@@ -142,9 +136,6 @@ async function main() {
   }
 
   function onResult(result: MediaPipeResults) {
-    console.log("resylt", getVonageMetadata())
-    setVonageMetadata({appId: 'MediaPipe Demo', sourceType: 'test', x:result.detections[0].boundingBox.xCenter, y:result.detections[0].boundingBox.yCenter, videoWidth: result.detections[0].boundingBox.width, videoHeight: result.detections[0].boundingBox.height})
-
     worker.postMessage({
       operation: 'onResults',
       info: JSON.stringify(result)
@@ -186,40 +177,6 @@ async function main() {
       }
    }
   }
-
-  aspectRatioSwitch?.addEventListener('change', (event: any) => {
-    if (event.target.checked) {
-      widthPaddingLabel?.classList.add('is-hidden');
-      widthPaddingInput?.classList.add('is-hidden');
-      if (heightPaddingLabel !== null) heightPaddingLabel.innerHTML = "Padding"
-    }
-    else {
-      widthPaddingLabel?.classList.remove('is-hidden');
-      widthPaddingInput?.classList.remove('is-hidden');
-      if (heightPaddingLabel !== null) heightPaddingLabel.innerHTML = "Height Padding"
-    }
-
-    worker.postMessage({
-      operation: 'aspectRatio',
-      aspectRatio: event.target.checked 
-    })
-  })
-
-  widthPaddingInput?.addEventListener("change", (event: any) => {
-    let paddingWidth = Math.floor((event.currentTarget.value/100) * (videoDimension.width/2));
-    worker.postMessage({
-      operation: "updatePaddingWidth",
-      paddingWidth
-    })
-  })
-
-  heightPaddingInput?.addEventListener("change", (event: any) => {
-    let paddingHeight = Math.floor((event.currentTarget.value/100) * (videoDimension.height/2));
-    worker.postMessage({
-      operation: "updatePaddingHeight",
-      paddingHeight
-    })
-  })
 
   if(githubButtonSelector){
     githubButtonSelector.addEventListener('click', () => {

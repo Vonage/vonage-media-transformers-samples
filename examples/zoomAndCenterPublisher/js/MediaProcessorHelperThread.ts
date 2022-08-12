@@ -27,13 +27,13 @@ if( 'function' === typeof importScripts) {
         const {operation} = event.data
 
         if(operation === 'init'){
-            const {metaData, modelType, videoDimension} = event.data
+            const {metaData, modelType, videoInfo} = event.data
             if(metaData){
                 setVonageMetadata(JSON.parse(metaData))
             }
             mediaipeTransformer_ = new MediapipeTransformer()
             mediapipePorcess_ = new MediapipePorcess()
-            mediaipeTransformer_.init(modelType, videoDimension, mediapipePorcess_).then( () => {
+            mediaipeTransformer_.init(modelType, videoInfo, mediapipePorcess_).then( () => {
                 mediaProcessor_ = new MediaProcessor()
                 mediaProcessor_.on('error', e => {
                     postMessage({
@@ -102,15 +102,6 @@ if( 'function' === typeof importScripts) {
             if(info){
                 mediaipeTransformer_.onResult(JSON.parse(info))
             }
-        } else if(operation === 'aspectRatio'){
-            const {aspectRatio} = event.data
-            mediaipeTransformer_.setAspectRatioState(aspectRatio);
-        } else if(operation === 'updatePaddingWidth'){
-            const {paddingWidth} = event.data
-            mediaipeTransformer_.setPaddingWidth(paddingWidth);
-        } else if(operation === 'updatePaddingHeight'){
-            const {paddingHeight} = event.data
-            mediaipeTransformer_.setPaddingHeight(paddingHeight);
         }
     }
 }
