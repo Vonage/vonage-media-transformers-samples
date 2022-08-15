@@ -110,6 +110,12 @@ class MediapipeTransformer implements MediapipeResultsListnerInterface {
             if (Math.abs(this.visibleRectDimensionState.visibleRectWidth  - this.visibleRectDimension.visibleRectWidth) <= this.frameMovingSteps.width) this.visibleRectDimensionState.visibleRectWidth = this.visibleRectDimension.visibleRectWidth
             if (Math.abs(this.visibleRectDimensionState.visibleRectHeight  - this.visibleRectDimension.visibleRectHeight) <= this.frameMovingSteps.height) this.visibleRectDimensionState.visibleRectHeight = this.visibleRectDimension.visibleRectHeight
             
+            let deltaX = this.visibleRectDimensionState.visibleRectX + this.visibleRectDimensionState.visibleRectWidth;
+            let deltaY = this.visibleRectDimensionState.visibleRectY + this.visibleRectDimensionState.visibleRectHeight;
+
+            if (deltaX > this.videoInfo.width) this.visibleRectDimensionState.visibleRectWidth = this.visibleRectDimensionState.visibleRectWidth - (deltaX - this.videoInfo.width);
+            if (deltaY > this.videoInfo.height) this.visibleRectDimensionState.visibleRectHeight = this.visibleRectDimensionState.visibleRectHeight - (deltaY - this.videoInfo.height);
+
             const resizeFrame = new VideoFrame(image, {
                 visibleRect: {
                     x: this.visibleRectDimensionState.visibleRectX,
