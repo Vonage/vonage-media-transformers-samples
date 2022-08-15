@@ -1,0 +1,108 @@
+<html>
+
+<head>
+  <style>
+    body {
+      margin: 0px;
+    }
+
+    .headline {
+      text-align: center;
+    }
+
+    vwc-top-app-bar img {
+      margin-left: 16px
+    }
+
+    .maincard {
+      margin: 10 auto;
+      width: 58%;
+      max-width: 1120px;
+      height: fit-content;
+      display: block;
+    }
+
+    .maincardlayout {
+      display: grid;
+      grid-template-columns: 5fr 5fr;
+    }
+
+    .video-wrapper {
+      aspect-ratio: 1.1;
+      background-image: url(images/vonage.png);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: var(--vvd-color-canvas);
+      background-size: 100% auto;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--vvd-color-neutral-30);
+    }
+
+    .video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .is-hidden {
+      display: none;
+    }
+  </style>
+
+  <script type="module">
+    import "@vonage/vwc-top-app-bar";
+    import "@vonage/vwc-layout";
+    import "@vonage/vwc-text";
+    import "@vonage/vwc-banner";
+    import "@vonage/vwc-card";
+    import "@vonage/vwc-switch";
+    import "@vonage/vwc-select";
+    import "@vonage/vwc-list/vwc-list-item";
+    import "@vonage/vwc-slider";
+    import "@vonage/vwc-formfield";
+    import "@vonage/vwc-radio";
+  </script>
+
+  <title>MediaPipe sample</title>
+  <link rel="icon" href="https://vonage-client-media-samples.s3.amazonaws.com/vonage.png">
+</head>
+
+<body>
+  <vwc-top-app-bar alternate>
+    <img slot="navigationIcon" height="24"
+      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQI9k8NKq3KoOs1VkwSYwPwwQbisiS_K-0jtBUyml13k7EBy8Aekz7G7I1vqceWf5kEQ&usqp=CAU" />
+    <div>
+      <vwc-banner open connotation="info" message="Vonage MediaPipe integration sample application"></vwc-banner>
+      <vwc-layout gutters="xs" column-basis="block">
+        <vwc-text font-face="subtitle-1" class="headline" tight>This sample app shows how to zoom a user's face with Vonage
+          Media Processor and ML Transformers libraries.</vwc-text>
+      </vwc-layout>
+      <vwc-card class="maincard" elevation="0">
+        <div slot="main" gutters="xs" class="maincardlayout">
+          <vwc-layout column-basis="block" gutters="xs">
+            <vwc-text font-face="subtitle-2" class="headline" tight>Source</vwc-text>
+            <div class="video-wrapper">
+              <video id="source_video" class="video"></video>
+            </div>
+          </vwc-layout>
+          <vwc-layout column-basis="block" gutters="xs">
+            <vwc-text font-face="subtitle-2" class="headline" tight>Preview</vwc-text>
+            <div class="video-wrapper">
+              <video id="priview_video" class="video"></video>
+            </div>
+            <vwc-layout>
+              <vwc-button connotation="cta" label="View code in GitHub" layout="filled" icon="open-line" trailingIcon
+                id="githubButton"></vwc-button>
+              <vwc-button connotation="cta" label="Use Vivid" layout="filled" icon="open-line" trailingIcon
+                id="vividButton"></vwc-button>
+            </vwc-layout>
+          </vwc-layout>
+        </div>
+      </vwc-card>
+    </div>
+  </vwc-top-app-bar>
+  <script type="module" src="./main.ts"></script>
+</body>
+
+</html>
