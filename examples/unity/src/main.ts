@@ -16,12 +16,14 @@ async function main() {
     alert('Something bad happened: ' + e);
     return;
   }
-  const sourceSelector: any =document.getElementById('sourceSelector');
-  let source:any// CameraSource //= new CameraSource()
+  
+  const typeSelector: any = document.getElementById('typeSelector');
+  const githubButtonSelector: HTMLElement | null = document.getElementById("githubButton")
+  const vividButtonSelector: HTMLElement | null = document.getElementById("vividButton")
+  let source:any
 
   async function updatePipelineSource() {
-    const sourceType = sourceSelector.options[sourceSelector.selectedIndex].value;
-    if(sourceType === 'camera'){
+    {
       source = new CameraSource()
     }
     await source.init().then(async () => {
@@ -36,7 +38,6 @@ async function main() {
       mediaProcessor.on('error', ((eventData: ErrorData) => {
         console.error(eventData.error, eventData.eventMetaData.transformerIndex, eventData.function);
       }))
-
       mediaProcessor.on('warn', ((eventData: WarnData) => {
         console.warn(eventData.dropInfo.requested, eventData.eventMetaData.transformerIndex, eventData.warningType);
       }))
@@ -59,8 +60,20 @@ async function main() {
       console.error(e)
     })
   }
-  sourceSelector.oninput = updatePipelineSource;
-  //updatePipelineSource();
+  if(githubButtonSelector){
+    githubButtonSelector.addEventListener('click', () => {
+      window.open("https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples", '_blank')?.focus();
+    })
+  }
+
+  if(vividButtonSelector){
+    vividButtonSelector.addEventListener('click', () => {
+      window.open("https://vivid.vonage.com/?path=/story/introduction-meet-vivid--meet-vivid", '_blank')?.focus();
+    })
+  }
+  typeSelector.addEventListener('change', () => {
+    updatePipelineSource()
+  })
 }
 window.onload = main;
 
