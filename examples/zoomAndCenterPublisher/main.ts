@@ -2,7 +2,7 @@
 import TheWorker from './js/MediaProcessorHelperThread?worker&inline'
 import CameraSource from '../common/js/camera-source'
 import { isSupported, MediaPipeModelType, MediaPipeResults, MediapipeConfig, MediapipeHelper, FaceDetectionOptions } from '@vonage/ml-transformers'
-import {setVonageMetadata, MediaProcessorConnectorInterface, MediaProcessorConnector, getVonageMetadata, PipelineInfoData, EventDataMap} from '@vonage/media-processor'
+import {MediaProcessorConnectorInterface, MediaProcessorConnector, getVonageMetadata, PipelineInfoData, EventDataMap} from '@vonage/media-processor'
 import Emittery from 'emittery' 
 
 interface VideoInfo {
@@ -180,7 +180,7 @@ async function main() {
 
   if(githubButtonSelector){
     githubButtonSelector.addEventListener('click', () => {
-      window.open("https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/mediapipe/zoomAndCenterPublisher", '_blank')?.focus();
+      window.open("https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/zoomAndCenterPublisher", '_blank')?.focus();
     })
   }
 
