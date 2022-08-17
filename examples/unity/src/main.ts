@@ -22,6 +22,16 @@ async function main() {
   const vividButtonSelector: HTMLElement | null = document.getElementById("vividButton")
   let source:any
 
+      setTimeout(() => {
+        if(source==undefined)
+        {
+          var snackbar: any = document.getElementById("disabledHover")
+          if(snackbar){
+            snackbar.message="Please select Type from Button";
+            snackbar.show()
+          }
+        }
+      }, 5000); 
   async function updatePipelineSource() {
     {
       source = new CameraSource()
@@ -71,6 +81,7 @@ async function main() {
       window.open("https://vivid.vonage.com/?path=/story/introduction-meet-vivid--meet-vivid", '_blank')?.focus();
     })
   }
+  
   typeSelector.addEventListener('change', () => {
     updatePipelineSource()
   })

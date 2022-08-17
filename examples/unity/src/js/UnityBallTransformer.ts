@@ -1,24 +1,16 @@
-
 class UnityBallTransformer {
-    container: any;
     canvas: any;
     script: any;
     unityGame?: object;
-    ctx_: any;
     number: any;
     //canvas for segmentation in frame size
     segmentationMaskFrameCanvas_: OffscreenCanvas;
     segmentationMaskFrameCtx_: OffscreenCanvasRenderingContext2D | null;
-    segmentationMaskCanvas_: OffscreenCanvas;
-    segmentationMaskCtx_: OffscreenCanvasRenderingContext2D | null;
     //final result canvas
     resultCanvas_: OffscreenCanvas;
     resultCtx_: OffscreenCanvasRenderingContext2D | null
-    //static sourceImage1_ = new Image()
     imageDataCarrier!: ImageData;
     constructor() {
-       // UnityBallTransformer.sourceImage1_.src = 'images/Avatar_cat.png'
-        this.ctx_ = null;
         this.script = document.createElement("script");
        this.canvas = document.getElementById('unity-canvas');
        this.canvas.style.width = 0 + 'px';
@@ -29,11 +21,7 @@ class UnityBallTransformer {
         if (!this.segmentationMaskFrameCtx_) {
             throw new Error('Unable to create OffscreenCanvasRenderingContext2D');
         }
-        this.segmentationMaskCanvas_ = new OffscreenCanvas(1, 1);
-        this.segmentationMaskCtx_ = this.segmentationMaskCanvas_.getContext('2d', { alpha: false, desynchronized: true });
-        if (!this.segmentationMaskCtx_) {
-            throw new Error('Unable to create OffscreenCanvasRenderingContext2D');
-        }
+      
         this.resultCanvas_ = new OffscreenCanvas(1, 1);
         this.resultCtx_ = this.resultCanvas_.getContext('2d', { alpha: false, desynchronized: true });
         if (!this.resultCtx_) {
@@ -80,7 +68,7 @@ class UnityBallTransformer {
             if (typeof VonageUnity === "object") {
                 createImageBitmap(frame).then(image => {
                     frame.close()
-                    this.processFrame(controller, image, timestamp)
+                    this.processFrame( image)
                     
                     controller.enqueue(new VideoFrame(this.resultCanvas_, { timestamp, alpha: 'discard' }));
                 }).catch(e => {
@@ -90,10 +78,8 @@ class UnityBallTransformer {
             }
             
         }
-
-        //controller.enqueue(frame);
     }
-    processFrame(controller: TransformStreamDefaultController, image: ImageBitmap, timestamp: number) {
+    processFrame(image: ImageBitmap) {
 
         this.segmentationMaskFrameCtx_!.drawImage(
             image,
@@ -154,8 +140,6 @@ class UnityBallTransformer {
                     image.width,
                     image.height
                 )
-
-
             }
         }
     }

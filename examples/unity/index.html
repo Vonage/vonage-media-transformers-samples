@@ -44,6 +44,7 @@
       height: 100%;
       object-fit: cover;
     }
+  
   </style>
 
   <script type="module">
@@ -90,13 +91,7 @@
                   Unity Camera
                 </vwc-list-item>
               </vwc-select>
-              <vwc-text font-face="subtitle-2" tight>Process</vwc-text>
-              <vwc-select dense="" id="processSelector">
-                <vwc-list-item disabled selected value="Choose_an_item">
-                  Process
-                </vwc-list-item>
               
-              </vwc-select>
             </vwc-layout>
           </vwc-layout>
           <vwc-layout column-basis="block" gutters="xs">
@@ -113,8 +108,10 @@
           </vwc-layout>
         </div>
       </vwc-card>
-      <vwc-snackbar timeoutms="5000" icon="megaphone-solid" message="Please select both Type and Process"
-        dismissible="true" position="BOTTOM-CENTER" connotation="info" id="disabledHover"></vwc-snackbar>
+      <vwc-snackbar timeoutms="5000" icon="megaphone-solid" 
+        dismissible="true" position="BOTTOM-CENTER" connotation="info" id="disabledHover">
+      <button outlined>mybutton</button>
+      </vwc-snackbar>
     </div>
     <div class="webgl-content">
         <canvas id="unity-canvas" width=960 height=600></canvas>
