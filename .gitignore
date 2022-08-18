@@ -180,3 +180,22 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # End of https://www.toptal.com/developers/gitignore/api/unity
+examples/unity/UnityVideoProject/build/test/Build
+examples/unity/UnityVideoProject/build
+examples/unity/UnityVideoProject/Library/ShaderCache
+examples/unity/UnityVideoProject/Library/StateCache
+examples/unity/UnityVideoProject/Library/ScriptAssemblies
+examples/unity/UnityVideoProject/Library/PackageCache
+examples/unity/UnityVideoProject/Library/Bee
+examples/unity/UnityVideoProject/Library/Artifacts
+examples/unity/public
+ArtifactDB
+examples/unity/UnityVideoProject/Temp
+SourceAssetDB
+SourceAssetDB-lock
+ArtifactDB-lock
+examples/unity/UnityVideoProject/Library/PlayerDataCache
+EditorInstance.json
+EditorUserBuildSettings.asset
+examples/unity/UnityVideoProject/Library/Search
+examples/unity/UnityVideoProject/test
