@@ -199,3 +199,7 @@ EditorInstance.json
 EditorUserBuildSettings.asset
 examples/unity/UnityVideoProject/Library/Search
 examples/unity/UnityVideoProject/test
+examples/unity/UnityVideoProject/Library/APIUpdater
+examples/unity/UnityVideoProject/Library/BuildPlayerData
+examples/unity/UnityVideoProject/UserSettings/Layouts
+SceneVisibilityState.asset
