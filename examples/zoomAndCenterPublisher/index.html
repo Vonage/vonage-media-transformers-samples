@@ -24,7 +24,7 @@
 
     .maincardlayout {
       display: grid;
-      grid-template-columns: 4fr 6fr;
+      grid-template-columns: 5fr 5fr;
     }
 
     .video-wrapper {
@@ -42,7 +42,11 @@
     .video {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+    }
+
+    .is-hidden {
+      display: none;
     }
   </style>
 
@@ -55,7 +59,9 @@
     import "@vonage/vwc-switch";
     import "@vonage/vwc-select";
     import "@vonage/vwc-list/vwc-list-item";
-    import "@vonage/vwc-snackbar";
+    import "@vonage/vwc-slider";
+    import "@vonage/vwc-formfield";
+    import "@vonage/vwc-radio";
   </script>
 
   <title>MediaPipe sample</title>
@@ -69,12 +75,9 @@
     <div>
       <vwc-banner open connotation="info" message="Vonage MediaPipe integration sample application"></vwc-banner>
       <vwc-layout gutters="xs" column-basis="block">
-        <vwc-text font-face="subtitle-1" class="headline" tight>This sample app shows how to use MediaPipe models with
-          Vonage Media Processor and ML Transformers libraries.</vwc-text>
-        <vwc-text font-face="subtitle-2" class="headline" tight>MediaPipe models: Face Detection/Face
-          Mash/Hands/Holistic/Objectron (Cup)/Pose/Selfie Segmentation</vwc-text>
+        <vwc-text font-face="subtitle-1" class="headline" tight>This sample app shows how to zoom a user's face with Vonage
+          Media Processor and ML Transformers libraries.</vwc-text>
       </vwc-layout>
-
       <vwc-card class="maincard" elevation="0">
         <div slot="main" gutters="xs" class="maincardlayout">
           <vwc-layout column-basis="block" gutters="xs">
@@ -82,49 +85,6 @@
             <div class="video-wrapper">
               <video id="source_video" class="video"></video>
             </div>
-            <vwc-layout column-spacing="md" style="--layout-grid-template-columns: 1fr 1fr;">
-              <vwc-text font-face="subtitle-2" tight>Show Preview</vwc-text>
-              <vwc-switch id="cameraswitch" style="justify-self: end;"></vwc-switch>
-              <vwc-text font-face="subtitle-2" tight>Type</vwc-text>
-              <vwc-select dense="" id="typeSelector">
-                <vwc-list-item disabled selected value="Choose_an_item">
-                  MediaPipe module
-                </vwc-list-item>
-                <vwc-list-item value="face_detection">
-                  Face Detection
-                </vwc-list-item>
-                <vwc-list-item value="face_mesh">
-                  Face Mesh
-                </vwc-list-item>
-                <vwc-list-item value="hands">
-                  Hands
-                </vwc-list-item>
-                <vwc-list-item value="holistic">
-                  Holistic
-                </vwc-list-item>
-                <vwc-list-item value="objectron">
-                  Objectron (Cup)
-                </vwc-list-item>
-                <vwc-list-item value="pose">
-                  Pose
-                </vwc-list-item>
-                <vwc-list-item value="selfie_segmentation">
-                  Selfie Segmentation
-                </vwc-list-item>
-              </vwc-select>
-              <vwc-text font-face="subtitle-2" tight>Process</vwc-text>
-              <vwc-select dense="" id="processSelector">
-                <vwc-list-item disabled selected value="Choose_an_item">
-                  Process
-                </vwc-list-item>
-                <vwc-list-item value="main">
-                  Main
-                </vwc-list-item>
-                <vwc-list-item value="worker">
-                  Worker
-                </vwc-list-item>
-              </vwc-select>
-            </vwc-layout>
           </vwc-layout>
           <vwc-layout column-basis="block" gutters="xs">
             <vwc-text font-face="subtitle-2" class="headline" tight>Preview</vwc-text>
@@ -140,8 +100,6 @@
           </vwc-layout>
         </div>
       </vwc-card>
-      <vwc-snackbar timeoutms="5000" icon="megaphone-solid" message="Please select both Type and Process"
-        dismissible="true" position="BOTTOM-CENTER" connotation="info" id="disabledHover"></vwc-snackbar>
     </div>
   </vwc-top-app-bar>
   <script type="module" src="./main.ts"></script>
