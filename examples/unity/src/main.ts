@@ -17,10 +17,9 @@ async function main() {
     return;
   }
   
-  const typeSelector: any = document.getElementById('typeSelector');
   const githubButtonSelector: HTMLElement | null = document.getElementById("githubButton")
   const vividButtonSelector: HTMLElement | null = document.getElementById("vividButton")
-  let source:any
+  let source: CameraSource
 
      
   async function updatePipelineSource() {
@@ -31,7 +30,7 @@ async function main() {
       let transformers: Array<Transformer> = [];
 
       const metadata: VonageMetadata = {
-        appId: 'vonage-media-processor-example',
+        appId: 'vonage-unity-example',
         sourceType: 'test'
       };
       setVonageMetadata(metadata);
@@ -42,10 +41,10 @@ async function main() {
       mediaProcessor.on('warn', ((eventData: WarnData) => {
         console.warn(eventData.dropInfo.requested, eventData.eventMetaData.transformerIndex, eventData.warningType);
       }))
-
       mediaProcessor.on('pipelineInfo', ((eventData: PipelineInfoData) => {
         console.info(eventData)
       }))
+      
       mediaProcessor.setTrackExpectedRate(-1);
       transformers.push(new UnityBallTransformer());
       mediaProcessor.setTransformers(transformers);

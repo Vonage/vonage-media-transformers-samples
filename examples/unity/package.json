@@ -8,19 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mediapipe/drawing_utils": "0.3.1620248257",
-    "@vonage/media-processor": "1.2.7",
-    "@vonage/ml-transformers": "3.0.0",
-    "@vonage/vivid": "^2.34.1",
-    "@vonage/vwc-banner": "^2.36.0",
-    "@vonage/vwc-card": "^2.36.0",
-    "@vonage/vwc-layout": "^2.36.0",
-    "@vonage/vwc-list": "^2.36.0",
-    "@vonage/vwc-select": "^2.36.0",
-    "@vonage/vwc-snackbar": "^2.36.0",
-    "@vonage/vwc-switch": "^2.36.0",
-    "@vonage/vwc-text": "^2.36.0",
-    "@vonage/vwc-top-app-bar": "^2.36.0"
+    "@vonage/media-processor": "^1.2.7",
+    "@vonage/vivid": "^2.34.1"
   },
   "devDependencies": {
     "typescript": "^4.5.4",
