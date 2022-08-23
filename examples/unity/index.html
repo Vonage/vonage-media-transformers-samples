@@ -44,23 +44,22 @@
       height: 100%;
       object-fit: cover;
     }
-  
   </style>
 
   <script type="module">
-      import "@vonage/vwc-top-app-bar";
-       import "@vonage/vwc-layout";
-       import "@vonage/vwc-text";
-       import "@vonage/vwc-banner";
-       import "@vonage/vwc-card";
-       import "@vonage/vwc-switch";
-       import "@vonage/vwc-select";
-       import "@vonage/vwc-list/vwc-list-item";
-       import "@vonage/vwc-snackbar";
+    import "@vonage/vwc-top-app-bar";
+    import "@vonage/vwc-layout";
+    import "@vonage/vwc-text";
+    import "@vonage/vwc-banner";
+    import "@vonage/vwc-card";
+    import "@vonage/vwc-switch";
+    import "@vonage/vwc-select";
+    import "@vonage/vwc-list/vwc-list-item";
+    import "@vonage/vwc-snackbar";
   </script>
 
   <title>MediaPipe sample</title>
-   <link rel="icon" href="https://vonage-client-media-samples.s3.amazonaws.com/vonage.png"> 
+  <link rel="icon" href="https://vonage-client-media-samples.s3.amazonaws.com/vonage.png">
 </head>
 
 <body>
@@ -81,7 +80,7 @@
             <div class="video-wrapper">
               <video id="source_video" class="video"></video>
             </div>
-            
+
           </vwc-layout>
           <vwc-layout column-basis="block" gutters="xs">
             <vwc-text font-face="subtitle-2" class="headline" tight>Preview</vwc-text>
@@ -97,13 +96,9 @@
           </vwc-layout>
         </div>
       </vwc-card>
-     
     </div>
-    <div class="webgl-content">
-        <canvas id="unity-canvas" width=960 height=600></canvas>
-      </div>
   </vwc-top-app-bar>
-  <script type="module" src="./src/main.ts"></script>
+  <script type="module" src="./main.ts"></script>
 </body>
 
 </html>

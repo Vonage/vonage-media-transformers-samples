@@ -1,7 +1,7 @@
 /*
   importing dependencies 
 */
-import CameraSource from '../../common/js/camera-source'
+import CameraSource from '../common/js/camera-source'
 import { isSupported, setVonageMetadata, MediaProcessor, MediaProcessorConnector, VonageMetadata, ErrorData, WarnData, PipelineInfoData } from '@vonage/media-processor'
 import UnityBallTransformer from './js/UnityBallTransformer'
 

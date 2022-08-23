@@ -50,7 +50,7 @@ class UnityBallTransformer {
         document.body.appendChild(this.unityScript_);
     }
 
-    start(){
+    start() {
     }
 
     async transform(frame: VideoFrame, controller: TransformStreamDefaultController) {
