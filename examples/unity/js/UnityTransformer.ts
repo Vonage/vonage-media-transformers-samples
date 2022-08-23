@@ -1,56 +1,63 @@
-class UnityBallTransformer {
+class UnityTransformer {
 
-    unityCanvas_: HTMLCanvasElement;
-    unityScript_: HTMLScriptElement;
     unityGame_: any;
 
     //canvas for segmentation in frame size
     videoFrameCanvas_: OffscreenCanvas
-    videoFrameCtx_: OffscreenCanvasRenderingContext2D | null
+    videoFrameCtx_?: OffscreenCanvasRenderingContext2D | null
 
     //final result canvas
     resultCanvas_: OffscreenCanvas
-    resultCtx_: OffscreenCanvasRenderingContext2D | null
+    resultCtx_?: OffscreenCanvasRenderingContext2D | null
     unityimageData_!: ImageData
 
     constructor() {
-        this.unityScript_ = document.createElement("script");
-        this.unityCanvas_ = document.createElement('canvas');
-
-        this.unityCanvas_.width = 960
-        this.unityCanvas_.height = 600
-
-        //segmentationMask in frame size
         this.videoFrameCanvas_ = new OffscreenCanvas(1, 1);
         this.videoFrameCtx_ = this.videoFrameCanvas_.getContext('2d', { alpha: false, desynchronized: true });
         if (!this.videoFrameCtx_) {
-            throw new Error('Unable to create OffscreenCanvasRenderingContext2D');
+            throw('Unable to create OffscreenCanvasRenderingContext2D');
         }
 
         this.resultCanvas_ = new OffscreenCanvas(1, 1);
         this.resultCtx_ = this.resultCanvas_.getContext('2d', { alpha: false, desynchronized: true });
         if (!this.resultCtx_) {
-            throw new Error('Unable to create OffscreenCanvasRenderingContext2D');
+            throw('Unable to create OffscreenCanvasRenderingContext2D');
         }
-        var config = {
-            dataUrl: window.location.href + "/demoBuild.data",
-            frameworkUrl: window.location.href + "/demoBuild.framework.js",
-            codeUrl: window.location.href + "/demoBuild.wasm",
-        };
-        this.unityScript_.src = window.location.href + "/demoBuild.loader.js";
-        this.unityScript_.onload = () => {
-            //@ts-ignore
-            createUnityInstance(this.canvas, config, (progress: number) => {
-            }).then((unityInstance: any) => {
-                this.unityGame_ = unityInstance;
-            }).catch((message: any) => {
-                alert(message);
-            });
-        };
-        document.body.appendChild(this.unityScript_);
+    }
+
+    init(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            let unityCanvas: HTMLCanvasElement = document.createElement('canvas')
+            let unityScript: HTMLScriptElement = document.createElement("script")
+
+            unityCanvas.width = 960
+            unityCanvas.height = 600
+            unityCanvas.id = 'unity_canvas'
+            unityCanvas.hidden = true
+            document.body.appendChild(unityCanvas)
+
+            unityScript.src = window.location.href + "/demoBuild.loader.js";
+            unityScript.onload = () => {
+                var config = {
+                    dataUrl: window.location.href + "/demoBuild.data",
+                    frameworkUrl: window.location.href + "/demoBuild.framework.js",
+                    codeUrl: window.location.href + "/demoBuild.wasm",
+                };
+                //@ts-ignore
+                createUnityInstance(unityCanvas, config, (progress: number) => {
+                }).then((unityInstance: any) => {
+                    this.unityGame_ = unityInstance;
+                    resolve()
+                }).catch((message: any) => {
+                    reject(message);
+                });
+            };
+            unityCanvas.appendChild(unityScript)
+        })
     }
 
     start() {
+
     }
 
     async transform(frame: VideoFrame, controller: TransformStreamDefaultController) {
@@ -80,8 +87,11 @@ class UnityBallTransformer {
                     controller.enqueue(frame)
                 })
             }
+        } else {
+            controller.enqueue(frame)
         }
     }
+
     processFrame(image: ImageBitmap) {
 
         this.videoFrameCtx_!.drawImage(
@@ -142,4 +152,4 @@ class UnityBallTransformer {
     flush() {
     }
 }
-export default UnityBallTransformer
+export default UnityTransformer

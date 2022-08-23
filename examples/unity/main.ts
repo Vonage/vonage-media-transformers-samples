@@ -3,7 +3,7 @@
 */
 import CameraSource from '../common/js/camera-source'
 import { isSupported, setVonageMetadata, MediaProcessor, MediaProcessorConnector, VonageMetadata, ErrorData, WarnData, PipelineInfoData } from '@vonage/media-processor'
-import UnityBallTransformer from './js/UnityBallTransformer'
+import UnityTransformer from './js/UnityTransformer'
 
 /*
   logic below
@@ -16,18 +16,17 @@ async function main() {
     alert('Something bad happened: ' + e);
     return;
   }
-  
+
   const githubButtonSelector: HTMLElement | null = document.getElementById("githubButton")
   const vividButtonSelector: HTMLElement | null = document.getElementById("vividButton")
   let source: CameraSource
 
-     
+
   async function updatePipelineSource() {
     {
       source = new CameraSource()
     }
     await source.init().then(async () => {
-      let transformers: Array<Transformer> = [];
 
       const metadata: VonageMetadata = {
         appId: 'vonage-unity-example',
@@ -44,29 +43,32 @@ async function main() {
       mediaProcessor.on('pipelineInfo', ((eventData: PipelineInfoData) => {
         console.info(eventData)
       }))
-      
-      mediaProcessor.setTrackExpectedRate(-1);
-      transformers.push(new UnityBallTransformer());
-      mediaProcessor.setTransformers(transformers);
 
-      let connector: MediaProcessorConnector = new MediaProcessorConnector(mediaProcessor);
-      try {
-        await source.setMediaProcessorConnector(connector);
-      }
-      catch (e) {
-        console.error(e)
-      }
-    }).catch((e: any) => {
+      mediaProcessor.setTrackExpectedRate(-1);
+      let unityTransformer: UnityTransformer = new UnityTransformer()
+      unityTransformer.init().then(() => {
+        let transformers: Array<Transformer> = [];
+        transformers.push(unityTransformer);
+        mediaProcessor.setTransformers(transformers);
+        let connector: MediaProcessorConnector = new MediaProcessorConnector(mediaProcessor);
+        source.setMediaProcessorConnector(connector).catch(e => {
+          console.log(e)
+        })
+      }).catch(e => {
+        console.log(e)
+      })
+
+    }).catch(e => {
       console.error(e)
     })
   }
-  if(githubButtonSelector){
+  if (githubButtonSelector) {
     githubButtonSelector.addEventListener('click', () => {
       window.open("https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples", '_blank')?.focus();
     })
   }
 
-  if(vividButtonSelector){
+  if (vividButtonSelector) {
     vividButtonSelector.addEventListener('click', () => {
       window.open("https://vivid.vonage.com/?path=/story/introduction-meet-vivid--meet-vivid", '_blank')?.focus();
     })

@@ -19,8 +19,6 @@ public class ExampleBridge : MonoBehaviour
     public GameObject panelRenderer;
     [DllImport("__Internal")]
     private static extern void SetArrays(float[] inputArray, int inputSize, float[] outputArray, int outputSize);
-    [DllImport("__Internal")]
-    private static extern void TestFun();
    
     void Start()
     {
