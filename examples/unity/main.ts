@@ -64,7 +64,7 @@ async function main() {
   }
   if (githubButtonSelector) {
     githubButtonSelector.addEventListener('click', () => {
-      window.open("https://github.com/Vonage/vonage-media-transformers-samples/tree/feature/main/examples/unity", '_blank')?.focus();
+      window.open("https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/unity", '_blank')?.focus();
     })
   }
 
