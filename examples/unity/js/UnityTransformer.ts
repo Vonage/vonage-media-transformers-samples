@@ -1,5 +1,5 @@
 class UnityTransformer {
-
+    static BASE_URL: string = 'https://unity-insertable-streams-sample.s3.amazonaws.com'
     unityGame_: any;
 
     //canvas for segmentation in frame size
@@ -36,12 +36,12 @@ class UnityTransformer {
             unityCanvas.hidden = true
             document.body.appendChild(unityCanvas)
 
-            unityScript.src = window.location.href + "/demoBuild.loader.js";
+            unityScript.src = UnityTransformer.BASE_URL + "/demoBuild.loader.js";
             unityScript.onload = () => {
                 var config = {
-                    dataUrl: window.location.href + "/demoBuild.data",
-                    frameworkUrl: window.location.href + "/demoBuild.framework.js",
-                    codeUrl: window.location.href + "/demoBuild.wasm",
+                    dataUrl: UnityTransformer.BASE_URL + "/demoBuild.data",
+                    frameworkUrl: UnityTransformer.BASE_URL + "/demoBuild.framework.js",
+                    codeUrl: UnityTransformer.BASE_URL + "/demoBuild.wasm",
                 };
                 //@ts-ignore
                 createUnityInstance(unityCanvas, config, (progress: number) => {
