@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@vonage/media-processor": "^1.2.7",
-    "@vonage/vivid": "^2.34.1"
+    "@vonage/vivid": "^2.36.0"
   },
   "devDependencies": {
     "typescript": "^4.5.4",

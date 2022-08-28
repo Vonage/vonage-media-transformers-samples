@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class ExampleBridge : MonoBehaviour
 {
 
-    float[] inputArray = new float[1228800];//307200
+    float[] inputArray = new float[1228800];
     float[] outputArray = new float[1228800];
     public GameObject myPlane;
     Texture2D texture,texture2;
