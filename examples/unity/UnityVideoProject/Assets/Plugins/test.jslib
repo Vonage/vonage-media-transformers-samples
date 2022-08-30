@@ -1,6 +1,6 @@
 mergeInto(LibraryManager.library, {
 
-  SetArrays: function (inputArray, inputSize, outputArray, outputSize) {
+  SetUnityData: function (inputArray, inputSize, outputArray, outputSize, width, height) {
     var VonageUnity = {
         input: {
             array: inputArray,
@@ -9,7 +9,11 @@ mergeInto(LibraryManager.library, {
         output: {
             array: outputArray,
             size: outputSize
-        } 
+        },
+        size: {
+          width: width,
+          height: height
+        }
     }
     this.VonageUnity = VonageUnity
   },

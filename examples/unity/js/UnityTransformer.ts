@@ -1,10 +1,15 @@
 class UnityTransformer {
-    static BASE_URL: string = 'https://unity-insertable-streams-sample.s3.amazonaws.com'
+    
+    static BASE_URL: string = 'http://localhost:3000'
     unityGame_: any;
 
     //canvas for segmentation in frame size
-    videoFrameCanvas_: OffscreenCanvas
-    videoFrameCtx_?: OffscreenCanvasRenderingContext2D | null
+    unityInputCanvas_: OffscreenCanvas
+    unityInputCtx_?: OffscreenCanvasRenderingContext2D | null
+
+    //canvas for segmentation in frame size
+    unityOutputCanvas_: OffscreenCanvas
+    unityOutputCtx_?: OffscreenCanvasRenderingContext2D | null
 
     //final result canvas
     resultCanvas_: OffscreenCanvas
@@ -12,16 +17,22 @@ class UnityTransformer {
     unityimageData_!: ImageData
 
     constructor() {
-        this.videoFrameCanvas_ = new OffscreenCanvas(1, 1);
-        this.videoFrameCtx_ = this.videoFrameCanvas_.getContext('2d', { alpha: false, desynchronized: true });
-        if (!this.videoFrameCtx_) {
-            throw('Unable to create OffscreenCanvasRenderingContext2D');
+        this.unityInputCanvas_ = new OffscreenCanvas(1, 1);
+        this.unityInputCtx_ = this.unityInputCanvas_.getContext('2d', { desynchronized: true });
+        if (!this.unityInputCtx_) {
+            throw ('Unable to create OffscreenCanvasRenderingContext2D');
+        }
+
+        this.unityOutputCanvas_ = new OffscreenCanvas(1, 1);
+        this.unityOutputCtx_ = this.unityOutputCanvas_.getContext('2d', { desynchronized: true });
+        if (!this.unityOutputCtx_) {
+            throw ('Unable to create OffscreenCanvasRenderingContext2D');
         }
 
         this.resultCanvas_ = new OffscreenCanvas(1, 1);
-        this.resultCtx_ = this.resultCanvas_.getContext('2d', { alpha: false, desynchronized: true });
+        this.resultCtx_ = this.resultCanvas_.getContext('2d', { desynchronized: true });
         if (!this.resultCtx_) {
-            throw('Unable to create OffscreenCanvasRenderingContext2D');
+            throw ('Unable to create OffscreenCanvasRenderingContext2D');
         }
     }
 
@@ -61,12 +72,6 @@ class UnityTransformer {
     }
 
     async transform(frame: VideoFrame, controller: TransformStreamDefaultController) {
-        if (this.videoFrameCanvas_.width != frame.displayWidth || this.videoFrameCanvas_.height != frame.displayHeight) {
-            this.videoFrameCanvas_.width = frame.displayWidth
-            this.videoFrameCanvas_.height = frame.displayHeight
-            this.unityimageData_ = new ImageData(frame.displayWidth, frame.displayHeight)
-        }
-
         if (this.resultCanvas_.width != frame.displayWidth || this.resultCanvas_.height != frame.displayHeight) {
             this.resultCanvas_.width = frame.displayWidth
             this.resultCanvas_.height = frame.displayHeight
@@ -75,11 +80,11 @@ class UnityTransformer {
         if (this.unityGame_) {
             const timestamp: number = frame.timestamp ? frame.timestamp : Date.now();
             //@ts-ignore
-            var VonageUnity: any = globalThis.VonageUnity;
-            if (typeof VonageUnity === "object") {
+            var vonageUnity: any = globalThis.VonageUnity;
+            if (typeof vonageUnity === "object") {
                 createImageBitmap(frame).then(image => {
                     frame.close()
-                    this.processFrame(image)
+                    this.processFrame(image, vonageUnity)
                     //@ts-ignore
                     controller.enqueue(new VideoFrame(this.resultCanvas_, { timestamp, alpha: 'discard' }));
                 }).catch(e => {
@@ -92,9 +97,20 @@ class UnityTransformer {
         }
     }
 
-    processFrame(image: ImageBitmap) {
+    processFrame(image: ImageBitmap, vonageUnity: any) {
 
-        this.videoFrameCtx_!.drawImage(
+        if (this.unityInputCanvas_.width != vonageUnity.size.width || this.unityInputCanvas_.height != vonageUnity.size.height) {
+            this.unityInputCanvas_.width = vonageUnity.size.width
+            this.unityInputCanvas_.height = vonageUnity.size.height
+        }
+
+        if (this.unityOutputCanvas_.width != vonageUnity.size.width || this.unityOutputCanvas_.height != vonageUnity.size.height) {
+            this.unityOutputCanvas_.width = vonageUnity.size.width
+            this.unityOutputCanvas_.height = vonageUnity.size.height
+            this.unityimageData_ = new ImageData(this.unityOutputCanvas_.width, this.unityOutputCanvas_.height)
+        }
+
+        this.unityInputCtx_!.drawImage(
             image,
             0,
             0,
@@ -102,50 +118,49 @@ class UnityTransformer {
             image.height,
             0,
             0,
-            this.videoFrameCanvas_.width,
-            this.videoFrameCanvas_.height
+            this.unityInputCanvas_.width,
+            this.unityInputCanvas_.height
         )
-        let imageData = this.videoFrameCtx_!.getImageData(
+        let imageData = this.unityInputCtx_!.getImageData(
             0,
             0,
-            this.videoFrameCanvas_.width,
-            this.videoFrameCanvas_.height
+            this.unityInputCanvas_.width,
+            this.unityInputCanvas_.height
         )
 
         if (this.unityGame_) {
-            //@ts-ignore
-            var VonageUnity: any = globalThis.VonageUnity;
-            if (typeof VonageUnity === "object") {
-                for (let i = 0; i < imageData.data.length; i += 4) {
-                    this.unityGame_.Module.HEAPF32[(VonageUnity.input.array >> 2) + i] = imageData.data[i] / 255
-                    this.unityGame_.Module.HEAPF32[(VonageUnity.input.array >> 2) + i + 1] = imageData.data[i + 1] / 255
-                    this.unityGame_.Module.HEAPF32[(VonageUnity.input.array >> 2) + i + 2] = imageData.data[i + 2] / 255
-                    this.unityGame_.Module.HEAPF32[(VonageUnity.input.array >> 2) + i + 3] = imageData.data[i + 3] / 255
-                }
-
-                this.unityGame_.SendMessage("ExampleBridge", "SetTexture");
-
-                for (let i = 0; i < imageData.data.length; i += 4) {
-                    this.unityimageData_.data[i] = this.unityGame_.Module.HEAPF32[(VonageUnity.output.array >> 2) + i] * 255
-                    this.unityimageData_.data[i + 1] = this.unityGame_.Module.HEAPF32[(VonageUnity.output.array >> 2) + i + 1] * 255
-                    this.unityimageData_.data[i + 2] = this.unityGame_.Module.HEAPF32[(VonageUnity.output.array >> 2) + i + 2] * 255
-                    this.unityimageData_.data[i + 3] = this.unityGame_.Module.HEAPF32[(VonageUnity.output.array >> 2) + i + 3] * 255
-
-                }
-                this.resultCtx_!.putImageData(this.unityimageData_, 0, 0)
-
-                this.resultCtx_!.drawImage(
-                    this.resultCanvas_,
-                    0,
-                    0,
-                    image.width,
-                    image.height,
-                    0,
-                    0,
-                    image.width,
-                    image.height
-                )
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                this.unityGame_.Module.HEAPF32[(vonageUnity.input.array >> 2) + i] = imageData.data[i] / 255
+                this.unityGame_.Module.HEAPF32[(vonageUnity.input.array >> 2) + i + 1] = imageData.data[i + 1] / 255
+                this.unityGame_.Module.HEAPF32[(vonageUnity.input.array >> 2) + i + 2] = imageData.data[i + 2] / 255
+                this.unityGame_.Module.HEAPF32[(vonageUnity.input.array >> 2) + i + 3] = imageData.data[i + 3] / 255
             }
+
+            this.unityGame_.SendMessage("ExampleBridge", "SetTexture");
+
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                this.unityimageData_.data[i] = this.unityGame_.Module.HEAPF32[(vonageUnity.output.array >> 2) + i] * 255
+                this.unityimageData_.data[i + 1] = this.unityGame_.Module.HEAPF32[(vonageUnity.output.array >> 2) + i + 1] * 255
+                this.unityimageData_.data[i + 2] = this.unityGame_.Module.HEAPF32[(vonageUnity.output.array >> 2) + i + 2] * 255
+                this.unityimageData_.data[i + 3] = this.unityGame_.Module.HEAPF32[(vonageUnity.output.array >> 2) + i + 3] * 255
+
+            }
+            this.unityOutputCtx_!.save()
+            this.unityOutputCtx_!.clearRect(0, 0, this.unityOutputCanvas_.width, this.unityOutputCanvas_.height)
+            this.unityOutputCtx_!.putImageData(this.unityimageData_, 0, 0)
+            this.unityOutputCtx_!.restore()
+
+            this.resultCtx_!.drawImage(
+                this.unityOutputCanvas_,
+                0,
+                0,
+                this.unityOutputCanvas_.width,
+                this.unityOutputCanvas_.height,
+                0,
+                0,
+                this.resultCanvas_.width,
+                this.resultCanvas_.height
+            )
         }
     }
 
