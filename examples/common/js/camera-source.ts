@@ -36,7 +36,7 @@ class CameraSource {
         console.log('[CameraSource] Requesting camera.');
         reject("no stream")
       }
-      this.mediaProcessorConnector_.setTrack(this.videoTrack_).then( newTrack => {
+      this.mediaProcessorConnector_.setTrack(this.videoTrack_!).then( newTrack => {
         let processedStream = new MediaStream();
         processedStream.addTrack(newTrack);
         this.sink_.setMediaStream(processedStream);
