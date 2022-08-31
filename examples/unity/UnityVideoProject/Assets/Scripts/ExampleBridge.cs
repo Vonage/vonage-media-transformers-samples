@@ -6,9 +6,12 @@ using UnityEngine.UI;
 
 public class ExampleBridge : MonoBehaviour
 {
+    const int WIDTH = 640;
+    const int HEIGHT = 480;
+    const int BUFFER_SIZE = 640 * 480 * 4;
 
-    float[] inputArray = new float[1228800];
-    float[] outputArray = new float[1228800];
+    float[] inputArray = new float[BUFFER_SIZE];
+    float[] outputArray = new float[BUFFER_SIZE];
     public GameObject myPlane;
     Texture2D texture,texture2;
     public RenderTexture src_render_texture;
@@ -18,20 +21,20 @@ public class ExampleBridge : MonoBehaviour
     Rect rect;
     public GameObject panelRenderer;
     [DllImport("__Internal")]
-    private static extern void SetArrays(float[] inputArray, int inputSize, float[] outputArray, int outputSize);
+    private static extern void SetUnityData(float[] inputArray, int inputSize, float[] outputArray, int outputSize, int width, int height);
    
     void Start()
     {
-        SetArrays(inputArray, inputArray.Length, outputArray, outputArray.Length);
+        SetUnityData(inputArray, inputArray.Length, outputArray, outputArray.Length, WIDTH, HEIGHT);
         len = inputArray.Length / 4;
         t = new Color[len];
         img = (RawImage)myPlane.GetComponent<RawImage>();
-        texture = new Texture2D(640, 480, TextureFormat.RGBA32, false);
+        texture = new Texture2D(WIDTH, HEIGHT, TextureFormat.RGBA32, false);
         texture.wrapMode = TextureWrapMode.Clamp;
         texture.filterMode = FilterMode.Point;
         texture.anisoLevel = 1;
-        texture2 = new Texture2D(640, 480, TextureFormat.RGBA32, false);
-        rect = new Rect(0, 0, 640, 480);
+        texture2 = new Texture2D(WIDTH, HEIGHT, TextureFormat.RGBA32, false);
+        rect = new Rect(0, 0, WIDTH, HEIGHT);
     }
 
     void CopyOutputArray()
@@ -64,7 +67,7 @@ public class ExampleBridge : MonoBehaviour
             t[x] = color;
         }
       
-        texture.SetPixels(0, 0, 640, 480, t, 0);
+        texture.SetPixels(0, 0, WIDTH, HEIGHT, t, 0);
         texture.Apply();
         img.texture = texture;
         StartCoroutine(wait());
