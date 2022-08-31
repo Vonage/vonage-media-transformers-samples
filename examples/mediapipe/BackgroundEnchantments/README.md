@@ -23,7 +23,7 @@ In our *main.ts* you can see this code chunk:
 ```typescript
 ...
 videoSource_.setMediaProcessorConnector(connector).then(() => {
-	console.log('all done and running')
+	console.log('ok')
 }).catch( e  => {
 	console.error(e)
 })
@@ -32,6 +32,10 @@ videoSource_.setMediaProcessorConnector(connector).then(() => {
 All you need to do is changed it with this code:
 ```typescript
 ...
-publisher.setVideoMediaProcessorConnector(connector)
+publisher.setVideoMediaProcessorConnector(connector).then(() => {
+    console.log('ok')
+}).catch( e  => {
+	console.error(e)
+})
 ...
 ```
