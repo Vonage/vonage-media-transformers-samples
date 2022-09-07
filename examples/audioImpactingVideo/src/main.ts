@@ -17,13 +17,14 @@ const DEFAULT_COLOR: vec3 = [255, 0, 0];
 
 async function main() {
     const { audioTransformers, videoTransformers } = createTransformers();
-    const pipeline = await Pipeline.create({
+    const pipeline = new Pipeline({
         source: await Source.camera(),
         targetOriginal: new Target("source_video"),
         targetProcessed: new Target("preview_video"),
         audioTransformers,
         videoTransformers,
     });
+    pipeline.start();
 
     bindButtonToLink(
         "githubButton",
@@ -36,7 +37,7 @@ async function main() {
     );
 
     bindSwitch("cameraswitch", (value: boolean) => {
-        pipeline.processingEnabled = value;
+        value ? pipeline.start() : pipeline.stop();
     });
 
     bindSlider("sensitivity_slider", (value: number) => {

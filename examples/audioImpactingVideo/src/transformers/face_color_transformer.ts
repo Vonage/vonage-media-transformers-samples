@@ -49,7 +49,7 @@ export class FaceColorTransformer implements VolumeOwnerTransformer {
     public async transform?(frame: VideoFrame, controller: TransformStreamDefaultController) {
         const frameAsBitmap = await createImageBitmap(frame);
 
-        await this.mediapipeHelper.send(frameAsBitmap);
+        this.mediapipeHelper.send(frameAsBitmap);
 
         if (this.mediapipeResults) {
             this.canvas.width = frame.displayWidth;

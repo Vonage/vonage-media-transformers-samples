@@ -17,16 +17,13 @@ export class Pipeline {
     private readonly targetProcessed: Target;
 
     // Processing
+    private started: boolean = false;
     private videoTransformers: Transformer[];
     private audioTransformers: Transformer[];
-    private videoMediaProcessor: MediaProcessor = new MediaProcessor();
-    private audioMediaProcessor: MediaProcessor = new MediaProcessor();
+    private videoMediaProcessor?: MediaProcessor;
+    private audioMediaProcessor?: MediaProcessor;
 
-    // Streams
-    private streamOriginal: MediaStream = new MediaStream();
-    private streamProcessed: MediaStream = new MediaStream();
-
-    private constructor(config: PipelineConfig) {
+    constructor(config: PipelineConfig) {
         this.source = config.source;
         this.targetOriginal = config.targetOriginal;
         this.targetProcessed = config.targetProcessed;
@@ -34,38 +31,59 @@ export class Pipeline {
         this.audioTransformers = config.audioTransformers;
     }
 
-    public static async create(config: PipelineConfig): Promise<Pipeline> {
-        const pipeline = new Pipeline(config);
-        await pipeline.init();
-        return pipeline;
-    }
+    public async start() {
+        if (this.started) return;
+        this.started = true;
 
-    public set processingEnabled(value: boolean) {
-        this.targetProcessed.setStream(value ? this.streamProcessed : this.streamOriginal);
+        const streamOriginal = this.createOriginalStream();
+        const streamProcessed = await this.createProcessedStream();
+
+        this.targetOriginal.setStream(streamOriginal);
+        this.targetProcessed.setStream(streamProcessed);
+        this.targetOriginal.start();
         this.targetProcessed.start();
     }
 
-    public async init() {
+    public stop() {
+        if (!this.started) return;
+        this.started = false;
+
+        this.destroyProcessedStream();
+
+        const stream = this.createOriginalStream();
+        this.targetOriginal.setStream(stream);
+        this.targetProcessed.setStream(stream);
+        this.targetOriginal.start();
+        this.targetProcessed.start();
+    }
+
+    private createOriginalStream(): MediaStream {
+        const stream = new MediaStream();
+        stream.addTrack(this.source.videoTrack);
+        return stream;
+    }
+
+    private async createProcessedStream(): Promise<MediaStream> {
+        this.videoMediaProcessor = new MediaProcessor();
+        this.audioMediaProcessor = new MediaProcessor();
+
         const videoConnector = new MediaProcessorConnector(this.videoMediaProcessor);
         const audioConnector = new MediaProcessorConnector(this.audioMediaProcessor);
-
         const [videoTrack, audioTrack] = await Promise.all([
             videoConnector.setTrack(this.source.videoTrack),
             audioConnector.setTrack(this.source.audioTrack),
             this.videoMediaProcessor.setTransformers(this.videoTransformers),
             this.audioMediaProcessor.setTransformers(this.audioTransformers),
         ]);
+        const stream = new MediaStream();
+        stream.addTrack(audioTrack);
+        stream.addTrack(videoTrack);
 
-        this.streamOriginal = new MediaStream();
-        this.streamOriginal.addTrack(this.source.videoTrack);
+        return stream;
+    }
 
-        this.streamProcessed = new MediaStream();
-        this.streamProcessed.addTrack(audioTrack);
-        this.streamProcessed.addTrack(videoTrack);
-
-        this.targetOriginal.setStream(this.streamOriginal);
-        this.targetOriginal.start();
-
-        this.processingEnabled = true;
+    private destroyProcessedStream() {
+        this.videoMediaProcessor?.destroy();
+        this.audioMediaProcessor?.destroy();
     }
 }
