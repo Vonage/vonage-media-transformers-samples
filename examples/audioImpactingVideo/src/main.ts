@@ -1,5 +1,3 @@
-import "./style.css";
-
 import { Source } from "./source";
 import { Target } from "./target";
 
