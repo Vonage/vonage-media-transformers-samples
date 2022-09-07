@@ -20,6 +20,8 @@ public class ExampleBridge : MonoBehaviour
     int len;
     Rect rect;
     public GameObject panelRenderer;
+
+#if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern void SetUnityData(float[] inputArray, int inputSize, float[] outputArray, int outputSize, int width, int height);
    
@@ -78,4 +80,7 @@ public class ExampleBridge : MonoBehaviour
         yield return new WaitForEndOfFrame();
         CopyOutputArray();
     }
+#else
+
+#endif
 }
