@@ -28,7 +28,7 @@ async function main() {
 
     bindButtonToLink(
         "githubButton",
-        "https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/dontSpeakTooLoud"
+        "https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/audioImpactingVideo"
     );
 
     bindButtonToLink(
