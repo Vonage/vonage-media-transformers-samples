@@ -54,8 +54,8 @@ export class FaceColorTransformer implements VolumeOwnerTransformer {
         if (this.mediapipeResults) {
             this.canvas.width = frame.displayWidth;
             this.canvas.height = frame.displayHeight;
-            const clipedVolume = clip(this.volume, this.minVolume, this.maxVolume);
-            const loudness = map(clipedVolume, this.minVolume, this.maxVolume, 0, 1) ** 2;
+            const clippedVolume = clip(this.volume, this.minVolume, this.maxVolume);
+            const loudness = map(clippedVolume, this.minVolume, this.maxVolume, 0, 1) ** 2;
             this.program.run(this.mediapipeResults.image, this.mediapipeResults.segmentationMask, [
                 ...(this.color.map((v) => v) as vec3),
                 loudness * 0.02,
