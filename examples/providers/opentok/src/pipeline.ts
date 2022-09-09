@@ -39,10 +39,10 @@ export class Pipeline {
         const streamProcessed = await this.createProcessedStream();
 
         this.targetProcessed.setStream(streamProcessed);
-        this.targetProcessed.start();
+        await this.targetProcessed.start();
 
         this.targetOriginal?.setStream(streamOriginal);
-        this.targetOriginal?.start();
+        await this.targetOriginal?.start();
     }
 
     public stop() {

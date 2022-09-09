@@ -1,6 +1,6 @@
 <html>
-  <head>
-    <!--
+    <head>
+        <!--
   <style>
     body {
       margin: 0px;
@@ -61,23 +61,66 @@
     import "@vonage/vwc-list/vwc-list-item";
   </script>
 -->
-    <title>MediaPipe sample</title>
-    <link
-      rel="icon"
-      href="https://vonage-audio-impacting-video-samples.s3.amazonaws.com/vonage.png"
-    />
-  </head>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .app {
+                padding: 0;
+                margin: 0;
+                width: 100vw;
+                height: 100vh;
+            }
 
-  <body>
-    <div class="app">
-      <div class="incoming-stream">
-        <video id="incoming-stream-video"></video>
-      </div>
-      <div class="outcoming-stream">
-        <video id="outcoming-stream-video"></video>
-      </div>
-    </div>
-    <!--
+            .upcoming-stream {
+                z-index: 10;
+                position: absolute;
+                bottom: 20px;
+                left: 20px;
+
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+                border-radius: 5px;
+                width: 300px;
+            }
+            .upcoming-stream video {
+                width: 100%;
+            }
+
+            .incoming-stream {
+                width: 100vw;
+                height: 100vh;
+            }
+            .incoming-stream-message {
+                background-color: black;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+            }
+        </style>
+        <title>OpenTok sample</title>
+    </head>
+
+    <body>
+        <div class="app">
+            <div class="incoming-stream">
+                <div class="incoming-stream-message">Connecting...</div>
+            </div>
+            <div class="upcoming-stream">
+                <video id="upcoming-stream-video"></video>
+            </div>
+        </div>
+        <!--
   <vwc-top-app-bar alternate>
     <img slot="navigationIcon" height="24"
       src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQI9k8NKq3KoOs1VkwSYwPwwQbisiS_K-0jtBUyml13k7EBy8Aekz7G7I1vqceWf5kEQ&usqp=CAU" />
@@ -120,6 +163,6 @@
     </div>
   </vwc-top-app-bar>
 -->
-    <script type="module" src="./src/main.ts"></script>
-  </body>
+        <script type="module" src="./src/main.ts"></script>
+    </body>
 </html>

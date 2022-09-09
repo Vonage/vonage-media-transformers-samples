@@ -42,10 +42,11 @@ class TargetVideo extends Target {
     }
 
     public setStream(stream: MediaStream) {
+        this.element?.pause();
         this.element!.srcObject = stream;
     }
 
-    public start() {
-        this.element?.play();
+    public async start() {
+        await this.element?.play();
     }
 }

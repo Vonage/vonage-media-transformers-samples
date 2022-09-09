@@ -1,22 +1,13 @@
 import * as OpenTok from "@opentok/client";
 import { Source } from "../source";
-import { Target } from "../target";
 
 export class OpenTokFacade {
-    public subscriberStream: MediaStream = new MediaStream();
-    public subscriberVideoElement: HTMLVideoElement = document.createElement("video");
-    public publisherStream: MediaStream = new MediaStream();
-    public publisherVideoElement: HTMLVideoElement = document.createElement("video");
     private session?: OpenTok.Session;
     private connectPromise?: Promise<boolean>;
 
-    public get source(): Source {
-        return Source.stream(this.publisherStream);
-    }
+    private publisherVideo: HTMLVideoElement = document.createElement("video");
 
-    public get target(): Target {
-        return Target.stream(this.publisherStream);
-    }
+    constructor(public readonly upcoming: Source, public readonly incoming?: HTMLElement) {}
 
     public async connect(apiKey: string, sessionId: string, token: string): Promise<Boolean> {
         if (!this.connectPromise) {
@@ -40,36 +31,31 @@ export class OpenTokFacade {
 
     private initPublisher() {
         const publisher = OpenTok.initPublisher(
-            this.publisherVideoElement,
+            this.publisherVideo,
             {
                 insertMode: "append",
                 width: "100%",
                 height: "100%",
+                videoSource: this.upcoming.videoTrack,
+                audioSource: this.upcoming.audioTrack,
             },
-            (e) => {
-                throw e;
+            (error?: OpenTok.OTError) => {
+                if (error) {
+                    throw error;
+                }
             }
         );
-        this.session?.publish(publisher, (e) => {
-            throw e;
+        this.session?.publish(publisher, (error?: OpenTok.OTError) => {
+            if (error) {
+                throw error;
+            }
         });
-
-        const audioTrack = publisher.getAudioSource();
-        if (audioTrack) {
-            this.publisherStream.addTrack(publisher.getAudioSource());
-        }
-
-        const videoSource = publisher.getVideoSource();
-        if (videoSource.track) {
-            this.publisherStream.addTrack(videoSource.track);
-        }
     }
 
-    private initSubscriber() {
-        /*
-        const subscriber = this.session?.subscribe(
+    private async initSubscriber(stream: OpenTok.Stream) {
+        this.session?.subscribe(
             stream,
-            this.subscriberVideoElement,
+            this.incoming,
             {
                 insertMode: "append",
                 width: "100%",
@@ -77,17 +63,15 @@ export class OpenTokFacade {
             },
             () => {}
         );
-        if (subscriber?.stream) {
-            this.initStream(subscriber.stream, this.subscriberStream);
-        }
-        */
     }
 
     private handleStreamCreated(stream: OpenTok.Stream) {
-        this.initSubscriber();
+        console.log("Stream created");
+        this.initSubscriber(stream);
     }
 
     private handleSessionConnect() {
+        console.log("Session connected");
         this.initPublisher();
     }
 

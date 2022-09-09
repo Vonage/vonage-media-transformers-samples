@@ -11,13 +11,6 @@ export class IdleVideoTransformer {
     }
 
     public async transform?(frame: VideoFrame, controller: TransformStreamDefaultController) {
-        frameToCanvas(frame, this.context);
-        frame.close();
-        controller.enqueue(
-            new VideoFrame(this.canvas as any as HTMLCanvasElement, {
-                timestamp: frame.timestamp ?? 0,
-                alpha: "discard",
-            })
-        );
+        controller.enqueue(frame);
     }
 }
