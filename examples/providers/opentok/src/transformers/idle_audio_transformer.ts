@@ -1,3 +1,3 @@
 export class IdleAudioTransformer {
-  public async transform?() {}
+    public async transform?() {}
 }

@@ -10,7 +10,10 @@ export class Source {
             audio: true,
             video: true,
         });
+        return Source.stream(stream);
+    }
 
+    public static stream(stream: MediaStream): Source {
         return new Source(stream, stream.getVideoTracks()[0], stream.getAudioTracks()[0]);
     }
 }

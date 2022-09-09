@@ -20,6 +20,7 @@
     "vite-plugin-glsl": "^0.3.0"
   },
   "dependencies": {
+    "@opentok/client": "^2.23.4",
     "@vonage/media-processor": "^2.0.0",
     "@vonage/ml-transformers": "^3.1.1",
     "@vonage/vivid": "^2.36.0",
