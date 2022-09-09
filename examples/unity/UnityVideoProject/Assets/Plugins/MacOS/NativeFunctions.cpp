@@ -10,54 +10,34 @@ using namespace std;
 
 extern "C" 
 {
-            // FIFO file path
-    const char * myfifo = "/Users/mhamed/Library/Containers/vonage.macOS-Test/Data/myfifo";
+    const int MAX_PIPE_BUFFER_SIZE = 64000;
 
-    int __stdcall CountLettersInString(wchar_t* str)
-    {
-        wstring ws(str);
-        // your new String
-        string result(ws.begin(), ws.end());
-        return (int)(result.size() + 1) / 2;
-    }
-
-    int __stdcall add_two_numbers(int a, int b)
-    {
-        return a+b;
-    }
-    
-    void __stdcall send_named_pipe(char *msg)
+    void __stdcall send_named_pipe(char *pipePath, char *buf, int size)
     {
         int fd;
 
         // Creating the named file(FIFO)
         // mkfifo(<pathname>, <permission>)
-        mkfifo(myfifo, 0666);
+        mkfifo(pipePath, 0666);
 
-        char arr1[80] = "test fifo from unity";
+        fd = open(pipePath, O_WRONLY);
 
-        strcpy(arr1, msg);
-
-        fd = open(myfifo, O_WRONLY);
-
-        write(fd, arr1, 80);
+        write(fd, buf, size);
         close(fd);
     }
 
-    void __stdcall read_from_pipe(unsigned char *result)
+    int __stdcall read_from_pipe(char *pipePath, unsigned char *buf)
     {
         int fd;
 
         // Creating the named file(FIFO)
         // mkfifo(<pathname>, <permission>)
-        mkfifo(myfifo, 0666);
+        mkfifo(pipePath, 0666);
 
-        char buf[80] = {0};
-
-        fd = open(myfifo,O_RDONLY);
-        read(fd, buf, 80);
+        fd = open(pipePath,O_RDONLY);
+        int bytesRead = read(fd, buf, MAX_PIPE_BUFFER_SIZE);
         close(fd);
 
-        strcpy((char*)result, buf);
+        return bytesRead;
     }
 }
