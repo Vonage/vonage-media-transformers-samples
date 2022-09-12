@@ -5,6 +5,7 @@ import { OpenTokFacade } from "./facades/opentok_facade";
 import { Pipeline } from "./pipeline";
 import { HandExtractorTransformer } from "./transformers/hands_extractor_transformer";
 import { IdleAudioTransformer } from "./transformers/idle_audio_transformer";
+import { ShowFilterTransformer } from "./transformers/show_filters_transformer";
 
 const API_KEY = "47568411";
 const SESSION_ID = "2_MX40NzU2ODQxMX5-MTY2MjcwMTIxNzU5NH5yUVVHMDJUNUZ3UWQxNmJKaDBLMm0vSzZ-fg";
@@ -20,11 +21,15 @@ async function main() {
     upcomingVideo.setStream(upcomingStream);
     upcomingVideo.start();
 
+    const handExtractorTransformer = new HandExtractorTransformer();
     const upcomingPipeline = new Pipeline({
         source: camera,
         targetProcessed: Target.stream(upcomingStream),
         audioTransformers: [new IdleAudioTransformer()],
-        videoTransformers: [new HandExtractorTransformer()],
+        videoTransformers: [
+            handExtractorTransformer,
+            new ShowFilterTransformer(handExtractorTransformer),
+        ],
     });
     await upcomingPipeline.start();
 

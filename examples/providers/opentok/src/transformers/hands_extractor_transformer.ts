@@ -27,7 +27,6 @@ export class HandExtractorTransformer {
                     },
                     listener: (results: MediaPipeResults): void => {
                         this.mediapipeResults = results as HandsResults;
-                        console.log(results);
                     },
                 },
             ],
@@ -38,21 +37,25 @@ export class HandExtractorTransformer {
         const frameAsBitmap = await createImageBitmap(frame);
         this.mediapipeHelper.send(frameAsBitmap);
 
+        this.rightHand = undefined;
+        this.leftHand = undefined;
+
         this.mediapipeResults?.multiHandLandmarks.forEach((landmarks, index) => {
             const classification = this.mediapipeResults?.multiHandedness[index];
             const center: vec2 = [0, 0];
+            if (classification?.score ?? 0 > 0.9) {
+                landmarks.forEach(({ x, y }) => {
+                    center[0] += x;
+                    center[1] += y;
+                });
+                center[0] /= landmarks.length;
+                center[1] /= landmarks.length;
 
-            landmarks.forEach(({ x, y }) => {
-                center[0] += x;
-                center[1] += x;
-            });
-            center[0] /= landmarks.length;
-            center[1] /= landmarks.length;
-
-            if (classification?.label == "Right") {
-                this.rightHand = center;
-            } else {
-                this.leftHand = center;
+                if (classification?.label == "Right") {
+                    this.rightHand = center;
+                } else {
+                    this.leftHand = center;
+                }
             }
         });
         controller.enqueue(frame);
