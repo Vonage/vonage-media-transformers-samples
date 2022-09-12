@@ -3,9 +3,9 @@
     <img src="public/logo.png" alt="Vonage logo" title="Vonage" align="right" height="60" />
 </a>
 
-# Audio impacting video sample
+# OpenTok
 
-This sample app show how audio could interact with video using Vonage [Media Processor](https://github.com/Vonage/media-processor) and [ML Transformers](https://github.com/Vonage/ml-transformers) libraries.
+This sample app show to use OpenTok with Vonage [Media Processor](https://github.com/Vonage/media-processor) and [ML Transformers](https://github.com/Vonage/ml-transformers) libraries.
 
 Start speaking to see the volume histogram. If you're loud enough, your body become red.
 
