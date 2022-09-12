@@ -10,6 +10,7 @@ import {
 } from "./transformers/volume_extractor_transformer";
 import { VolumeHistogramTransformer } from "./transformers/volume_histogram_transformer";
 import { vec3 } from "./types";
+import { bindButtonToLink, bindSwitch, bindSlider } from "./utils/ui";
 
 const DEFAULT_MIN_VOLUME: number = 0.0001;
 const DEFAULT_MAX_VOLUME: number = 0.01;
@@ -29,49 +30,24 @@ async function main() {
     upcomingVideo.start();
 
     const { audioTransformers, videoTransformers } = createTransformers();
-    const upcomingPipeline = new Pipeline({
+    const pipeline = new Pipeline({
         source: camera,
         targetProcessed: Target.stream(upcomingStream),
         audioTransformers,
         videoTransformers,
     });
-    await upcomingPipeline.start();
+    await pipeline.start();
 
     const opentok = new OpenTokFacade(Source.stream(upcomingStream), incomingDiv);
     await opentok.connect(API_KEY, SESSION_ID, TOKEN);
-}
 
-window.onload = main;
-
-/*
- ✔  10:08:00 
-import { Source } from "./source";
-import { Target } from "./target";
-
-import { Pipeline } from "./pipeline";
-import { FaceColorTransformer } from "./transformers/face_color_transformer";
-import {
-    VolumeExtractorTransformer,
-    VolumeOwnerTransformer,
-} from "./transformers/volume_extractor_transformer";
-import { VolumeHistogramTransformer } from "./transformers/volume_histogram_transformer";
-import { vec3 } from "./types";
-import { bindButtonToLink, bindSwitch, bindSlider } from "./utils/ui";
-
-const DEFAULT_MIN_VOLUME: number = 0.0001;
-const DEFAULT_MAX_VOLUME: number = 0.01;
-const DEFAULT_COLOR: vec3 = [255, 0, 0];
-
-async function main() {
-    const { audioTransformers, videoTransformers } = createTransformers();
-    const pipeline = new Pipeline({
-        source: await Source.camera(),
-        targetOriginal: new Target("source_video"),
-        targetProcessed: new Target("preview_video"),
-        audioTransformers,
-        videoTransformers,
+    pipeline.onStart.register(() => {
+        opentok.setUpcomingSource(Source.stream(upcomingStream));
     });
-    pipeline.start();
+
+    pipeline.onStop.register(() => {
+        opentok.setUpcomingSource(camera);
+    });
 
     bindButtonToLink(
         "githubButton",
@@ -83,15 +59,18 @@ async function main() {
         "https://vivid.vonage.com/?path=/story/introduction-meet-vivid--meet-vivid"
     );
 
+    /**
     bindSwitch("cameraswitch", (value: boolean) => {
         value ? pipeline.start() : pipeline.stop();
     });
+     */
 
     bindSlider("sensitivity_slider", (value: number) => {
         videoTransformers.forEach((t: any) => (t.maxVolume = value));
     });
 }
-*/
+
+window.onload = main;
 
 function createTransformers(): {
     audioTransformers: Transformer[];

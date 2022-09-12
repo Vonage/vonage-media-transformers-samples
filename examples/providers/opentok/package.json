@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "@opentok/client": "^2.23.4",
+        "@vonage/js-nameless-events": "github:vonage/js-nameless-events",
         "@vonage/media-processor": "^2.0.0",
         "@vonage/ml-transformers": "^3.1.1",
         "@vonage/vivid": "^2.36.0",

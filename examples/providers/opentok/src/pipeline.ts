@@ -1,6 +1,7 @@
 import { MediaProcessor, MediaProcessorConnector } from "@vonage/media-processor";
 import { Source } from "./source";
 import { Target } from "./target";
+import { EventEmitter } from "@vonage/js-nameless-events";
 
 export interface PipelineConfig {
     source: Source;
@@ -11,6 +12,9 @@ export interface PipelineConfig {
 }
 
 export class Pipeline {
+    public onStart: EventEmitter = new EventEmitter();
+    public onStop: EventEmitter = new EventEmitter();
+
     // IO
     private readonly source: Source;
     private readonly targetOriginal?: Target;
@@ -43,6 +47,8 @@ export class Pipeline {
 
         this.targetOriginal?.setStream(streamOriginal);
         await this.targetOriginal?.start();
+
+        this.onStart.fire();
     }
 
     public stop() {
@@ -57,11 +63,13 @@ export class Pipeline {
 
         this.targetOriginal?.setStream(stream);
         this.targetOriginal?.start();
+        this.onStop.fire();
     }
 
     private createOriginalStream(): MediaStream {
         const stream = new MediaStream();
         stream.addTrack(this.source.videoTrack);
+        stream.addTrack(this.source.audioTrack);
         return stream;
     }
 

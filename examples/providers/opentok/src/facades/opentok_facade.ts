@@ -4,10 +4,11 @@ import { Source } from "../source";
 export class OpenTokFacade {
     private session?: OpenTok.Session;
     private connectPromise?: Promise<boolean>;
+    private publisher?: OT.Publisher;
 
     private publisherVideo: HTMLVideoElement = document.createElement("video");
 
-    constructor(public readonly upcoming: Source, public readonly incoming?: HTMLElement) {}
+    constructor(public upcoming: Source, public readonly incoming?: HTMLElement) {}
 
     public async connect(apiKey: string, sessionId: string, token: string): Promise<Boolean> {
         if (!this.connectPromise) {
@@ -29,8 +30,14 @@ export class OpenTokFacade {
         return this.connectPromise;
     }
 
+    public setUpcomingSource(source: Source) {
+        this.upcoming = source;
+        this.publisher?.setAudioSource(source.audioTrack);
+        // this.publisher?.setVideoSource(source.videoTrack); //Not possible atm
+    }
+
     private initPublisher() {
-        const publisher = OpenTok.initPublisher(
+        this.publisher = OpenTok.initPublisher(
             this.publisherVideo,
             {
                 insertMode: "append",
@@ -45,7 +52,7 @@ export class OpenTokFacade {
                 }
             }
         );
-        this.session?.publish(publisher, (error?: OpenTok.OTError) => {
+        this.session?.publish(this.publisher, (error?: OpenTok.OTError) => {
             if (error) {
                 throw error;
             }
