@@ -40,5 +40,5 @@ This project is licensed under the terms of the [MIT license](https://opensource
 
 ## Links
 
-* [Online demo](https://vonage-audio-impacting-video-sample.s3.amazonaws.com/index.html)
-* [Source code](https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/audioImpactingVideo)
+* [Online demo](https://vonage-opentok-sample.s3.amazonaws.com/index.html)
+* [Source code](https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/providers/opentok)
