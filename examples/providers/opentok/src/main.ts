@@ -21,33 +21,21 @@ const TOKEN =
     "T1==cGFydG5lcl9pZD00NzU2ODQxMSZzaWc9MWNkMTYzZTE3ODI3OGY4ZjgwOWVmYTg1YzcwMjdkYTI1NGEzNjc1MzpzZXNzaW9uX2lkPTJfTVg0ME56VTJPRFF4TVg1LU1UWTJNamsyTlRJNE9UQTFOWDR5YnpBelJYbzVRbTF0VVhGVlJuVnJRM3BFYzFsdVVWQi1mZyZjcmVhdGVfdGltZT0xNjYyOTY1MzQyJm5vbmNlPTAuNzE4NjgwOTg3NDEyNzIyNyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjY1NTU3MzQxJmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
 
 async function main() {
-    const camera = await Source.camera();
-    const incomingDiv = document.getElementsByClassName("incoming-stream")[0] as HTMLElement;
-    const upcomingVideo = Target.video("upcoming-stream-video");
-    const upcomingStream = new MediaStream();
-
-    upcomingVideo.setStream(upcomingStream);
-    upcomingVideo.start();
-
     const { audioTransformers, videoTransformers } = createTransformers();
     const pipeline = new Pipeline({
-        source: camera,
-        targetProcessed: Target.stream(upcomingStream),
+        source: await Source.camera(),
+        targetOriginal: Target.video("source_video"),
         audioTransformers,
         videoTransformers,
     });
-    await pipeline.start();
 
-    const opentok = new OpenTokFacade(Source.stream(upcomingStream), incomingDiv);
-    await opentok.connect(API_KEY, SESSION_ID, TOKEN);
+    const opentok = new OpenTokFacade(
+        document.getElementsByClassName("incoming-stream")[0] as HTMLElement
+    );
 
-    pipeline.onStart.register(() => {
-        opentok.setUpcomingSource(Source.stream(upcomingStream));
-    });
+    await Promise.all([pipeline.start(), opentok.connect(API_KEY, SESSION_ID, TOKEN)]);
 
-    pipeline.onStop.register(() => {
-        opentok.setUpcomingSource(camera);
-    });
+    opentok.setVideoMediaProcessorConnector(pipeline.videoConnector);
 
     bindButtonToLink(
         "githubButton",
@@ -59,11 +47,13 @@ async function main() {
         "https://vivid.vonage.com/?path=/story/introduction-meet-vivid--meet-vivid"
     );
 
-    /**
     bindSwitch("cameraswitch", (value: boolean) => {
-        value ? pipeline.start() : pipeline.stop();
+        if (value) {
+            opentok.setVideoMediaProcessorConnector(pipeline.videoConnector);
+        } else {
+            opentok.setVideoMediaProcessorConnector();
+        }
     });
-     */
 
     bindSlider("sensitivity_slider", (value: number) => {
         videoTransformers.forEach((t: any) => (t.maxVolume = value));

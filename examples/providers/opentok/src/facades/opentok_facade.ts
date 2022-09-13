@@ -1,5 +1,6 @@
 import * as OpenTok from "@opentok/client";
-import { Source } from "../source";
+import { MediaProcessorConnector } from "@vonage/media-processor";
+import { Nullable } from "../types";
 
 export class OpenTokFacade {
     private session?: OpenTok.Session;
@@ -8,7 +9,7 @@ export class OpenTokFacade {
 
     private publisherVideo: HTMLVideoElement = document.createElement("video");
 
-    constructor(public upcoming: Source, public readonly incoming?: HTMLElement) {}
+    constructor(public readonly incoming?: HTMLElement) {}
 
     public async connect(apiKey: string, sessionId: string, token: string): Promise<Boolean> {
         if (!this.connectPromise) {
@@ -21,41 +22,42 @@ export class OpenTokFacade {
                 this.session.on("sessionDisconnected", ({ reason }) => {
                     this.handleSessionDisconnected(reason);
                 });
-                this.session.connect(token, (error) => {
+                this.session.connect(token, async (error) => {
+                    error
+                        ? this.handleSessionConnectError(error)
+                        : await this.handleSessionConnect();
                     resolve(!!error);
-                    error ? this.handleSessionConnectError(error) : this.handleSessionConnect();
                 });
             });
         }
         return this.connectPromise;
     }
 
-    public setUpcomingSource(source: Source) {
-        this.upcoming = source;
-        this.publisher?.setAudioSource(source.audioTrack);
-        // this.publisher?.setVideoSource(source.videoTrack); //Not possible atm
+    public setVideoMediaProcessorConnector(video: Nullable<MediaProcessorConnector> = null) {
+        this.publisher?.setVideoMediaProcessorConnector(video);
     }
 
-    private initPublisher() {
-        this.publisher = OpenTok.initPublisher(
-            this.publisherVideo,
-            {
-                insertMode: "append",
-                width: "100%",
-                height: "100%",
-                videoSource: this.upcoming.videoTrack,
-                audioSource: this.upcoming.audioTrack,
-            },
-            (error?: OpenTok.OTError) => {
+    private async initPublisher() {
+        return new Promise((resolve) => {
+            this.publisher = OpenTok.initPublisher(
+                this.publisherVideo,
+                {
+                    insertMode: "append",
+                    width: "100%",
+                    height: "100%",
+                },
+                (error?: OpenTok.OTError) => {
+                    if (error) {
+                        throw error;
+                    }
+                    resolve(undefined);
+                }
+            );
+            this.session?.publish(this.publisher, (error?: OpenTok.OTError) => {
                 if (error) {
                     throw error;
                 }
-            }
-        );
-        this.session?.publish(this.publisher, (error?: OpenTok.OTError) => {
-            if (error) {
-                throw error;
-            }
+            });
         });
     }
 
@@ -79,7 +81,7 @@ export class OpenTokFacade {
 
     private handleSessionConnect() {
         console.log("Session connected");
-        this.initPublisher();
+        return this.initPublisher();
     }
 
     private handleSessionConnectError(error: OpenTok.OTError) {

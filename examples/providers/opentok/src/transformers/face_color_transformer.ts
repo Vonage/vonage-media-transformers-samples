@@ -3,7 +3,7 @@ import {
     MediaPipeResults,
     SelfieSegmentationResults,
 } from "@vonage/ml-transformers";
-import { map, clip } from "js-math-utils";
+import { map, clip } from "../utils/math";
 import { vec3 } from "../types";
 import { ApplyColor } from "../webgl/apply_color/apply_color";
 import { VolumeOwnerTransformer } from "./volume_extractor_transformer";

@@ -1,24 +1,20 @@
 import { MediaProcessor, MediaProcessorConnector } from "@vonage/media-processor";
 import { Source } from "./source";
 import { Target } from "./target";
-import { EventEmitter } from "@vonage/js-nameless-events";
 
 export interface PipelineConfig {
     source: Source;
     targetOriginal?: Target;
-    targetProcessed: Target;
+    targetProcessed?: Target;
     videoTransformers: Transformer[];
     audioTransformers: Transformer[];
 }
 
 export class Pipeline {
-    public onStart: EventEmitter = new EventEmitter();
-    public onStop: EventEmitter = new EventEmitter();
-
     // IO
     private readonly source: Source;
     private readonly targetOriginal?: Target;
-    private readonly targetProcessed: Target;
+    private readonly targetProcessed?: Target;
 
     // Processing
     private started: boolean = false;
@@ -26,6 +22,8 @@ export class Pipeline {
     private audioTransformers: Transformer[];
     private videoMediaProcessor?: MediaProcessor;
     private audioMediaProcessor?: MediaProcessor;
+    public videoConnector?: MediaProcessorConnector;
+    public audioConnector?: MediaProcessorConnector;
 
     constructor(config: PipelineConfig) {
         this.source = config.source;
@@ -42,13 +40,11 @@ export class Pipeline {
         const streamOriginal = this.createOriginalStream();
         const streamProcessed = await this.createProcessedStream();
 
-        this.targetProcessed.setStream(streamProcessed);
-        await this.targetProcessed.start();
+        this.targetProcessed?.setStream(streamProcessed);
+        await this.targetProcessed?.start();
 
         this.targetOriginal?.setStream(streamOriginal);
         await this.targetOriginal?.start();
-
-        this.onStart.fire();
     }
 
     public stop() {
@@ -58,12 +54,11 @@ export class Pipeline {
         this.destroyProcessedStream();
 
         const stream = this.createOriginalStream();
-        this.targetProcessed.setStream(stream);
-        this.targetProcessed.start();
+        this.targetProcessed?.setStream(stream);
+        this.targetProcessed?.start();
 
         this.targetOriginal?.setStream(stream);
         this.targetOriginal?.start();
-        this.onStop.fire();
     }
 
     private createOriginalStream(): MediaStream {
@@ -77,11 +72,11 @@ export class Pipeline {
         this.videoMediaProcessor = new MediaProcessor();
         this.audioMediaProcessor = new MediaProcessor();
 
-        const videoConnector = new MediaProcessorConnector(this.videoMediaProcessor);
-        const audioConnector = new MediaProcessorConnector(this.audioMediaProcessor);
+        this.videoConnector = new MediaProcessorConnector(this.videoMediaProcessor);
+        this.audioConnector = new MediaProcessorConnector(this.audioMediaProcessor);
         const [videoTrack, audioTrack] = await Promise.all([
-            videoConnector.setTrack(this.source.videoTrack),
-            audioConnector.setTrack(this.source.audioTrack),
+            this.videoConnector.setTrack(this.source.videoTrack),
+            this.audioConnector.setTrack(this.source.audioTrack),
             this.videoMediaProcessor.setTransformers(this.videoTransformers),
             this.audioMediaProcessor.setTransformers(this.audioTransformers),
         ]);
