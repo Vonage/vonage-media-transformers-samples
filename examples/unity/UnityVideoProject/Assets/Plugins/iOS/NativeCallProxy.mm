@@ -1,6 +1,10 @@
-#define EXPORT __attribute__((visibility("default")))
+#import <Foundation/Foundation.h>
+#import "NativeCallProxy.h"
+
 
 #include <memory>
+
+#define EXPORT __attribute__((visibility("default")))
 
 class someBridge;
 typedef std::shared_ptr<someBridge> someBridgePrt;
@@ -65,7 +69,27 @@ extern "C"{
         someBridge::getBridge()->setInputBufferData(bufferData);
     }
 
-    EXPORT uint32_t* getInputBufferCpp(){
-        return someBridge::getBridge()->getInput();
-    }
+//    EXPORT uint32_t* getInputBufferCpp(){
+//        return someBridge::getBridge()->getInput();
+//    }
 }
+
+@implementation FrameworkLibAPI
+
+id<NativeCallsProtocol> api = NULL;
++(void) registerAPIforNativeCalls:(id<NativeCallsProtocol>) aApi
+{
+    api = aApi;
+}
+
++ (uint32_t*) getInputBufferCpp
+{
+    return someBridge::getBridge()->getInput();
+}
+@end
+
+
+extern "C" {
+    void showHostMainWindow(const char* color) { return [api showHostMainWindow:[NSString stringWithUTF8String:color]]; }
+}
+
