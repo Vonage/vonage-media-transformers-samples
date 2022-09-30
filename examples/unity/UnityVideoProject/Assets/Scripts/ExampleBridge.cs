@@ -91,10 +91,13 @@ public class ExampleBridge : MonoBehaviour
 #else
 
     [DllImport("__Internal")]
-    private static extern void send_named_pipe(byte[] pipePath, byte[] buf);
+    private static extern void initInputBufferCS(UInt32 size);
 
     [DllImport("__Internal")]
-    private static extern int read_from_pipe(byte[] pipePath, byte[] buf);
+    private static extern void getInputBufferCS(UInt32[] outBuffer);
+
+    [DllImport("__Internal")]
+    private static extern void setInputBufferDataCS(UInt32[] bufferData);
 
     private const int textureWidth = 640;
     private const int textureHeight = 480;
@@ -113,6 +116,8 @@ public class ExampleBridge : MonoBehaviour
     private byte[] rgbaPipeBuffer;
     private Color32[] texturePixels;
     private bool isComponentEnabled;
+    
+    UInt32[] inputBuffer;
 
     private void Start()
     {
@@ -122,6 +127,21 @@ public class ExampleBridge : MonoBehaviour
 #else
         pipePath = Application.persistentDataPath + "/myfifo";
 #endif
+
+
+        //visibility = GetComponent<CanvasElementVisibility>();
+        //GameController.Instance.Data.DialogOpen.Subscribe((value) =>
+        //{
+        //    visibility.Visible = value;
+        //}).AddTo(this);
+
+
+        UInt32 bufferSize = 4;
+        initInputBufferCS(bufferSize);
+
+        inputBuffer = new UInt32[bufferSize];
+
+        StartCoroutine(UpdateData());
 
         if(File.Exists(pipePath))
         {
@@ -184,8 +204,20 @@ public class ExampleBridge : MonoBehaviour
 
     }
 
+    private IEnumerator UpdateData()
+    {
+        yield return new WaitForSeconds(10);
+
+        var newData = new uint[] { 10, 20, 30, 40 };
+
+        setInputBufferDataCS(newData);
+
+
+    }
     private void Update()
     {
+        getInputBufferCS(inputBuffer);
+
         SetTexture();
     }
 
@@ -213,6 +245,14 @@ public class ExampleBridge : MonoBehaviour
         }
         catch (Exception)
         {
+        }
+    }
+
+    private void OnGUI()
+    {
+        for(int i = 0; i < inputBuffer.Length; i++)
+        {
+            GUI.Label(new Rect(200, 200 + i * 100, 200, 100), "array[" + i + " ] = " + inputBuffer[i]);
         }
     }
 
