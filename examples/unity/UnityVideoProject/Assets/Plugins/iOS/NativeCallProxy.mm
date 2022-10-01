@@ -17,7 +17,8 @@ public:
         return instance_;
     }
     someBridge(){
-        
+        inputArray_ = nullptr;
+        inputArraySize_ = 0;
     }
     
     uint32_t* getInput(){
@@ -30,15 +31,12 @@ public:
     void initInputBuffer(uint32_t size){
         inputArraySize_ = size;
         inputArray_ = std::unique_ptr<uint32_t>(new uint32_t[size]);
-
-        for(int i = 0 ; i < inputArraySize_ ; i++)
-        {
-            inputArray_.get()[i] = i * 2;
-        }
     }
 
     void copyInputArray(uint32_t *outArray)
     {
+        if(inputArray_ == nullptr) return;
+        
         memcpy(outArray, someBridge::getBridge()->getInput(), inputArraySize_ * sizeof(uint32_t));
     }
 

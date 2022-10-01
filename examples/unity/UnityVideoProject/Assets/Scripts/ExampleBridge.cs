@@ -101,53 +101,22 @@ public class ExampleBridge : MonoBehaviour
 
     private const int textureWidth = 640;
     private const int textureHeight = 480;
-    private const int rgbaBytesPerPixel = 4;
     
-    private const int maxPipeBufferSize = 16384;
-
     private const int numTexturePixels = textureWidth * textureHeight;
-    private const int rgbaTotalBytes = textureWidth * textureHeight * rgbaBytesPerPixel;
-
-    private static string libraryPath;
-    private static string pipePath;
-
+    
     private Texture2D texture;
     private RawImage img;
-    private byte[] rgbaPipeBuffer;
     private Color32[] texturePixels;
-    private bool isComponentEnabled;
     
-    UInt32[] inputBuffer;
+    UInt32[] receivedInputBuffer;
+
+    bool initializeDone = false;
 
     private void Start()
     {
-#if UNITY_STANDALONE_OSX
-        libraryPath = Application.persistentDataPath.Substring(0, Application.persistentDataPath.IndexOf("/Application Support"));
-        pipePath = libraryPath + "/Containers/vonage.macOS-Test/Data/rgb_frame.raw";
-#else
-        pipePath = Application.persistentDataPath + "/myfifo";
-#endif
-
-
-        //visibility = GetComponent<CanvasElementVisibility>();
-        //GameController.Instance.Data.DialogOpen.Subscribe((value) =>
-        //{
-        //    visibility.Visible = value;
-        //}).AddTo(this);
-
-
-        UInt32 bufferSize = 4;
-        initInputBufferCS(bufferSize);
-
-        inputBuffer = new UInt32[bufferSize];
-
-        StartCoroutine(UpdateData());
-
-        if(File.Exists(pipePath))
-        {
-            File.Delete(pipePath);
-        }
-
+        receivedInputBuffer = new UInt32[numTexturePixels];
+        initInputBufferCS(numTexturePixels);
+        
         img = myPlane.GetComponent<RawImage>();
         texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false)
         {
@@ -156,52 +125,9 @@ public class ExampleBridge : MonoBehaviour
             anisoLevel = 1
         };
 
-      //  rgbaPipeBuffer = new byte[maxPipeBufferSize];
         texturePixels = new Color32[numTexturePixels];
 
-        //Thread th = new(new ThreadStart(() =>
-        //{
-        //    while (isComponentEnabled)
-        //    {
-
-        //        int currentPixelIndex = 0;
-        //        // bytesRead += read_from_pipe(Encoding.ASCII.GetBytes(pipePath), rgbaPipeBuffer);
-        //        rgbaPipeBuffer = File.ReadAllBytes(pipePath);
-
-        //        for (int i = 0; i < rgbaPipeBuffer.Length; i += 4)
-        //        {
-        //            texturePixels[currentPixelIndex].r = rgbaPipeBuffer[i];
-        //            texturePixels[currentPixelIndex].g = rgbaPipeBuffer[i + 1];
-        //            texturePixels[currentPixelIndex].b = rgbaPipeBuffer[i + 2];
-        //            texturePixels[currentPixelIndex].a = rgbaPipeBuffer[i + 3];
-        //            currentPixelIndex++;
-        //        }
-        //    }
-
-
-        //        //int bytesRead = 0;
-        //        //int currentPixelIndex = 0;
-
-        //        //while (bytesRead < rgbaTotalBytes)
-        //        //{
-        //        //    // bytesRead += read_from_pipe(Encoding.ASCII.GetBytes(pipePath), rgbaPipeBuffer);
-        //        //    rgbaPipeBuffer = File.ReadAllBytes(pipePath);
-        //        //    bytesRead += rgbaPipeBuffer.Length;
-
-        //        //    for (int i = 0; i < rgbaPipeBuffer.Length; i += 4)
-        //        //    {
-        //        //        texturePixels[currentPixelIndex].r = rgbaPipeBuffer[i];
-        //        //        texturePixels[currentPixelIndex].g = rgbaPipeBuffer[i + 1];
-        //        //        texturePixels[currentPixelIndex].b = rgbaPipeBuffer[i + 2];
-        //        //        texturePixels[currentPixelIndex].a = rgbaPipeBuffer[i + 3];
-        //        //        currentPixelIndex++;
-        //        //    }
-        //        //}
-        //}));
-
-
-       // th.Start();
-
+        initializeDone = true;
     }
 
     private IEnumerator UpdateData()
@@ -211,31 +137,28 @@ public class ExampleBridge : MonoBehaviour
         var newData = new uint[] { 10, 20, 30, 40 };
 
         setInputBufferDataCS(newData);
-
-
     }
+
     private void Update()
     {
-        getInputBufferCS(inputBuffer);
+        if (initializeDone == false) return;
+
+        getInputBufferCS(receivedInputBuffer);
 
         SetTexture();
     }
 
     public void SetTexture()
     {
-        if (File.Exists(pipePath) == false) return;
-
         int currentPixelIndex = 0;
         try
         {
-            rgbaPipeBuffer = File.ReadAllBytes(pipePath);
-
-            for (int i = 0; i < rgbaPipeBuffer.Length; i += 4)
+            for (int i = 0; i < receivedInputBuffer.Length; i++)
             {
-                texturePixels[currentPixelIndex].r = rgbaPipeBuffer[i];
-                texturePixels[currentPixelIndex].g = rgbaPipeBuffer[i + 1];
-                texturePixels[currentPixelIndex].b = rgbaPipeBuffer[i + 2];
-                texturePixels[currentPixelIndex].a = rgbaPipeBuffer[i + 3];
+                texturePixels[currentPixelIndex].r = (byte)((receivedInputBuffer[i]) & 0xFF);
+                texturePixels[currentPixelIndex].g = (byte)((receivedInputBuffer[i] >> 8) & 0xFF);
+                texturePixels[currentPixelIndex].b = (byte)((receivedInputBuffer[i] >> 16) & 0xFF);
+                texturePixels[currentPixelIndex].a = (byte)((receivedInputBuffer[i] >> 24) & 0xFF);
                 currentPixelIndex++;
             }
 
@@ -250,20 +173,12 @@ public class ExampleBridge : MonoBehaviour
 
     private void OnGUI()
     {
-        for(int i = 0; i < inputBuffer.Length; i++)
+        if (receivedInputBuffer == null) return;
+
+        for(int i = 0; i < 4; i++)
         {
-            GUI.Label(new Rect(200, 200 + i * 100, 200, 100), "array[" + i + " ] = " + inputBuffer[i]);
+            GUI.Label(new Rect(200, 200 + i * 100, 200, 100), "array[" + i + " ] = " + receivedInputBuffer[i]);
         }
-    }
-
-    private void OnEnable()
-    {
-        isComponentEnabled = enabled;
-    }
-
-    private void OnDestroy()
-    {
-        isComponentEnabled = false;
     }
 
 #endif
