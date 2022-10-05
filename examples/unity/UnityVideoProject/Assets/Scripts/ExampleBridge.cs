@@ -99,26 +99,25 @@ public class ExampleBridge : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void setInputBufferDataCS(UInt32[] bufferData);
 
-    private const int textureWidth = 640;
-    private const int textureHeight = 480;
-    
-    private const int numTexturePixels = textureWidth * textureHeight;
-    
+    const int WIDTH = 640;
+    const int HEIGHT = 480;
+    const int BUFFER_SIZE = 640 * 480 * 4;
+
+    private const int numTexturePixels = WIDTH * HEIGHT;
+
+    UInt32[] inputArray;
+
     private Texture2D texture;
     private RawImage img;
     private Color32[] texturePixels;
     
-    UInt32[] receivedInputBuffer;
-
-    bool initializeDone = false;
-
     private void Start()
     {
-        receivedInputBuffer = new UInt32[numTexturePixels];
         initInputBufferCS(numTexturePixels);
-        
+        inputArray = new UInt32[numTexturePixels];
+
         img = myPlane.GetComponent<RawImage>();
-        texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false)
+        texture = new Texture2D(WIDTH, HEIGHT, TextureFormat.RGBA32, false)
         {
             wrapMode = TextureWrapMode.Clamp,
             filterMode = FilterMode.Point,
@@ -127,57 +126,43 @@ public class ExampleBridge : MonoBehaviour
 
         texturePixels = new Color32[numTexturePixels];
 
-        initializeDone = true;
+        StartCoroutine(UpdateTexture());
     }
 
-    private IEnumerator UpdateData()
+    private IEnumerator UpdateTexture()
     {
-        yield return new WaitForSeconds(10);
+        while (gameObject.activeSelf)
+        {
+            getInputBufferCS(inputArray);
 
-        var newData = new uint[] { 10, 20, 30, 40 };
+            yield return SetTexture();
 
-        setInputBufferDataCS(newData);
+            yield return new WaitForEndOfFrame();
+        }
     }
 
-    private void Update()
-    {
-        if (initializeDone == false) return;
-
-        getInputBufferCS(receivedInputBuffer);
-
-        SetTexture();
-    }
-
-    public void SetTexture()
+    public IEnumerator SetTexture()
     {
         int currentPixelIndex = 0;
         try
         {
-            for (int i = 0; i < receivedInputBuffer.Length; i++)
+            for (int i = 0; i < inputArray.Length; i++)
             {
-                texturePixels[currentPixelIndex].r = (byte)((receivedInputBuffer[i]) & 0xFF);
-                texturePixels[currentPixelIndex].g = (byte)((receivedInputBuffer[i] >> 8) & 0xFF);
-                texturePixels[currentPixelIndex].b = (byte)((receivedInputBuffer[i] >> 16) & 0xFF);
-                texturePixels[currentPixelIndex].a = (byte)((receivedInputBuffer[i] >> 24) & 0xFF);
+                texturePixels[currentPixelIndex].b = (byte)((inputArray[i]) & 0xFF);
+                texturePixels[currentPixelIndex].g = (byte)((inputArray[i] >> 8) & 0xFF);
+                texturePixels[currentPixelIndex].r = (byte)((inputArray[i] >> 16) & 0xFF);
+                texturePixels[currentPixelIndex].a = (byte)((inputArray[i] >> 24) & 0xFF);
                 currentPixelIndex++;
             }
 
-            texture.SetPixels32(0, 0, textureWidth, textureHeight, texturePixels, 0);
+            texture.SetPixels32(0, 0, WIDTH, HEIGHT, texturePixels, 0);
             texture.Apply();
             img.texture = texture;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-        }
-    }
-
-    private void OnGUI()
-    {
-        if (receivedInputBuffer == null) return;
-
-        for(int i = 0; i < 4; i++)
-        {
-            GUI.Label(new Rect(200, 200 + i * 100, 200, 100), "array[" + i + " ] = " + receivedInputBuffer[i]);
+            Debug.LogError(ex.Message);
+            yield break;
         }
     }
 

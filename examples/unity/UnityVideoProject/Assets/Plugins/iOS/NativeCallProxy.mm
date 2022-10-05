@@ -22,15 +22,19 @@ public:
     }
     
     uint32_t* getInput(){
-        if(inputArray_){
+        if(inputArraySize_ == 0) return nullptr;
+        
+        if(inputArray_ != nullptr){
             return inputArray_.get();
         }
+        
         return nullptr;
     }
     
     void initInputBuffer(uint32_t size){
         inputArraySize_ = size;
         inputArray_ = std::unique_ptr<uint32_t>(new uint32_t[size]);
+        memset(someBridge::getBridge()->getInput(), 0, size * sizeof(uint32_t));
     }
 
     void copyInputArray(uint32_t *outArray)
@@ -82,7 +86,11 @@ id<NativeCallsProtocol> api = NULL;
 
 + (uint32_t*) getInputBufferCpp
 {
-    return someBridge::getBridge()->getInput();
+    auto bridge = someBridge::getBridge();
+    
+    if(bridge == nullptr) return nullptr;
+    
+    return bridge->getInput();
 }
 @end
 
