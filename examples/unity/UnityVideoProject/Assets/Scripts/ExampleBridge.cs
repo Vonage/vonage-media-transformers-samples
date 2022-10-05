@@ -99,6 +99,9 @@ public class ExampleBridge : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void setInputBufferDataCS(UInt32[] bufferData);
 
+    [DllImport("__Internal")]
+    private static extern bool isNewBufferDataAvailable();
+
     const int WIDTH = 640;
     const int HEIGHT = 480;
     const int BUFFER_SIZE = 640 * 480 * 4;
@@ -133,26 +136,30 @@ public class ExampleBridge : MonoBehaviour
     {
         while (gameObject.activeSelf)
         {
+            yield return new WaitForEndOfFrame();
+
+            if (isNewBufferDataAvailable() == false) continue;
+
+            Array.Clear(inputArray, 0, inputArray.Length);
+
             getInputBufferCS(inputArray);
 
             yield return SetTexture();
-
-            yield return new WaitForEndOfFrame();
         }
     }
 
     public IEnumerator SetTexture()
     {
-        int currentPixelIndex = 0;
+        Array.Clear(texturePixels, 0, texturePixels.Length);
+
         try
         {
             for (int i = 0; i < inputArray.Length; i++)
             {
-                texturePixels[currentPixelIndex].b = (byte)((inputArray[i]) & 0xFF);
-                texturePixels[currentPixelIndex].g = (byte)((inputArray[i] >> 8) & 0xFF);
-                texturePixels[currentPixelIndex].r = (byte)((inputArray[i] >> 16) & 0xFF);
-                texturePixels[currentPixelIndex].a = (byte)((inputArray[i] >> 24) & 0xFF);
-                currentPixelIndex++;
+                texturePixels[i].b = (byte)((inputArray[i]) & 0xFF);
+                texturePixels[i].g = (byte)((inputArray[i] >> 8) & 0xFF);
+                texturePixels[i].r = (byte)((inputArray[i] >> 16) & 0xFF);
+                texturePixels[i].a = (byte)((inputArray[i] >> 24) & 0xFF);
             }
 
             texture.SetPixels32(0, 0, WIDTH, HEIGHT, texturePixels, 0);

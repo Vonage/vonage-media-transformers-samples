@@ -15,6 +15,7 @@ __attribute__ ((visibility("default")))
 // call it any time after UnityFrameworkLoad to set object implementing NativeCallsProtocol methods
 +(void) registerAPIforNativeCalls:(id<NativeCallsProtocol>) aApi;
 + (uint32_t*) getInputBufferCpp;
++ (void) setInputBufferCpp: (uint32_t*) buffer;
 
 @end
 
