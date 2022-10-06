@@ -16,7 +16,7 @@ __attribute__ ((visibility("default")))
 +(void) registerAPIforNativeCalls:(id<NativeCallsProtocol>) aApi;
 + (uint32_t*) getInputBufferCpp;
 + (void) setInputBufferCpp: (uint32_t*) buffer;
-
++ (uint32_t*) getOutputBufferCpp;
 @end
 
 

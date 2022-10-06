@@ -18,7 +18,9 @@ public:
     }
     someBridge(){
         inputArray_ = nullptr;
+        outputArray_ = nullptr;
         inputArraySize_ = 0;
+        outputArraySize_ = 0;
         newBufferDataAvailable_ = false;
     }
     
@@ -27,6 +29,16 @@ public:
         
         if(inputArray_ != nullptr){
             return inputArray_.get();
+        }
+        
+        return nullptr;
+    }
+
+    uint32_t* getOutput(){
+        if(outputArraySize_ == 0) return nullptr;
+        
+        if(outputArray_ != nullptr){
+            return outputArray_.get();
         }
         
         return nullptr;
@@ -45,7 +57,13 @@ public:
     void initInputBuffer(uint32_t size){
         inputArraySize_ = size;
         inputArray_ = std::unique_ptr<uint32_t>(new uint32_t[size]);
-        memset(someBridge::getBridge()->getInput(), 0, size * sizeof(uint32_t));
+        memset(inputArray_.get(), 0, size * sizeof(uint32_t));
+    }
+
+    void initOutputBuffer(uint32_t size){
+        outputArraySize_ = size;
+        outputArray_ = std::unique_ptr<uint32_t>(new uint32_t[size]);
+        memset(outputArray_.get(), 0, size * sizeof(uint32_t));
     }
 
     void copyInputArray(uint32_t *outArray)
@@ -63,10 +81,23 @@ public:
 
         memcpy(input, bufferData, inputArraySize_ * sizeof(uint32_t));
     }
+
+    void setOutputBufferData(uint32_t *bufferData)
+    {
+        auto output = someBridge::getBridge()->getOutput();
+
+        if(output == nullptr) return;
+
+        memcpy(output, bufferData, outputArraySize_ * sizeof(uint32_t));
+    }
     
 private:
     std::unique_ptr<uint32_t> inputArray_;
+    std::unique_ptr<uint32_t> outputArray_;
+    
     uint32_t inputArraySize_;
+    uint32_t outputArraySize_;
+    
     bool newBufferDataAvailable_;
     
 };
@@ -79,6 +110,10 @@ extern "C"{
         someBridge::getBridge()->initInputBuffer(size);
     }
 
+        void __stdcall initOutputBufferCS(uint32_t size){
+        someBridge::getBridge()->initOutputBuffer(size);
+    }
+
     void __stdcall getInputBufferCS(uint32_t* outBuffer){
         someBridge::getBridge()->copyInputArray(outBuffer);
         someBridge::getBridge()->setNewBufferDataAvailable(false);
@@ -86,6 +121,10 @@ extern "C"{
 
     void __stdcall setInputBufferDataCS(uint32_t* bufferData){
         someBridge::getBridge()->setInputBufferData(bufferData);
+    }
+
+    void __stdcall setOutputBufferDataCS(uint32_t* bufferData){
+        someBridge::getBridge()->setOutputBufferData(bufferData);
     }
 
     bool __stdcall isNewBufferDataAvailable()
@@ -113,6 +152,15 @@ id<NativeCallsProtocol> api = NULL;
     if(bridge == nullptr) return nullptr;
     
     return bridge->getInput();
+}
+
++ (uint32_t*) getOutputBufferCpp
+{
+    auto bridge = someBridge::getBridge();
+    
+    if(bridge == nullptr) return nullptr;
+    
+    return bridge->getOutput();
 }
 
 + (void) setInputBufferCpp: (uint32_t*) buffer
