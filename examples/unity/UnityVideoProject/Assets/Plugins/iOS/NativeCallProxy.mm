@@ -6,17 +6,17 @@
 
 #define EXPORT __attribute__((visibility("default")))
 
-class someBridge;
-typedef std::shared_ptr<someBridge> someBridgePrt;
+class unityBridge;
+typedef std::shared_ptr<unityBridge> unityBridgePtr;
 
 
-class someBridge {
+class unityBridge {
 public:
-    static someBridgePrt instance_;
-    static someBridgePrt getBridge(){
+    static unityBridgePtr instance_;
+    static unityBridgePtr getBridge(){
         return instance_;
     }
-    someBridge(){
+    unityBridge(){
         inputArray_ = nullptr;
         outputArray_ = nullptr;
         inputArraySize_ = 0;
@@ -70,12 +70,12 @@ public:
     {
         if(inputArray_ == nullptr) return;
         
-        memcpy(outArray, someBridge::getBridge()->getInput(), inputArraySize_ * sizeof(uint32_t));
+        memcpy(outArray, unityBridge::getBridge()->getInput(), inputArraySize_ * sizeof(uint32_t));
     }
 
     void setInputBufferData(uint32_t *bufferData)
     {
-        auto input = someBridge::getBridge()->getInput();
+        auto input = unityBridge::getBridge()->getInput();
 
         if(input == nullptr) return;
 
@@ -84,7 +84,7 @@ public:
 
     void setOutputBufferData(uint32_t *bufferData)
     {
-        auto output = someBridge::getBridge()->getOutput();
+        auto output = unityBridge::getBridge()->getOutput();
 
         if(output == nullptr) return;
 
@@ -102,52 +102,42 @@ private:
     
 };
 
-someBridgePrt someBridge::instance_ = std::make_shared<someBridge>();
+unityBridgePtr unityBridge::instance_ = std::make_shared<unityBridge>();
 
 extern "C"{
 
     void __stdcall initInputBufferCS(uint32_t size){
-        someBridge::getBridge()->initInputBuffer(size);
+        unityBridge::getBridge()->initInputBuffer(size);
     }
 
         void __stdcall initOutputBufferCS(uint32_t size){
-        someBridge::getBridge()->initOutputBuffer(size);
+        unityBridge::getBridge()->initOutputBuffer(size);
     }
 
     void __stdcall getInputBufferCS(uint32_t* outBuffer){
-        someBridge::getBridge()->copyInputArray(outBuffer);
-        someBridge::getBridge()->setNewBufferDataAvailable(false);
+        unityBridge::getBridge()->copyInputArray(outBuffer);
+        unityBridge::getBridge()->setNewBufferDataAvailable(false);
     }
 
     void __stdcall setInputBufferDataCS(uint32_t* bufferData){
-        someBridge::getBridge()->setInputBufferData(bufferData);
+        unityBridge::getBridge()->setInputBufferData(bufferData);
     }
 
     void __stdcall setOutputBufferDataCS(uint32_t* bufferData){
-        someBridge::getBridge()->setOutputBufferData(bufferData);
+        unityBridge::getBridge()->setOutputBufferData(bufferData);
     }
 
     bool __stdcall isNewBufferDataAvailable()
     {
-        return someBridge::getBridge()->isNewBufferDataAvailable();
+        return unityBridge::getBridge()->isNewBufferDataAvailable();
     }
-
-//    EXPORT uint32_t* getInputBufferCpp(){
-//        return someBridge::getBridge()->getInput();
-//    }
 }
 
 @implementation FrameworkLibAPI
 
-id<NativeCallsProtocol> api = NULL;
-+(void) registerAPIforNativeCalls:(id<NativeCallsProtocol>) aApi
-{
-    api = aApi;
-}
-
 + (uint32_t*) getInputBufferCpp
 {
-    auto bridge = someBridge::getBridge();
+    auto bridge = unityBridge::getBridge();
     
     if(bridge == nullptr) return nullptr;
     
@@ -156,7 +146,7 @@ id<NativeCallsProtocol> api = NULL;
 
 + (uint32_t*) getOutputBufferCpp
 {
-    auto bridge = someBridge::getBridge();
+    auto bridge = unityBridge::getBridge();
     
     if(bridge == nullptr) return nullptr;
     
@@ -165,7 +155,7 @@ id<NativeCallsProtocol> api = NULL;
 
 + (void) setInputBufferCpp: (uint32_t*) buffer
 {
-    auto bridge = someBridge::getBridge();
+    auto bridge = unityBridge::getBridge();
     
     if(bridge == nullptr) return;
     
@@ -174,9 +164,4 @@ id<NativeCallsProtocol> api = NULL;
 }
 
 @end
-
-
-extern "C" {
-    void showHostMainWindow(const char* color) { return [api showHostMainWindow:[NSString stringWithUTF8String:color]]; }
-}
 
