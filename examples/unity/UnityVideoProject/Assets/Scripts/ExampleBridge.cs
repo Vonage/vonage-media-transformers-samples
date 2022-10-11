@@ -108,11 +108,10 @@ public class ExampleBridge : MonoBehaviour
     [DllImport("__Internal")]
     private static extern bool isNewBufferDataAvailable();
 
-    const int WIDTH = 640;
-    const int HEIGHT = 480;
-    const int BUFFER_SIZE = 640 * 480 * 4;
-
-    private const int numTexturePixels = WIDTH * HEIGHT;
+    const int width = 640;
+    const int height = 480;
+    
+    private const int numTexturePixels = width * height;
 
     UInt32[] inputArray;
     UInt32[] outputArray;
@@ -132,7 +131,7 @@ public class ExampleBridge : MonoBehaviour
         outputArray = new UInt32[numTexturePixels];
 
         img = myPlane.GetComponent<RawImage>();
-        texture = new Texture2D(WIDTH, HEIGHT, TextureFormat.RGBA32, false)
+        texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
         {
             wrapMode = TextureWrapMode.Clamp,
             filterMode = FilterMode.Point,
@@ -141,8 +140,8 @@ public class ExampleBridge : MonoBehaviour
 
         texturePixels = new Color32[numTexturePixels];
 
-        texture2 = new Texture2D(WIDTH, HEIGHT, TextureFormat.RGBA32, false);
-        rect = new Rect(0, 0, WIDTH, HEIGHT);
+        texture2 = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        rect = new Rect(0, 0, width, height);
 
         StartCoroutine(UpdateTexture());
     }
@@ -179,7 +178,7 @@ public class ExampleBridge : MonoBehaviour
                 texturePixels[i].b = (byte)((inputArray[i]) & 0xFF);
             }
 
-            texture.SetPixels32(0, 0, WIDTH, HEIGHT, texturePixels, 0);
+            texture.SetPixels32(0, 0, width, height, texturePixels, 0);
             texture.Apply();
             img.texture = texture;
         }
