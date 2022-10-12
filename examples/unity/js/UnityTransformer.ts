@@ -83,7 +83,6 @@ class UnityTransformer {
             var vonageUnity: any = globalThis.VonageUnity;
             if (typeof vonageUnity === "object") {
                 createImageBitmap(frame).then(image => {
-                    frame.close()
                     this.processFrame(image, vonageUnity)
                     //@ts-ignore
                     controller.enqueue(new VideoFrame(this.resultCanvas_, { timestamp, alpha: 'discard' }));
@@ -95,6 +94,8 @@ class UnityTransformer {
         } else {
             controller.enqueue(frame)
         }
+
+        frame.close()
     }
 
     toBytesInt32 = (num: number) => {
