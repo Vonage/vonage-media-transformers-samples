@@ -97,6 +97,13 @@ class UnityTransformer {
         }
     }
 
+    toBytesInt32 = (num: number) => {
+        const arr = new ArrayBuffer(4);
+        const view = new DataView(arr);
+        view.setUint32(0, num, false);
+        return arr;
+      }
+
     processFrame(image: ImageBitmap, vonageUnity: any) {
 
         if (this.unityInputCanvas_.width != vonageUnity.size.width || this.unityInputCanvas_.height != vonageUnity.size.height) {
@@ -129,22 +136,29 @@ class UnityTransformer {
         )
 
         if (this.unityGame_) {
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                this.unityGame_.Module.HEAPF32[(vonageUnity.input.array >> 2) + i] = imageData.data[i] / 255
-                this.unityGame_.Module.HEAPF32[(vonageUnity.input.array >> 2) + i + 1] = imageData.data[i + 1] / 255
-                this.unityGame_.Module.HEAPF32[(vonageUnity.input.array >> 2) + i + 2] = imageData.data[i + 2] / 255
-                this.unityGame_.Module.HEAPF32[(vonageUnity.input.array >> 2) + i + 3] = imageData.data[i + 3] / 255
+
+            for (let i = 0; i < vonageUnity.size.width * vonageUnity.size.height; i++) {
+
+                // from rgba to Unity argb
+                this.unityGame_.Module.HEAPU32[(vonageUnity.input.array >> 2) + i] = ((imageData.data[i * 4 + 3] << 24) |  //a
+                                                                                        (imageData.data[i * 4] << 16) |    //r
+                                                                                        (imageData.data[i * 4 + 1] << 8) | //g
+                                                                                        (imageData.data[i * 4 + 2]))       //b
             }
 
             this.unityGame_.SendMessage("ExampleBridge", "SetTexture");
 
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                this.unityimageData_.data[i] = this.unityGame_.Module.HEAPF32[(vonageUnity.output.array >> 2) + i] * 255
-                this.unityimageData_.data[i + 1] = this.unityGame_.Module.HEAPF32[(vonageUnity.output.array >> 2) + i + 1] * 255
-                this.unityimageData_.data[i + 2] = this.unityGame_.Module.HEAPF32[(vonageUnity.output.array >> 2) + i + 2] * 255
-                this.unityimageData_.data[i + 3] = this.unityGame_.Module.HEAPF32[(vonageUnity.output.array >> 2) + i + 3] * 255
+            for (let i = 0; i < vonageUnity.size.width * vonageUnity.size.height; i++) {
 
+                let bytes = new Uint8Array(this.toBytesInt32(this.unityGame_.Module.HEAPU32[(vonageUnity.output.array >> 2) + i]))
+
+                // from Unity argb to rgba
+                this.unityimageData_.data[i * 4] = bytes[1];
+                this.unityimageData_.data[i * 4 + 1] = bytes[2];
+                this.unityimageData_.data[i * 4 + 2] = bytes[3];
+                this.unityimageData_.data[i * 4 + 3] = bytes[0];
             }
+
             this.unityOutputCtx_!.save()
             this.unityOutputCtx_!.clearRect(0, 0, this.unityOutputCanvas_.width, this.unityOutputCanvas_.height)
             this.unityOutputCtx_!.putImageData(this.unityimageData_, 0, 0)
