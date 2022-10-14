@@ -1,0 +1,13 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'iOSObjCApp' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  target 'iOSObjCApp' do
+    platform :ios, '12.0'
+    project 'iOSObjCApp.xcodeproj'
+    use_frameworks! :linkage => :static
+    pod 'VonageMediaProcessor', '= 1.0.0-dev.60'
+  end
+
+end

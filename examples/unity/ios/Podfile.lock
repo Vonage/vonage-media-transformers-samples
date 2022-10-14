@@ -1,0 +1,20 @@
+PODS:
+  - VonageMediaProcessor (1.0.0-dev.60):
+    - VonageWebRTC (= 99.1.34)
+  - VonageWebRTC (99.1.34)
+
+DEPENDENCIES:
+  - VonageMediaProcessor (= 1.0.0-dev.60)
+
+SPEC REPOS:
+  trunk:
+    - VonageMediaProcessor
+    - VonageWebRTC
+
+SPEC CHECKSUMS:
+  VonageMediaProcessor: 237e6f8dd777f5925abe3be9a95ffc76286bc57c
+  VonageWebRTC: 2eadcd95578d5f81bee919bf04aad9225b5ee25b
+
+PODFILE CHECKSUM: 769590156c40e3fecca490a3684d2aa5470cdf22
+
+COCOAPODS: 1.11.3
