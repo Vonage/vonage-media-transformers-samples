@@ -15,18 +15,16 @@
 #import "helpers/UIDevice+RTCDevice.h"
 #endif
 
+extern const int NUM_FRAMES = 137;
 
 @interface RTC_OBJC_TYPE (RTCFakeCameraVideoCapturer) ()
 {
-    CVPixelBufferRef pixelBufferImages[76];
+    CVPixelBufferRef pixelBufferImages[NUM_FRAMES];
 }
 
 @property NSTimer* timer;
 @property UIImage *image;
-@property int numFrames;
 @property int currentFrameIndex;
-
-
 @end
 
 @implementation RTC_OBJC_TYPE (RTCFakeCameraVideoCapturer) {
@@ -35,13 +33,9 @@
 -(id) init {
     self = [super init];
     if(self){
-        self.image = [UIImage imageNamed:@"frame1"];
-        
-        
-        self.numFrames = sizeof(pixelBufferImages) / sizeof(CVPixelBufferRef);
         self.currentFrameIndex = 0;
         
-        for(int i = 0 ; i < self.numFrames ; i++)
+        for(int i = 0 ; i < NUM_FRAMES ; i++)
         {
             UIImage *img = [UIImage imageNamed:[NSString stringWithFormat:@"frame%d", i + 1]];
             CVPixelBufferRef pixelBufferRef = [self pixelBufferFromCGImage:img.CGImage];
@@ -61,8 +55,6 @@
     self.timer = [NSTimer scheduledTimerWithTimeInterval:0.03 repeats:YES block:^(NSTimer * _Nonnull timer) {
         dispatch_async(dispatch_get_main_queue(),^{
             
-            //CVPixelBufferRef pixelBufferRef = [self pixelBufferFromCGImage:self.image.CGImage];
-            
             RTC_OBJC_TYPE(RTCCVPixelBuffer) *rtcPixelBuffer =
             [[RTC_OBJC_TYPE(RTCCVPixelBuffer) alloc] initWithPixelBuffer:self->pixelBufferImages[self->_currentFrameIndex]];
             
@@ -72,7 +64,7 @@
                                                      timeStampNs:100];
             [self.delegate capturer:self didCaptureVideoFrame:videoFrame];
             
-            self->_currentFrameIndex = (self->_currentFrameIndex + 1) % self->_numFrames;
+            self->_currentFrameIndex = (self->_currentFrameIndex + 1) % NUM_FRAMES;
         });
     }];
 }
