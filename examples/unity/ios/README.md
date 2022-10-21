@@ -10,6 +10,7 @@ Integrating this sample with **Vonage Video SDK** will allow you to publish a un
 - Select iOS from platform list.
 - Build unity project for iOS.
 - Copy all generated build files and place them in this directory (clear the directory if not empty):
+
 vonage-media-transformers-samples/examples/unity/ios/Unity-iPhone/
 
 ### Building the app:
