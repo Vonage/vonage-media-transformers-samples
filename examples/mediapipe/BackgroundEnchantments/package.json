@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vonage/ml-transformers": "3.1.1",
+    "@vonage/ml-transformers": "4.0.0",
     "@vonage/vivid": "2.36.0"
   },
   "devDependencies": {
