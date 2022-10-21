@@ -15,9 +15,11 @@
 #include <api/video_codecs/builtin_video_encoder_factory.h>
 #include <api/create_peerconnection_factory.h>
 #include <api/task_queue/default_task_queue_factory.h>
+#include <media_processor/media_processor.h>
 
 #include <rtc_base/logging.h>
 #include <rtc_base/ssl_adapter.h>
+#include "transformers.h"
 
 WebRTCHelper::WebRTCHelper(){
     RTC_LOG(LS_VERBOSE) << "WebRTCHelper";
@@ -45,6 +47,14 @@ bool WebRTCHelper::init(webrtc::VideoTrackSourceInterface *videoSource, std::uni
                                                    nullptr, nullptr);
     _video_track = _factory->CreateVideoTrack("test", videoSource);
     _video_track->AddOrUpdateSink(_local_sink.get(), rtc::VideoSinkWants());
+    
+    auto video_processor_ = new vonage::VideoProcessor();
+    
+    _video_transformers.push_back(std::make_shared<vonage::VonageUnityVideoTransformer>());
+    video_processor_->SetTransformers(_video_transformers);
+    if (video_processor_->SetTrack(_video_track) == false) {
+        RTC_LOG_T_F(LS_WARNING) << "Video processor set track method failed";
+    }
     return true;
 }
 

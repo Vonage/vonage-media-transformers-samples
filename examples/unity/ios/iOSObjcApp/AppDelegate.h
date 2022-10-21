@@ -6,9 +6,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#include <UnityFramework/UnityFramework.h>
+#include "../Unity-iPhone/Libraries/Plugins/iOS/NativeCallProxy.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UnityFrameworkListener>
 
+@property UnityFramework* ufw;
+@property bool didQuit;
+
+
+- (void)initUnity;
 
 @end
+
+extern int gArgc;
+extern char** gArgv;
 

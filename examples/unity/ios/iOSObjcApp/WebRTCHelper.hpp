@@ -33,5 +33,7 @@ private:
     rtc::scoped_refptr<webrtc::VideoTrackInterface> _video_track;
     
     std::unique_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> _local_sink;
+    
+    std::vector<std::shared_ptr<webrtc::BaseFrameTransformer<webrtc::VideoFrame>>> _video_transformers;
 };
 #endif
