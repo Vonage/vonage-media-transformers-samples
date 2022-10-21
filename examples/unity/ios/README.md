@@ -11,14 +11,15 @@ Integrating this sample with **Vonage Video SDK** will allow you to publish a un
 - Build unity project for iOS.
 - Copy all generated build files and place them in this directory (clear the directory if not empty):
 
-vonage-media-transformers-samples/examples/unity/ios/Unity-iPhone/
+  vonage-media-transformers-samples/examples/unity/ios/Unity-iPhone/
 
 ### Building the app:
 - Open vonage-media-transformers-samples/examples/unity/ios/iOSObjCApp.xcworkspace with xcode.
 - In Unity-iPhone project, change target of Data directory to UnityFramework.
 - In Pods project do the following in all targets build settings:
     
-    go to Build Settings -> Architectures -> Debug -> Click plus sign  (+) select "Any iOS Simulator SDK" and set the architecture to "x86_64" only. 
+  go to Build Settings -> Architectures -> Debug -> Click plus sign  (+) select "Any iOS Simulator SDK" and set the architecture to "x86_64" only. 
+
 - Build the target UnityFramework.
 - Run target iOSObjCApp on ios simulator.
 
