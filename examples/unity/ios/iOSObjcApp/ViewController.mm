@@ -44,19 +44,23 @@
     self->_webrtcHelper = std::make_unique<WebRTCHelper>();
     
     self.view = _view;
+  
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    self.capturer = [[RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer) alloc] init];
+
     
-    std::unique_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
-    rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(_capturer, _webrtcHelper->getSignalingThread(), _webrtcHelper->getWorkerThread());
-    
-    [self.capturer startCaptureWithFps];
-    
-    self->_webrtcHelper->init(video_track_source.get(), std::move(local_sink));
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)) , dispatch_get_main_queue(), ^() {
+        self.capturer = [[RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer) alloc] init];
+        
+        std::unique_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
+        rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
+        
+        [self.capturer startCaptureWithFps];
+        self->_webrtcHelper->init(video_track_source.get(), std::move(local_sink));
+    });
 }
 
 
