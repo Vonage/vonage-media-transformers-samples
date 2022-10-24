@@ -7,7 +7,7 @@ target 'iOSObjCApp' do
     platform :ios, '12.0'
     project 'iOSObjCApp.xcodeproj'
     use_frameworks! :linkage => :static
-    pod 'VonageMediaProcessor', '= 1.0.0-dev.60'
+    pod 'VonageWebRTC', '= 99.4.0-alpha.114'
   end
 
 end

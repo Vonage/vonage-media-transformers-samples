@@ -22,18 +22,18 @@
 		AC611E8A28FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8928FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m */; };
 		AC611E8D29004A5700B00CEA /* WebRTCHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */; };
 		AC611E9A2902A7AB00B00CEA /* transformers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E992902A7AB00B00CEA /* transformers.cpp */; };
-		AC611EA02902E83B00B00CEA /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AC611E9B2902E00B00B00CEA /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		FE2CA7AA6A20F311F48BE5C2 /* Pods_iOSObjCApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E81EBA81D6FA6B27EC77601 /* Pods_iOSObjCApp.framework */; };
+		AC611EA82906E77E00B00CEA /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AC611E9B2902E00B00B00CEA /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AFB3CE1ACAC2973F248A1802 /* Pods_iOSObjCApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 352B6C43C33A05E79F2D8DC0 /* Pods_iOSObjCApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		AC611EA12902E83B00B00CEA /* Embed Frameworks */ = {
+		AC611EA62906D28800B00CEA /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				AC611EA02902E83B00B00CEA /* UnityFramework.framework in Embed Frameworks */,
+				AC611EA82906E77E00B00CEA /* UnityFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -42,7 +42,7 @@
 
 /* Begin PBXFileReference section */
 		2F6617A591F4819C7629EDDD /* Pods-iOSObjCApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSObjCApp.debug.xcconfig"; path = "Target Support Files/Pods-iOSObjCApp/Pods-iOSObjCApp.debug.xcconfig"; sourceTree = "<group>"; };
-		9E81EBA81D6FA6B27EC77601 /* Pods_iOSObjCApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOSObjCApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		352B6C43C33A05E79F2D8DC0 /* Pods_iOSObjCApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOSObjCApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC611E5D28F848CD00B00CEA /* iOSObjCApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSObjCApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC611E6028F848CD00B00CEA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		AC611E6128F848CD00B00CEA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -79,9 +79,9 @@
 				AC611E8028F98CEE00B00CEA /* QuartzCore.framework in Frameworks */,
 				AC611E7A28F98C1200B00CEA /* AVFoundation.framework in Frameworks */,
 				AC611E7E28F98CA600B00CEA /* UIKit.framework in Frameworks */,
-				FE2CA7AA6A20F311F48BE5C2 /* Pods_iOSObjCApp.framework in Frameworks */,
 				AC611E8228F98D1A00B00CEA /* Metal.framework in Frameworks */,
 				AC611E7C28F98C7900B00CEA /* CoreVideo.framework in Frameworks */,
+				AFB3CE1ACAC2973F248A1802 /* Pods_iOSObjCApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,7 +98,7 @@
 				AC611E7D28F98CA600B00CEA /* UIKit.framework */,
 				AC611E7B28F98C7900B00CEA /* CoreVideo.framework */,
 				AC611E7928F98C1200B00CEA /* AVFoundation.framework */,
-				9E81EBA81D6FA6B27EC77601 /* Pods_iOSObjCApp.framework */,
+				352B6C43C33A05E79F2D8DC0 /* Pods_iOSObjCApp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -165,7 +165,7 @@
 				AC611E5928F848CD00B00CEA /* Sources */,
 				AC611E5A28F848CD00B00CEA /* Frameworks */,
 				AC611E5B28F848CD00B00CEA /* Resources */,
-				AC611EA12902E83B00B00CEA /* Embed Frameworks */,
+				AC611EA62906D28800B00CEA /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -405,6 +405,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -456,6 +460,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GCC_PREPROCESSOR_DEFINITIONS = (
