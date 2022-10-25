@@ -15,7 +15,7 @@
 #include <api/video_codecs/builtin_video_encoder_factory.h>
 #include <api/create_peerconnection_factory.h>
 #include <api/task_queue/default_task_queue_factory.h>
-#include <media_processor/media_processor.h>
+#include <modules/vonage/api/media_processor/media_processor.h>
 
 #include <rtc_base/logging.h>
 #include <rtc_base/ssl_adapter.h>
