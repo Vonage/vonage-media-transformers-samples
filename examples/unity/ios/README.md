@@ -6,12 +6,19 @@ Integrating this sample with **Vonage Video SDK** will allow you to publish a un
  - Unity - this sample was built with Unity *2021.3.6f1* (make sure ios is installed)
 
 ### Building Unity:
+- In player settings iOS tab, set target SDK to device SDK (You can also select simulator SDK if you are using iOS simulator)
 - From file meny select build settings.
 - Select iOS from platform list.
+- Set 'Run XCode as Debug' if you plan to run the ios native app in debug mode.
 - Build unity project for iOS.
-- Copy all generated build files and place them in this directory (clear the directory if not empty):
-
-  vonage-media-transformers-samples/examples/unity/ios/Unity-iPhone/
+- Open the generated project 'Unity-iPhone.xcodeproj' with XCode.
+- In file inspector select Data folder and set target membership to 'UnityFramework'
+- In file inspector select Libraries/Plugins/iOS/NativeCallProxy.h and set target membership to 'UnityFramework' and 'Public'.
+- Open terminal, change directory to the directory containing 'Unity-iPhone.xcodeproj' and run this command to build Unity framework:
+  xcodebuild -configuration Debug -target UnityFramework -sdk iphoneos
+- Copy 'UnityFramework.framework' that you built in previous step from to 'Unity-iPhone' directory. 
+- Open VonageUnityIntegration.xcworkspace with XCode and in the general settings of 'VonageUnityIntegration' target, add the 'Unity-iPhone/UnityFramework.framework' to the target.
+- Build and run the 'VonageUnityIntegration' project.
 
 ### Building the app:
 - Open vonage-media-transformers-samples/examples/unity/ios/iOSObjCApp.xcworkspace with xcode.
