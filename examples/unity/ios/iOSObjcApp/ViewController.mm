@@ -35,11 +35,10 @@
     [_view addSubview:_localVideoView];
 
     UILayoutGuide *margin = _view.layoutMarginsGuide;
-
-    [_localVideoView.leadingAnchor constraintEqualToAnchor:margin.leadingAnchor constant:8.0].active = YES;
-    [_localVideoView.topAnchor constraintEqualToAnchor:margin.topAnchor constant:8.0].active = YES;
-    [_localVideoView.widthAnchor constraintEqualToConstant:60].active = YES;
-    [_localVideoView.heightAnchor constraintEqualToConstant:60].active = YES;
+    [_localVideoView.leadingAnchor constraintEqualToAnchor:margin.leadingAnchor].active = YES;
+    [_localVideoView.topAnchor constraintEqualToAnchor:margin.topAnchor].active = YES;
+    [_localVideoView.trailingAnchor constraintEqualToAnchor:margin.trailingAnchor].active = YES;
+    [_localVideoView.bottomAnchor constraintEqualToAnchor:margin.bottomAnchor].active = YES;
     
     self->_webrtcHelper = std::make_unique<WebRTCHelper>();
     
