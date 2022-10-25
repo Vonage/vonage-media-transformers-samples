@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A0EA1962907FFEE008B1EFB /* UnityFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A0EA1952907FFEE008B1EFB /* UnityFramework.framework */; platformFilter = ios; };
+		0A0EA1972907FFEE008B1EFB /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A0EA1952907FFEE008B1EFB /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AC611E6228F848CD00B00CEA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6128F848CD00B00CEA /* AppDelegate.m */; };
 		AC611E6528F848CD00B00CEA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6428F848CD00B00CEA /* SceneDelegate.m */; };
 		AC611E6828F848CD00B00CEA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6728F848CD00B00CEA /* ViewController.mm */; };
@@ -22,18 +24,17 @@
 		AC611E8A28FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8928FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m */; };
 		AC611E8D29004A5700B00CEA /* WebRTCHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */; };
 		AC611E9A2902A7AB00B00CEA /* transformers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E992902A7AB00B00CEA /* transformers.cpp */; };
-		AC611EA82906E77E00B00CEA /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AC611E9B2902E00B00B00CEA /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AFB3CE1ACAC2973F248A1802 /* Pods_iOSObjCApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 352B6C43C33A05E79F2D8DC0 /* Pods_iOSObjCApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		AC611EA62906D28800B00CEA /* Embed Frameworks */ = {
+		0A0EA1982907FFEE008B1EFB /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				AC611EA82906E77E00B00CEA /* UnityFramework.framework in Embed Frameworks */,
+				0A0EA1972907FFEE008B1EFB /* UnityFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -41,6 +42,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A0EA1952907FFEE008B1EFB /* UnityFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnityFramework.framework; path = "Unity-iPhone/UnityFramework.framework"; sourceTree = "<group>"; };
 		2F6617A591F4819C7629EDDD /* Pods-iOSObjCApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSObjCApp.debug.xcconfig"; path = "Target Support Files/Pods-iOSObjCApp/Pods-iOSObjCApp.debug.xcconfig"; sourceTree = "<group>"; };
 		352B6C43C33A05E79F2D8DC0 /* Pods_iOSObjCApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOSObjCApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC611E5D28F848CD00B00CEA /* iOSObjCApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSObjCApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -64,10 +66,8 @@
 		AC611E8928FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RTCFakeCameraVideoCapturer.m; sourceTree = "<group>"; };
 		AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WebRTCHelper.cpp; sourceTree = "<group>"; };
 		AC611E8C29004A5700B00CEA /* WebRTCHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = WebRTCHelper.hpp; sourceTree = "<group>"; };
-		AC611E8F2901A3DD00B00CEA /* UnityFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = UnityFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC611E982902A7AB00B00CEA /* transformers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = transformers.h; sourceTree = "<group>"; };
 		AC611E992902A7AB00B00CEA /* transformers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = transformers.cpp; sourceTree = "<group>"; };
-		AC611E9B2902E00B00B00CEA /* UnityFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnityFramework.framework; path = "../../../../../../../Library/Developer/Xcode/DerivedData/iOSObjCApp-ckgioixhbqbngfdxrggbwefjrwfz/Build/Products/Debug-iphonesimulator/UnityFramework.framework"; sourceTree = "<group>"; };
 		BEF13A07D0F672E2F430B8F2 /* Pods-iOSObjCApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSObjCApp.release.xcconfig"; path = "Target Support Files/Pods-iOSObjCApp/Pods-iOSObjCApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -76,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A0EA1962907FFEE008B1EFB /* UnityFramework.framework in Frameworks */,
 				AC611E8028F98CEE00B00CEA /* QuartzCore.framework in Frameworks */,
 				AC611E7A28F98C1200B00CEA /* AVFoundation.framework in Frameworks */,
 				AC611E7E28F98CA600B00CEA /* UIKit.framework in Frameworks */,
@@ -91,8 +92,7 @@
 		3358E8ED3C0073701B2A50D2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AC611E8F2901A3DD00B00CEA /* UnityFramework.framework */,
-				AC611E9B2902E00B00B00CEA /* UnityFramework.framework */,
+				0A0EA1952907FFEE008B1EFB /* UnityFramework.framework */,
 				AC611E8128F98D1A00B00CEA /* Metal.framework */,
 				AC611E7F28F98CEE00B00CEA /* QuartzCore.framework */,
 				AC611E7D28F98CA600B00CEA /* UIKit.framework */,
@@ -165,7 +165,7 @@
 				AC611E5928F848CD00B00CEA /* Sources */,
 				AC611E5A28F848CD00B00CEA /* Frameworks */,
 				AC611E5B28F848CD00B00CEA /* Resources */,
-				AC611EA62906D28800B00CEA /* Embed Frameworks */,
+				0A0EA1982907FFEE008B1EFB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -399,15 +399,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2F6617A591F4819C7629EDDD /* Pods-iOSObjCApp.debug.xcconfig */;
 			buildSettings = {
-				"ARCHS[sdk=iphonesimulator*]" = x86_64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PR6C39UQ38;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Unity-iPhone",
 				);
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
@@ -423,11 +424,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageMediaProcessor/Headers\"",
-					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers",
-					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/sdk/objc",
-					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/sdk/objc/base",
-					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/third_party/abseil-cpp",
 					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/third_party/libyuv/include",
 				);
 				INFOPLIST_FILE = iOSObjCApp/Info.plist;
@@ -438,7 +434,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -460,9 +456,11 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PR6C39UQ38;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Unity-iPhone",
 				);
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
@@ -478,11 +476,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageMediaProcessor/Headers\"",
-					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers",
-					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/sdk/objc",
-					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/sdk/objc/base",
-					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/third_party/abseil-cpp",
 					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/third_party/libyuv/include",
 				);
 				INFOPLIST_FILE = iOSObjCApp/Info.plist;
@@ -493,7 +486,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

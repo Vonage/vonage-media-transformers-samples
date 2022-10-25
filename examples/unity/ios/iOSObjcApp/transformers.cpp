@@ -4,8 +4,8 @@
 #include <api/video/i420_buffer.h>
 #include <api/video/video_frame.h>
 #include <rtc_base/logging.h>
-#include "../Unity-iPhone/Libraries/Plugins/iOS/NativeCallProxy.h"
 #include <third_party/libyuv/include/libyuv.h>
+#include <UnityFramework/NativeCallProxy.h>
 
 namespace vonage {
 

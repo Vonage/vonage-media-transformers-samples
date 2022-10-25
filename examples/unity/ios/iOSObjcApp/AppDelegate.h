@@ -7,7 +7,8 @@
 
 #import <UIKit/UIKit.h>
 #include <UnityFramework/UnityFramework.h>
-#include "../Unity-iPhone/Libraries/Plugins/iOS/NativeCallProxy.h"
+#include <UnityFramework/NativeCallProxy.h>
+
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, UnityFrameworkListener>
 
