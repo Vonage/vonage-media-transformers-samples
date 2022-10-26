@@ -27,6 +27,6 @@ Integrating this sample with **Vonage Video SDK** will allow you to publish a un
 
 ## Key points for Unity iOS integration
 
-The main iOS app code that communicates with Unity is located in file [transformers.cpp](https://github.com/Vonage/vonage-media-transformers-samples/blob/feature/iOS/examples/unity/ios/VonageUnityIntegration/transformers.cpp) that contains insertable stream implementation in Unity video transformer class.
+The main iOS app code that communicates with Unity is located in file [transformers.cpp](https://github.com/Vonage/vonage-media-transformers-samples/blob/feature/OW-325/examples/unity/ios/VonageUnityIntegration/transformers.cpp) that contains insertable stream implementation in Unity video transformer class.
 
 
