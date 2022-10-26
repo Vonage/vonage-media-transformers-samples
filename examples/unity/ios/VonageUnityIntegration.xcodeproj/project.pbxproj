@@ -22,8 +22,6 @@
 		AC611E8A28FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8928FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m */; };
 		AC611E8D29004A5700B00CEA /* WebRTCHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */; };
 		AC611E9A2902A7AB00B00CEA /* transformers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E992902A7AB00B00CEA /* transformers.cpp */; };
-		ACB1682E2908646A000DED73 /* UnityFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACB1682D2908646A000DED73 /* UnityFramework.framework */; platformFilter = ios; };
-		ACB1682F2908646A000DED73 /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = ACB1682D2908646A000DED73 /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CAD901F71F9E1E7D7B80F82A /* Pods_VonageUnityIntegration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5F95F2B1AEC4862ADE63016 /* Pods_VonageUnityIntegration.framework */; };
 /* End PBXBuildFile section */
 
@@ -34,7 +32,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				ACB1682F2908646A000DED73 /* UnityFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -69,8 +66,6 @@
 		AC611E8C29004A5700B00CEA /* WebRTCHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = WebRTCHelper.hpp; sourceTree = "<group>"; };
 		AC611E982902A7AB00B00CEA /* transformers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = transformers.h; sourceTree = "<group>"; };
 		AC611E992902A7AB00B00CEA /* transformers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = transformers.cpp; sourceTree = "<group>"; };
-		AC879FE1290862110083437B /* UnityFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnityFramework.framework; path = "../UnityVideoProject/build/ios_simulator/build/Debug-iphonesimulator/UnityFramework.framework"; sourceTree = "<group>"; };
-		ACB1682D2908646A000DED73 /* UnityFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnityFramework.framework; path = "Unity-iPhone/UnityFramework.framework"; sourceTree = "<group>"; };
 		BEF13A07D0F672E2F430B8F2 /* Pods-VonageUnityIntegration.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.release.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -79,7 +74,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ACB1682E2908646A000DED73 /* UnityFramework.framework in Frameworks */,
 				AC611E8028F98CEE00B00CEA /* QuartzCore.framework in Frameworks */,
 				AC611E7A28F98C1200B00CEA /* AVFoundation.framework in Frameworks */,
 				AC611E7E28F98CA600B00CEA /* UIKit.framework in Frameworks */,
@@ -95,8 +89,6 @@
 		3358E8ED3C0073701B2A50D2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AC879FE1290862110083437B /* UnityFramework.framework */,
-				ACB1682D2908646A000DED73 /* UnityFramework.framework */,
 				AC611E8128F98D1A00B00CEA /* Metal.framework */,
 				AC611E7F28F98CEE00B00CEA /* QuartzCore.framework */,
 				AC611E7D28F98CA600B00CEA /* UIKit.framework */,

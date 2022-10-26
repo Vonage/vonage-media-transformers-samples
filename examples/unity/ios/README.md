@@ -15,72 +15,18 @@ Integrating this sample with **Vonage Video SDK** will allow you to publish a un
 - In file inspector select Data folder and set target membership to 'UnityFramework'
 - In file inspector select Libraries/Plugins/iOS/NativeCallProxy.h and set target membership to 'UnityFramework' and 'Public'.
 - Open terminal, change directory to the directory containing 'Unity-iPhone.xcodeproj' and run this command to build Unity framework:
+  ```
   xcodebuild -configuration Debug -target UnityFramework -sdk iphoneos
-- Copy 'UnityFramework.framework' that you built in previous step from to 'Unity-iPhone' directory. 
-- Open VonageUnityIntegration.xcworkspace with XCode and in the general settings of 'VonageUnityIntegration' target, add the 'Unity-iPhone/UnityFramework.framework' to the target.
-- Build and run the 'VonageUnityIntegration' project.
+  ```
+- Copy 'UnityFramework.framework' that you have just built in previous step from build/Debug-iphoneos/ to 'Unity-iPhone' directory. 
 
 ### Building the app:
-- Open vonage-media-transformers-samples/examples/unity/ios/iOSObjCApp.xcworkspace with xcode.
-- In Unity-iPhone project, change target of Data directory to UnityFramework.
-- In Pods project do the following in all targets build settings:
-    
-  go to Build Settings -> Architectures -> Debug -> Click plus sign  (+) select "Any iOS Simulator SDK" and set the architecture to "x86_64" only. 
-
-- Build the target UnityFramework.
-- Run target iOSObjCApp on ios simulator.
+- Open VonageUnityIntegration.xcworkspace with XCode.
+- In the general settings of 'VonageUnityIntegration' target, add the 'Unity-iPhone/UnityFramework.framework' to the target.
+- Build and run the 'VonageUnityIntegration' project.
 
 ## Key points for Unity iOS integration
 
-The main iOS app code that communicates with Unity is located in file transformers.cpp that contains insertable stream implementation in Unity video transformer class:
+The main iOS app code that communicates with Unity is located in file [transformers.cpp](https://github.com/Vonage/vonage-media-transformers-samples/blob/feature/iOS/examples/unity/ios/VonageUnityIntegration/transformers.cpp) that contains insertable stream implementation in Unity video transformer class.
 
-    void VonageUnityVideoTransformer::Transform(webrtc::VideoFrame* target_frame) {
-        if (target_frame == nullptr) {
-            RTC_LOG_T_F(LS_WARNING) << "Video frame is null";
-            return;
-        }
-
-        
-        rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer(target_frame->video_frame_buffer());
-        
-        auto i420Buffer = buffer->ToI420();
-        
-        libyuv::I420ToARGB(i420Buffer->DataY(),
-                           i420Buffer->StrideY(),
-                           i420Buffer->DataU(),
-                           i420Buffer->StrideU(),
-                           i420Buffer->DataV(),
-                           i420Buffer->StrideV(),
-                           (uint8_t*)inputArgbBuffer_,
-                           target_frame->width() * 4,
-                           target_frame->width(),
-                           target_frame->height());
-        
-        [NSClassFromString(@"FrameworkLibAPI") setInputBufferCpp: inputArgbBuffer_];
-        
-        auto outputArgbBuffer = [NSClassFromString(@"FrameworkLibAPI") getOutputBufferCpp];
-        
-        if(outputArgbBuffer != NULL)
-        {
-            libyuv::ARGBToI420((uint8_t*)outputArgbBuffer,
-                               target_frame->width() * 4,
-                               outputYBuffer_,
-                               i420Buffer->StrideY(),
-                               outputUBuffer_,
-                               i420Buffer->StrideU(),
-                               outputVBuffer_,
-                               i420Buffer->StrideV(),
-                               target_frame->width(),
-                               target_frame->height());
-            
-            target_frame->set_video_frame_buffer(webrtc::I420Buffer::Copy(target_frame->width(),
-                                                                          target_frame->height(),
-                                                                          outputYBuffer_,
-                                                                          i420Buffer->StrideY(),
-                                                                          outputUBuffer_,
-                                                                          i420Buffer->StrideU(),
-                                                                          outputVBuffer_,
-                                                                          i420Buffer->StrideV()));
-        }
-    }
 

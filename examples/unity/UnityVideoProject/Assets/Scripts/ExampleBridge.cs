@@ -75,36 +75,15 @@ public class ExampleBridge : MonoBehaviour
 
         texture2 = new Texture2D(width, height, TextureFormat.RGBA32, false);
         rect = new Rect(0, 0, width, height);
-
-        StartCoroutine(UpdateTexture());
-    }
-
-    private IEnumerator UpdateTexture()
-    {
-#if UNITY_WEBGL
-        yield break;
-#else
-        while (gameObject.activeSelf)
-        {
-            yield return new WaitForEndOfFrame();
-
-            if (isNewBufferDataAvailable() == false) continue;
-
-            Array.Clear(inputArray, 0, inputArray.Length);
-
-            getInputBufferCS(inputArray);
-
-            SetTexture();
-        }
-#endif
     }
 
     public void SetTexture()
     {
-        Array.Clear(texturePixels, 0, texturePixels.Length);
-
         try
         {
+#if !UNITY_WEBGL
+            getInputBufferCS(inputArray);
+#endif
             for (int i = 0; i < inputArray.Length; i++)
             {
                 texturePixels[i].a = (byte)((inputArray[i] >> 24) & 0xFF);

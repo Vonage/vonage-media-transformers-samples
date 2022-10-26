@@ -22,4 +22,4 @@
 
 extern int gArgc;
 extern char** gArgv;
-
+extern UnityFramework *gUfw;

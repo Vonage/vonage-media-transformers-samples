@@ -11,7 +11,7 @@
 int gArgc = 0;
 char** gArgv = nullptr;
 NSDictionary* appLaunchOpts;
-
+UnityFramework* gUfw;
 
 UnityFramework* UnityFrameworkLoad()
 {
@@ -81,6 +81,8 @@ UnityFramework* UnityFrameworkLoad()
     }
     
     [self setUfw: UnityFrameworkLoad()];
+    gUfw = self.ufw;
+    
     // Set UnityFramework target for Unity-iPhone/Data folder to make Data part of a UnityFramework.framework and uncomment call to setDataBundleId
     // ODR is not supported in this case, ( if you need embedded and ODR you need to copy data )
     [[self ufw] setDataBundleId: "com.unity3d.framework"];

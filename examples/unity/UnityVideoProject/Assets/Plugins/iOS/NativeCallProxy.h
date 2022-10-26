@@ -1,6 +1,9 @@
 // [!] important set UnityFramework in Target Membership for this file
 // [!]           and set Public header visibility
 
+#ifndef NATIVECALLPROXY_H_
+#define NATIVECALLPROXY_H_
+
 #import <Foundation/Foundation.h>
 
 __attribute__ ((visibility("default")))
@@ -10,5 +13,7 @@ __attribute__ ((visibility("default")))
 + (void) setInputBufferCpp: (uint32_t*) buffer;
 + (uint32_t*) getOutputBufferCpp;
 @end
+
+#endif //NATIVECALLPROXY_H_
 
 
