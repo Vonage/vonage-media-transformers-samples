@@ -1,7 +1,12 @@
-export function bindSwitch(id: string, callback: (value: boolean) => void) {
+export function bindSwitch(
+    id: string,
+    callback: (value: boolean) => boolean | void | Promise<boolean | void>
+) {
     const element = document.getElementById(id) as HTMLInputElement;
     if (element) {
-        element.oninput = () => callback(!element.checked);
+        element.oninput = async () => {
+            await callback(!element.checked);
+        };
     }
 }
 
@@ -19,4 +24,25 @@ export function bindButtonToLink(id: string, link: string) {
             window.open(link, "_blank")?.focus();
         });
     }
+}
+
+let notifications: HTMLDivElement;
+export function notifyError(message: string) {
+    if (!notifications) {
+        notifications = document.createElement("div");
+        notifications.style.position = "fixed";
+        notifications.style.width = "100%";
+        notifications.style.zIndex = "100";
+        document.body.prepend(notifications);
+    }
+    notifications.innerHTML = `
+    <vwc-banner
+      connotation="alert"
+      open=""
+      dismissible=""
+      message="${message}"
+      role="status"
+      aria-live="polite"
+    ></vwc-banner>
+    `;
 }

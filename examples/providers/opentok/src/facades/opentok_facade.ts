@@ -26,11 +26,19 @@ export class OpenTokFacade {
                     error
                         ? this.handleSessionConnectError(error)
                         : await this.handleSessionConnect();
-                    resolve(!!error);
+
+                    resolve(error === undefined);
                 });
             });
         }
         return this.connectPromise;
+    }
+    public async disconnect(): Promise<void> {
+        if (this.connectPromise) {
+            await this.connectPromise;
+            this.session?.disconnect();
+            this.connectPromise = undefined;
+        }
     }
 
     public setVideoMediaProcessorConnector(video: Nullable<MediaProcessorConnector> = null) {

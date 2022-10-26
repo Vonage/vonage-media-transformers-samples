@@ -20,6 +20,10 @@
                 height: fit-content;
                 display: block;
             }
+            vwc-slider {
+                position: relative;
+                top: -13px;
+            }
 
             .maincardlayout {
                 display: grid;
@@ -142,21 +146,71 @@
                             </div>
                             <vwc-layout
                                 column-spacing="md"
-                                style="--layout-grid-template-columns: 1fr 1fr"
+                                style="--layout-grid-template-columns: 1fr"
                             >
-                                <vwc-text font-face="subtitle-2" tight>Show Results</vwc-text>
-                                <vwc-switch
-                                    id="cameraswitch"
-                                    style="justify-self: end"
-                                    checked
-                                ></vwc-switch>
-                                <vwc-text font-face="subtitle-2" tight>Sensitivity</vwc-text>
-                                <vwc-slider
-                                    value="0.01"
-                                    min="0.0002"
-                                    max="0.02"
-                                    id="sensitivity_slider"
-                                ></vwc-slider>
+                                <vwc-text font-face="subtitle-2" tight>OpenTok</vwc-text>
+                                <vwc-layout
+                                    column-spacing="md"
+                                    style="--layout-grid-template-columns: 1fr 1fr"
+                                >
+                                    <vwc-text font-face="subtitle-3" tight>Connect</vwc-text>
+                                    <vwc-switch id="connect" style="justify-self: end"></vwc-switch>
+
+                                    <vwc-text font-face="subtitle-3" tight>API key</vwc-text>
+                                    <vwc-textfield name="api_key" label="api_key" outlined="">
+                                        <input
+                                            style="justify-self: end"
+                                            value=""
+                                            class="vivid-input-internal"
+                                            id="input_api_key"
+                                            name="api_key"
+                                            type="text"
+                                            placeholder=" "
+                                        />
+                                    </vwc-textfield>
+                                    <vwc-text font-face="subtitle-3" tight>Session id</vwc-text>
+                                    <vwc-textfield name="session_id" label="session_id" outlined="">
+                                        <input
+                                            style="justify-self: end"
+                                            value=""
+                                            class="vivid-input-internal"
+                                            id="input_session_id"
+                                            name="session_id"
+                                            type="text"
+                                            placeholder=" "
+                                        />
+                                    </vwc-textfield>
+                                    <vwc-text font-face="subtitle-3" tight>Token</vwc-text>
+                                    <vwc-textfield name="token" label="token" outlined="">
+                                        <input
+                                            style="justify-self: end"
+                                            value=""
+                                            class="vivid-input-internal"
+                                            id="input_token"
+                                            name="token"
+                                            type="text"
+                                            placeholder=""
+                                        />
+                                    </vwc-textfield>
+                                </vwc-layout>
+                                <vwc-text font-face="subtitle-2" tight>Result</vwc-text>
+                                <vwc-layout
+                                    column-spacing="md"
+                                    style="--layout-grid-template-columns: 1fr 1fr"
+                                >
+                                    <vwc-text font-face="subtitle-3" tight>Show</vwc-text>
+                                    <vwc-switch
+                                        id="cameraswitch"
+                                        style="justify-self: end"
+                                    ></vwc-switch>
+                                    <vwc-text font-face="subtitle-3" tight>Sensitivity</vwc-text>
+                                    <vwc-slider
+                                        value="0.01"
+                                        min="0.0002"
+                                        max="0.02"
+                                        id="sensitivity_slider"
+                                    ></vwc-slider>
+                                </vwc-layout>
                             </vwc-layout>
                         </vwc-layout>
                         <vwc-layout column-basis="block" gutters="xs">
@@ -165,9 +219,7 @@
                             >
                             <div class="video-wrapper">
                                 <div class="app">
-                                    <div class="incoming-stream">
-                                        <div class="incoming-stream-message">Connecting...</div>
-                                    </div>
+                                    <div class="incoming-stream"></div>
                                 </div>
                             </div>
                             <vwc-layout>

@@ -10,15 +10,11 @@ import {
 } from "./transformers/volume_extractor_transformer";
 import { VolumeHistogramTransformer } from "./transformers/volume_histogram_transformer";
 import { vec3 } from "./types";
-import { bindButtonToLink, bindSwitch, bindSlider } from "./utils/ui";
+import { bindButtonToLink, bindSwitch, bindSlider, notifyError } from "./utils/ui";
 
 const DEFAULT_MIN_VOLUME: number = 0.0001;
 const DEFAULT_MAX_VOLUME: number = 0.01;
 const DEFAULT_COLOR: vec3 = [255, 0, 0];
-const API_KEY = "47568411";
-const SESSION_ID = "2_MX40NzU2ODQxMX5-MTY2Mjk2NTI4OTA1NX4ybzAzRXo5Qm1tUXFVRnVrQ3pEc1luUVB-fg";
-const TOKEN =
-    "T1==cGFydG5lcl9pZD00NzU2ODQxMSZzaWc9MWNkMTYzZTE3ODI3OGY4ZjgwOWVmYTg1YzcwMjdkYTI1NGEzNjc1MzpzZXNzaW9uX2lkPTJfTVg0ME56VTJPRFF4TVg1LU1UWTJNamsyTlRJNE9UQTFOWDR5YnpBelJYbzVRbTF0VVhGVlJuVnJRM3BFYzFsdVVWQi1mZyZjcmVhdGVfdGltZT0xNjYyOTY1MzQyJm5vbmNlPTAuNzE4NjgwOTg3NDEyNzIyNyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjY1NTU3MzQxJmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
 
 async function main() {
     const { audioTransformers, videoTransformers } = createTransformers();
@@ -33,9 +29,7 @@ async function main() {
         document.getElementsByClassName("incoming-stream")[0] as HTMLElement
     );
 
-    await Promise.all([pipeline.start(), opentok.connect(API_KEY, SESSION_ID, TOKEN)]);
-
-    opentok.setVideoMediaProcessorConnector(pipeline.videoConnector);
+    await Promise.all([pipeline.start()]);
 
     bindButtonToLink(
         "githubButton",
@@ -47,6 +41,33 @@ async function main() {
         "https://vivid.vonage.com/?path=/story/introduction-meet-vivid--meet-vivid"
     );
 
+    const inputApiKey = document.getElementById("input_api_key") as HTMLInputElement;
+    const inputSessionId = document.getElementById("input_session_id") as HTMLInputElement;
+    const inputToken = document.getElementById("input_token") as HTMLInputElement;
+
+    bindSwitch("connect", async (value: boolean) => {
+        if (value) {
+            inputApiKey.disabled = true;
+            inputSessionId.disabled = true;
+            inputToken.disabled = true;
+            const result = await opentok.connect(
+                inputApiKey.value,
+                inputSessionId.value,
+                inputToken.value
+            );
+            if (!result) {
+                notifyError(
+                    "Failled to connect to OpenTok. Please, ensure your api key, session id and token are correct."
+                );
+            }
+            console.log("DONE");
+        } else {
+            inputApiKey.disabled = false;
+            inputSessionId.disabled = false;
+            inputToken.disabled = false;
+            await opentok.disconnect();
+        }
+    });
     bindSwitch("cameraswitch", (value: boolean) => {
         if (value) {
             opentok.setVideoMediaProcessorConnector(pipeline.videoConnector);
