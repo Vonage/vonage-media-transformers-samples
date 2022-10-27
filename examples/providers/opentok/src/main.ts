@@ -24,7 +24,7 @@ async function main() {
         audioTransformers,
         videoTransformers,
     });
-
+    let enabled = false;
     const opentok = new OpenTokFacade(
         document.getElementsByClassName("incoming-stream")[0] as HTMLElement
     );
@@ -60,7 +60,9 @@ async function main() {
                     "Failled to connect to OpenTok. Please, ensure your api key, session id and token are correct."
                 );
             }
-            console.log("DONE");
+            if (enabled) {
+                opentok.setVideoMediaProcessorConnector(pipeline.videoConnector);
+            }
         } else {
             inputApiKey.disabled = false;
             inputSessionId.disabled = false;
@@ -70,8 +72,10 @@ async function main() {
     });
     bindSwitch("cameraswitch", (value: boolean) => {
         if (value) {
+            enabled = true;
             opentok.setVideoMediaProcessorConnector(pipeline.videoConnector);
         } else {
+            enabled = false;
             opentok.setVideoMediaProcessorConnector();
         }
     });
