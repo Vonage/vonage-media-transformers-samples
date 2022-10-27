@@ -1,6 +1,5 @@
 # Insertable Streams iOS Unity sample
-This sample application shows how to integrate insertable streams (video) with unity.
-Integrating this sample with **Vonage Video SDK** will allow you to publish a unity scene as your video. 
+This sample application shows how to use insertable streams (video) in ios app to render video frame buffers using unity.
 
 ### Prerequisite:
  - Unity - this sample was built with Unity *2021.3.6f1* (make sure ios is installed)
