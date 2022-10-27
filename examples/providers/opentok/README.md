@@ -18,7 +18,8 @@ Start speaking to see the volume histogram. If you're loud enough, your body bec
 ## Installation
 
 ### Requirements
-* [Node 16.3+](https://nodejs.org/en/)
+* [Node 16.15.1+](https://nodejs.org/en/)
+* [NPM 8.11.0'+](https://npmjs.org/)
 
 ### Running the app
 
