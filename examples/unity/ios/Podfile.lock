@@ -1,0 +1,16 @@
+PODS:
+  - VonageWebRTC (99.4.0-alpha.114)
+
+DEPENDENCIES:
+  - VonageWebRTC (= 99.4.0-alpha.114)
+
+SPEC REPOS:
+  trunk:
+    - VonageWebRTC
+
+SPEC CHECKSUMS:
+  VonageWebRTC: 7529ceeca1360d4d78dccf9ca07981639bba9556
+
+PODFILE CHECKSUM: 1ae626212683f35c349a93086a97eb551bb3ed94
+
+COCOAPODS: 1.11.3

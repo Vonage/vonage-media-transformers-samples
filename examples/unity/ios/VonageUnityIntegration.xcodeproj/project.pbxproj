@@ -1,0 +1,525 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AC611E6228F848CD00B00CEA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6128F848CD00B00CEA /* AppDelegate.m */; };
+		AC611E6528F848CD00B00CEA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6428F848CD00B00CEA /* SceneDelegate.m */; };
+		AC611E6828F848CD00B00CEA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6728F848CD00B00CEA /* ViewController.mm */; };
+		AC611E6B28F848CD00B00CEA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AC611E6928F848CD00B00CEA /* Main.storyboard */; };
+		AC611E6D28F848CE00B00CEA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC611E6C28F848CE00B00CEA /* Assets.xcassets */; };
+		AC611E7028F848CE00B00CEA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AC611E6E28F848CE00B00CEA /* LaunchScreen.storyboard */; };
+		AC611E7328F848CE00B00CEA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E7228F848CE00B00CEA /* main.m */; };
+		AC611E7A28F98C1200B00CEA /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC611E7928F98C1200B00CEA /* AVFoundation.framework */; };
+		AC611E7C28F98C7900B00CEA /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC611E7B28F98C7900B00CEA /* CoreVideo.framework */; };
+		AC611E7E28F98CA600B00CEA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC611E7D28F98CA600B00CEA /* UIKit.framework */; };
+		AC611E8028F98CEE00B00CEA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC611E7F28F98CEE00B00CEA /* QuartzCore.framework */; };
+		AC611E8228F98D1A00B00CEA /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC611E8128F98D1A00B00CEA /* Metal.framework */; };
+		AC611E8A28FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8928FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m */; };
+		AC611E8D29004A5700B00CEA /* WebRTCHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */; };
+		AC611E9A2902A7AB00B00CEA /* transformers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E992902A7AB00B00CEA /* transformers.cpp */; };
+		CAD901F71F9E1E7D7B80F82A /* Pods_VonageUnityIntegration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5F95F2B1AEC4862ADE63016 /* Pods_VonageUnityIntegration.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		ACB168302908646A000DED73 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		00AE298E8E96D45A82B4A983 /* Pods-VonageUnityIntegration.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.debug.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.debug.xcconfig"; sourceTree = "<group>"; };
+		088419715A3F0D1D131AD324 /* Pods-VonageUnityIntegration.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.release.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.release.xcconfig"; sourceTree = "<group>"; };
+		2F6617A591F4819C7629EDDD /* Pods-VonageUnityIntegration.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.debug.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.debug.xcconfig"; sourceTree = "<group>"; };
+		A5F95F2B1AEC4862ADE63016 /* Pods_VonageUnityIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VonageUnityIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC611E5D28F848CD00B00CEA /* VonageUnityIntegration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VonageUnityIntegration.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC611E6028F848CD00B00CEA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		AC611E6128F848CD00B00CEA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		AC611E6328F848CD00B00CEA /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		AC611E6428F848CD00B00CEA /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		AC611E6628F848CD00B00CEA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		AC611E6728F848CD00B00CEA /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
+		AC611E6A28F848CD00B00CEA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		AC611E6C28F848CE00B00CEA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AC611E6F28F848CE00B00CEA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		AC611E7128F848CE00B00CEA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AC611E7228F848CE00B00CEA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		AC611E7928F98C1200B00CEA /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		AC611E7B28F98C7900B00CEA /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		AC611E7D28F98CA600B00CEA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		AC611E7F28F98CEE00B00CEA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		AC611E8128F98D1A00B00CEA /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		AC611E8828FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RTCFakeCameraVideoCapturer.h; sourceTree = "<group>"; };
+		AC611E8928FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RTCFakeCameraVideoCapturer.m; sourceTree = "<group>"; };
+		AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WebRTCHelper.cpp; sourceTree = "<group>"; };
+		AC611E8C29004A5700B00CEA /* WebRTCHelper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = WebRTCHelper.hpp; sourceTree = "<group>"; };
+		AC611E982902A7AB00B00CEA /* transformers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = transformers.h; sourceTree = "<group>"; };
+		AC611E992902A7AB00B00CEA /* transformers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = transformers.cpp; sourceTree = "<group>"; };
+		BEF13A07D0F672E2F430B8F2 /* Pods-VonageUnityIntegration.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.release.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AC611E5A28F848CD00B00CEA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC611E8028F98CEE00B00CEA /* QuartzCore.framework in Frameworks */,
+				AC611E7A28F98C1200B00CEA /* AVFoundation.framework in Frameworks */,
+				AC611E7E28F98CA600B00CEA /* UIKit.framework in Frameworks */,
+				AC611E8228F98D1A00B00CEA /* Metal.framework in Frameworks */,
+				AC611E7C28F98C7900B00CEA /* CoreVideo.framework in Frameworks */,
+				CAD901F71F9E1E7D7B80F82A /* Pods_VonageUnityIntegration.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3358E8ED3C0073701B2A50D2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AC611E8128F98D1A00B00CEA /* Metal.framework */,
+				AC611E7F28F98CEE00B00CEA /* QuartzCore.framework */,
+				AC611E7D28F98CA600B00CEA /* UIKit.framework */,
+				AC611E7B28F98C7900B00CEA /* CoreVideo.framework */,
+				AC611E7928F98C1200B00CEA /* AVFoundation.framework */,
+				A5F95F2B1AEC4862ADE63016 /* Pods_VonageUnityIntegration.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		63D77CED08528CCB762A3ECF /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2F6617A591F4819C7629EDDD /* Pods-VonageUnityIntegration.debug.xcconfig */,
+				BEF13A07D0F672E2F430B8F2 /* Pods-VonageUnityIntegration.release.xcconfig */,
+				00AE298E8E96D45A82B4A983 /* Pods-VonageUnityIntegration.debug.xcconfig */,
+				088419715A3F0D1D131AD324 /* Pods-VonageUnityIntegration.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		AC611E5428F848CD00B00CEA = {
+			isa = PBXGroup;
+			children = (
+				AC611E5F28F848CD00B00CEA /* VonageUnityIntegration */,
+				AC611E5E28F848CD00B00CEA /* Products */,
+				63D77CED08528CCB762A3ECF /* Pods */,
+				3358E8ED3C0073701B2A50D2 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		AC611E5E28F848CD00B00CEA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AC611E5D28F848CD00B00CEA /* VonageUnityIntegration.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AC611E5F28F848CD00B00CEA /* VonageUnityIntegration */ = {
+			isa = PBXGroup;
+			children = (
+				AC611E992902A7AB00B00CEA /* transformers.cpp */,
+				AC611E982902A7AB00B00CEA /* transformers.h */,
+				AC611E6028F848CD00B00CEA /* AppDelegate.h */,
+				AC611E6128F848CD00B00CEA /* AppDelegate.m */,
+				AC611E6328F848CD00B00CEA /* SceneDelegate.h */,
+				AC611E6428F848CD00B00CEA /* SceneDelegate.m */,
+				AC611E6628F848CD00B00CEA /* ViewController.h */,
+				AC611E6728F848CD00B00CEA /* ViewController.mm */,
+				AC611E6928F848CD00B00CEA /* Main.storyboard */,
+				AC611E6C28F848CE00B00CEA /* Assets.xcassets */,
+				AC611E6E28F848CE00B00CEA /* LaunchScreen.storyboard */,
+				AC611E7128F848CE00B00CEA /* Info.plist */,
+				AC611E7228F848CE00B00CEA /* main.m */,
+				AC611E8828FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.h */,
+				AC611E8928FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m */,
+				AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */,
+				AC611E8C29004A5700B00CEA /* WebRTCHelper.hpp */,
+			);
+			path = VonageUnityIntegration;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AC611E5C28F848CD00B00CEA /* VonageUnityIntegration */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC611E7628F848CE00B00CEA /* Build configuration list for PBXNativeTarget "VonageUnityIntegration" */;
+			buildPhases = (
+				2F33135B0FB91AE0EA84BCCF /* [CP] Check Pods Manifest.lock */,
+				AC611E5928F848CD00B00CEA /* Sources */,
+				AC611E5A28F848CD00B00CEA /* Frameworks */,
+				AC611E5B28F848CD00B00CEA /* Resources */,
+				ACB168302908646A000DED73 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VonageUnityIntegration;
+			productName = VonageUnityIntegration;
+			productReference = AC611E5D28F848CD00B00CEA /* VonageUnityIntegration.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AC611E5528F848CD00B00CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1320;
+				TargetAttributes = {
+					AC611E5C28F848CD00B00CEA = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+				};
+			};
+			buildConfigurationList = AC611E5828F848CD00B00CEA /* Build configuration list for PBXProject "VonageUnityIntegration" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AC611E5428F848CD00B00CEA;
+			productRefGroup = AC611E5E28F848CD00B00CEA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AC611E5C28F848CD00B00CEA /* VonageUnityIntegration */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AC611E5B28F848CD00B00CEA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC611E7028F848CE00B00CEA /* LaunchScreen.storyboard in Resources */,
+				AC611E6D28F848CE00B00CEA /* Assets.xcassets in Resources */,
+				AC611E6B28F848CD00B00CEA /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2F33135B0FB91AE0EA84BCCF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-VonageUnityIntegration-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AC611E5928F848CD00B00CEA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC611E6828F848CD00B00CEA /* ViewController.mm in Sources */,
+				AC611E9A2902A7AB00B00CEA /* transformers.cpp in Sources */,
+				AC611E6228F848CD00B00CEA /* AppDelegate.m in Sources */,
+				AC611E7328F848CE00B00CEA /* main.m in Sources */,
+				AC611E8D29004A5700B00CEA /* WebRTCHelper.cpp in Sources */,
+				AC611E6528F848CD00B00CEA /* SceneDelegate.m in Sources */,
+				AC611E8A28FD9C0100B00CEA /* RTCFakeCameraVideoCapturer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		AC611E6928F848CD00B00CEA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AC611E6A28F848CD00B00CEA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		AC611E6E28F848CE00B00CEA /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AC611E6F28F848CE00B00CEA /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		AC611E7428F848CE00B00CEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		AC611E7528F848CE00B00CEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AC611E7728F848CE00B00CEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 00AE298E8E96D45A82B4A983 /* Pods-VonageUnityIntegration.debug.xcconfig */;
+			buildSettings = {
+				"ARCHS[sdk=iphonesimulator*]" = x86_64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PR6C39UQ38;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Unity-iPhone",
+				);
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"APPLE_TEST=1",
+					"WEBRTC_POSIX=1",
+					"WEBRTC_IOS=1",
+					"WEBRTC_MAC=1",
+					WEBRTC_NDEBUG,
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/third_party/libyuv/include",
+				);
+				INFOPLIST_FILE = VonageUnityIntegration/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Device camera access is needed for video stream communication";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed for video stream communication";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.VonageUnityIntegration;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AC611E7828F848CE00B00CEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 088419715A3F0D1D131AD324 /* Pods-VonageUnityIntegration.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PR6C39UQ38;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Unity-iPhone",
+				);
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"APPLE_TEST=1",
+					"WEBRTC_POSIX=1",
+					"WEBRTC_IOS=1",
+					"WEBRTC_MAC=1",
+					WEBRTC_NDEBUG,
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/third_party/libyuv/include",
+				);
+				INFOPLIST_FILE = VonageUnityIntegration/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Device camera access is needed for video stream communication";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed for video stream communication";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.VonageUnityIntegration;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AC611E5828F848CD00B00CEA /* Build configuration list for PBXProject "VonageUnityIntegration" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC611E7428F848CE00B00CEA /* Debug */,
+				AC611E7528F848CE00B00CEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC611E7628F848CE00B00CEA /* Build configuration list for PBXNativeTarget "VonageUnityIntegration" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC611E7728F848CE00B00CEA /* Debug */,
+				AC611E7828F848CE00B00CEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AC611E5528F848CD00B00CEA /* Project object */;
+}
