@@ -31,4 +31,4 @@ pod install --verbose --repo-update --clean-install
 - Build and run the `VonageUnityIntegration` project.
 
 ## Key points for Unity iOS integration
-The main iOS app code that communicates with Unity is located in file [transformers.cpp](https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/unity/examples/unity/ios/VonageUnityIntegration/transformers.cpp) that contains insertable stream implementation in Unity video transformer class.
+The main iOS app code that communicates with Unity is located in file [transformers.cpp](https://github.com/Vonage/vonage-media-transformers-samples/blob/main/examples/unity/ios/VonageUnityIntegration/transformers.cpp) that contains insertable stream implementation in Unity video transformer class.
