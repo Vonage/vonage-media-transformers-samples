@@ -20,8 +20,8 @@
     "vite-plugin-glsl": "^0.3.0"
   },
   "dependencies": {
-    "@vonage/media-processor": "^2.0.0",
-    "@vonage/ml-transformers": "^3.1.1",
+    "@vonage/media-processor": "2.0.0",
+    "@vonage/ml-transformers": "4.1.0",
     "@vonage/vivid": "^2.36.0",
     "twgl.js": "^4.24.0"
   }

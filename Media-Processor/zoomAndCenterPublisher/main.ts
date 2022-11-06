@@ -1,6 +1,6 @@
 // @ts-ignore
 import TheWorker from './js/MediaProcessorHelperThread?worker&inline'
-import CameraSource from '../common/js/camera-source'
+import CameraSource from '../../common/js/camera-source'
 import { isSupported, MediaPipeModelType, MediaPipeResults, MediapipeConfig, MediapipeHelper, FaceDetectionOptions } from '@vonage/ml-transformers'
 import {MediaProcessorConnectorInterface, MediaProcessorConnector, getVonageMetadata, PipelineInfoData, EventDataMap} from '@vonage/media-processor'
 import Emittery from 'emittery' 
@@ -167,7 +167,7 @@ async function main() {
               processorEmittery.emit('error', msg.data.info)
           } else if(msg.data.type === 'pipelineInfo'){
               let info: PipelineInfoData = msg.data.info
-              if(info.message === 'pipeline_ended' || info.message === 'pipeline_ended_with_error'){
+              if(info === 'pipeline_ended' || info === 'pipeline_ended_with_error'){
                   worker.terminate()
               }
               processorEmittery.emit('pipelineInfo', msg.data.info)
