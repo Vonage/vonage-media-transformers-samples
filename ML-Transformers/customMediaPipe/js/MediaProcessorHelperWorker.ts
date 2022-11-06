@@ -51,7 +51,7 @@ class MediaProcessorHelperWorker implements MediapipeMediaProcessorInterface, Me
                     this.processorEmittery_.emit('error', msg.data.info)
                 } else if(msg.data.type === 'pipelineInfo'){
                     let info: PipelineInfoData = msg.data.info
-                    if(info.message === 'pipeline_ended' || info.message === 'pipeline_ended_with_error'){
+                    if(info === 'pipeline_ended' || info === 'pipeline_ended_with_error'){
                         this.worker_.terminate()
                     }
                     this.processorEmittery_.emit('pipelineInfo', msg.data.info)

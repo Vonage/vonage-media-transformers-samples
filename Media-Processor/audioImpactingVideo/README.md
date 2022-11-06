@@ -3,9 +3,9 @@
     <img src="public/logo.png" alt="Vonage logo" title="Vonage" align="right" height="60" />
 </a>
 
-# OpenTok
+# Audio impacting video sample
 
-This sample app show to use OpenTok with Vonage [Media Processor](https://github.com/Vonage/media-processor) and [ML Transformers](https://github.com/Vonage/ml-transformers) libraries.
+This sample app show how audio could interact with video using Vonage [Media Processor](https://github.com/Vonage/media-processor) and [ML Transformers](https://github.com/Vonage/ml-transformers) libraries.
 
 Start speaking to see the volume histogram. If you're loud enough, your body become red.
 
@@ -18,8 +18,7 @@ Start speaking to see the volume histogram. If you're loud enough, your body bec
 ## Installation
 
 ### Requirements
-* [Node 16.15.1+](https://nodejs.org/en/)
-* [NPM 8.11.0'+](https://npmjs.org/)
+* [Node 16.3+](https://nodejs.org/en/)
 
 ### Running the app
 
@@ -41,5 +40,4 @@ This project is licensed under the terms of the [MIT license](https://opensource
 
 ## Links
 
-* [Online demo](https://vonage-opentok-sample.s3.amazonaws.com/index.html)
-* [Source code](https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/providers/opentok)
+* [Online demo](https://vonage-audio-impacting-video-sample.s3.amazonaws.com/index.html)

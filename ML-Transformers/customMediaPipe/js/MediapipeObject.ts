@@ -1,6 +1,6 @@
 import { MediapipeHelper, MediaPipeModelType, MediapipeConfig, MediaPipeResults, FaceDetectionOptions, FaceMeshOptions, HandsOptions, HolisticOptions, ObjectronOptions, SelfieSegmentationOptions, PoseOptions } from "@vonage/ml-transformers"
 import { MediapipePorcessInterface, MediapipeResultsListnerInterface, MediapipeConsts } from "./MediapipeInterfaces"
-import {VonageFacemash, VonageHands, VonageHolistic, VonageObjectron, VonagePose, VonageFacedetection} from '@vonage/ml-transformers'
+import {getVonageFaceMash, getVonageHands, getVonageHolistic, getVonageObjectron, getVonagePose, getVonageFaceDetection} from '@vonage/ml-transformers'
 
 class MediapipeObject implements MediapipePorcessInterface{
     mediapipeHelper_?: MediapipeHelper
@@ -13,60 +13,60 @@ class MediapipeObject implements MediapipePorcessInterface{
     getMediapipeConsts(): MediapipeConsts {
         let ret: MediapipeConsts = {
             facedetection: {
-                FACEDETECTION_LIPS: VonageFacedetection.FACEDETECTION_LIPS,
-                FACEDETECTION_LEFT_EYE: VonageFacedetection.FACEDETECTION_LEFT_EYE,
-                FACEDETECTION_LEFT_EYEBROW: VonageFacedetection.FACEDETECTION_LEFT_EYEBROW,
-                FACEDETECTION_RIGHT_EYE: VonageFacedetection.FACEDETECTION_RIGHT_EYE,
-                FACEDETECTION_RIGHT_EYEBROW: VonageFacedetection.FACEDETECTION_RIGHT_EYEBROW,
-                FACEDETECTION_FACE_OVAL: VonageFacedetection.FACEDETECTION_FACE_OVAL,
-                FACEDETECTION_CONTOURS: VonageFacedetection.FACEDETECTION_CONTOURS,
-                FACEDETECTION_TESSELATION: VonageFacedetection.FACEDETECTION_TESSELATION
+                FACEDETECTION_LIPS: getVonageFaceDetection().FACEDETECTION_LIPS,
+                FACEDETECTION_LEFT_EYE: getVonageFaceDetection().FACEDETECTION_LEFT_EYE,
+                FACEDETECTION_LEFT_EYEBROW: getVonageFaceDetection().FACEDETECTION_LEFT_EYEBROW,
+                FACEDETECTION_RIGHT_EYE: getVonageFaceDetection().FACEDETECTION_RIGHT_EYE,
+                FACEDETECTION_RIGHT_EYEBROW: getVonageFaceDetection().FACEDETECTION_RIGHT_EYEBROW,
+                FACEDETECTION_FACE_OVAL: getVonageFaceDetection().FACEDETECTION_FACE_OVAL,
+                FACEDETECTION_CONTOURS: getVonageFaceDetection().FACEDETECTION_CONTOURS,
+                FACEDETECTION_TESSELATION: getVonageFaceDetection().FACEDETECTION_TESSELATION
             },
             facemash: {
-                FACE_GEOMETRY: VonageFacemash.FACE_GEOMETRY,
-                FACEMESH_LIPS: VonageFacemash.FACEMESH_LIPS,
-                FACEMESH_LEFT_EYE: VonageFacemash.FACEMESH_LEFT_EYE,
-                FACEMESH_LEFT_EYEBROW: VonageFacemash.FACEMESH_LEFT_EYEBROW,
-                FACEMESH_LEFT_IRIS: VonageFacemash.FACEMESH_LEFT_IRIS,
-                FACEMESH_RIGHT_EYE: VonageFacemash.FACEMESH_RIGHT_EYE,
-                FACEMESH_RIGHT_EYEBROW: VonageFacemash.FACEMESH_RIGHT_EYEBROW,
-                FACEMESH_RIGHT_IRIS: VonageFacemash.FACEMESH_RIGHT_IRIS,
-                FACEMESH_FACE_OVAL: VonageFacemash.FACEMESH_FACE_OVAL,
-                FACEMESH_CONTOURS: VonageFacemash.FACEMESH_CONTOURS,
-                FACEMESH_TESSELATION: VonageFacemash.FACEMESH_TESSELATION
+                FACE_GEOMETRY: getVonageFaceMash().FACE_GEOMETRY,
+                FACEMESH_LIPS: getVonageFaceMash().FACEMESH_LIPS,
+                FACEMESH_LEFT_EYE: getVonageFaceMash().FACEMESH_LEFT_EYE,
+                FACEMESH_LEFT_EYEBROW: getVonageFaceMash().FACEMESH_LEFT_EYEBROW,
+                FACEMESH_LEFT_IRIS: getVonageFaceMash().FACEMESH_LEFT_IRIS,
+                FACEMESH_RIGHT_EYE: getVonageFaceMash().FACEMESH_RIGHT_EYE,
+                FACEMESH_RIGHT_EYEBROW: getVonageFaceMash().FACEMESH_RIGHT_EYEBROW,
+                FACEMESH_RIGHT_IRIS: getVonageFaceMash().FACEMESH_RIGHT_IRIS,
+                FACEMESH_FACE_OVAL: getVonageFaceMash().FACEMESH_FACE_OVAL,
+                FACEMESH_CONTOURS: getVonageFaceMash().FACEMESH_CONTOURS,
+                FACEMESH_TESSELATION: getVonageFaceMash().FACEMESH_TESSELATION
             },
             holistic: {
-                FACE_GEOMETRY: VonageHolistic.FACE_GEOMETRY,
-                FACEMESH_LIPS: VonageHolistic.FACEMESH_LIPS,
-                FACEMESH_LEFT_EYE: VonageHolistic.FACEMESH_LEFT_EYE,
-                FACEMESH_LEFT_EYEBROW: VonageHolistic.FACEMESH_LEFT_EYEBROW,
-                FACEMESH_LEFT_IRIS: VonageHolistic.FACEMESH_LEFT_IRIS,
-                FACEMESH_RIGHT_EYE: VonageHolistic.FACEMESH_RIGHT_EYE,
-                FACEMESH_RIGHT_EYEBROW: VonageHolistic.FACEMESH_RIGHT_EYEBROW,
-                FACEMESH_RIGHT_IRIS: VonageHolistic.FACEMESH_RIGHT_IRIS,
-                FACEMESH_FACE_OVAL: VonageHolistic.FACEMESH_FACE_OVAL,
-                FACEMESH_CONTOURS: VonageHolistic.FACEMESH_CONTOURS,
-                FACEMESH_TESSELATION: VonageHolistic.FACEMESH_TESSELATION,
-                HAND_CONNECTIONS: VonageHolistic.HAND_CONNECTIONS,
-                POSE_CONNECTIONS: VonageHolistic.POSE_CONNECTIONS,
-                POSE_LANDMARKS: VonageHolistic.POSE_LANDMARKS,
-                POSE_LANDMARKS_LEFT: VonageHolistic.POSE_LANDMARKS_LEFT,
-                POSE_LANDMARKS_RIGHT: VonageHolistic.POSE_LANDMARKS_RIGHT,
-                POSE_LANDMARKS_NEUTRAL: VonageHolistic.POSE_LANDMARKS_NEUTRAL
+                FACE_GEOMETRY: getVonageHolistic().FACE_GEOMETRY,
+                FACEMESH_LIPS: getVonageHolistic().FACEMESH_LIPS,
+                FACEMESH_LEFT_EYE: getVonageHolistic().FACEMESH_LEFT_EYE,
+                FACEMESH_LEFT_EYEBROW: getVonageHolistic().FACEMESH_LEFT_EYEBROW,
+                FACEMESH_LEFT_IRIS: getVonageHolistic().FACEMESH_LEFT_IRIS,
+                FACEMESH_RIGHT_EYE: getVonageHolistic().FACEMESH_RIGHT_EYE,
+                FACEMESH_RIGHT_EYEBROW: getVonageHolistic().FACEMESH_RIGHT_EYEBROW,
+                FACEMESH_RIGHT_IRIS: getVonageHolistic().FACEMESH_RIGHT_IRIS,
+                FACEMESH_FACE_OVAL: getVonageHolistic().FACEMESH_FACE_OVAL,
+                FACEMESH_CONTOURS: getVonageHolistic().FACEMESH_CONTOURS,
+                FACEMESH_TESSELATION: getVonageHolistic().FACEMESH_TESSELATION,
+                HAND_CONNECTIONS: getVonageHolistic().HAND_CONNECTIONS,
+                POSE_CONNECTIONS: getVonageHolistic().POSE_CONNECTIONS,
+                POSE_LANDMARKS: getVonageHolistic().POSE_LANDMARKS,
+                POSE_LANDMARKS_LEFT: getVonageHolistic().POSE_LANDMARKS_LEFT,
+                POSE_LANDMARKS_RIGHT: getVonageHolistic().POSE_LANDMARKS_RIGHT,
+                POSE_LANDMARKS_NEUTRAL: getVonageHolistic().POSE_LANDMARKS_NEUTRAL
             },
             hands: {
-                HAND_CONNECTIONS: VonageHands.HAND_CONNECTIONS
+                HAND_CONNECTIONS: getVonageHands().HAND_CONNECTIONS
             },
             objectron: {
-                BOX_CONNECTIONS: VonageObjectron.BOX_CONNECTIONS,
-                BOX_KEYPOINTS: VonageObjectron.BOX_KEYPOINTS
+                BOX_CONNECTIONS: getVonageObjectron().BOX_CONNECTIONS,
+                BOX_KEYPOINTS: getVonageObjectron().BOX_KEYPOINTS
             },
             pose: {
-                POSE_CONNECTIONS: VonagePose.POSE_CONNECTIONS,
-                POSE_LANDMARKS: VonagePose.POSE_LANDMARKS,
-                POSE_LANDMARKS_LEFT: VonagePose.POSE_LANDMARKS_LEFT,
-                POSE_LANDMARKS_RIGHT: VonagePose.POSE_LANDMARKS_RIGHT,
-                POSE_LANDMARKS_NEUTRAL: VonagePose.POSE_LANDMARKS_NEUTRAL
+                POSE_CONNECTIONS: getVonagePose().POSE_CONNECTIONS,
+                POSE_LANDMARKS: getVonagePose().POSE_LANDMARKS,
+                POSE_LANDMARKS_LEFT: getVonagePose().POSE_LANDMARKS_LEFT,
+                POSE_LANDMARKS_RIGHT: getVonagePose().POSE_LANDMARKS_RIGHT,
+                POSE_LANDMARKS_NEUTRAL: getVonagePose().POSE_LANDMARKS_NEUTRAL
             }
         }
         return ret
