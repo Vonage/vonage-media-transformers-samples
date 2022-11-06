@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vonage/media-processor": "^1.2.7",
+    "@vonage/media-processor": "2.0.0",
     "@vonage/vivid": "^2.36.0"
   },
   "devDependencies": {
