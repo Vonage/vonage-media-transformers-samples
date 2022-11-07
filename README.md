@@ -16,7 +16,7 @@ In this repo we created cool sample application using
 #### Unity Integration
 - [Web integration](Unity/web).
 - [iOS integration](Unity/ios).
-#### Vonage Video (TokBox) integration
-- [Publisher Integration](Providers/opentok).
+#### Vonage Video integration
+- [Publisher Integration](Providers/VonageVideo).
 ## License
 This project is licensed under the terms of the [MIT license](https://opensource.org/licenses/MIT) and is available for free.
