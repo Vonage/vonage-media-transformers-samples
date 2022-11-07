@@ -4,8 +4,6 @@ This sample application shows the result of applying some background visual effe
 You can see a live demo of this sample running [here](https://vonage-background-enchantments-sample.s3.amazonaws.com/index.html)
 # Building the application
 ## Configure the environment
-    nvm install 16.13
-    nvm use 16.13
     npm i
 ## Run dev version
 
