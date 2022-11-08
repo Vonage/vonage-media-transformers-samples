@@ -1,0 +1,28 @@
+{
+  "name": "audio-impacting-video",
+  "author": {
+    "name": "Remi Deltombe",
+    "email": "remi.deltombe@vonage.com",
+    "url": "https://www.vonage.com"
+  },
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "prettier": "prettier --write ./src"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.4",
+    "vite": "^3.1.0",
+    "vite-plugin-glsl": "^0.3.0"
+  },
+  "dependencies": {
+    "@vonage/media-processor": "2.0.0",
+    "@vonage/ml-transformers": "4.1.0",
+    "@vonage/vivid": "^2.36.0",
+    "twgl.js": "^4.24.0"
+  }
+}
