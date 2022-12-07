@@ -145,7 +145,6 @@ async function main() {
     checkEnableCameraSwitch();
     if (cameraSwitchChecked) {
       const backgroundType = backgroundPostProcessSelector.value;
-      console.log(getConfig("CONFIG", backgroundType));
       processor
         ?.setBackgroundOptions(getConfig(backgroundType))
         .then(() => {
