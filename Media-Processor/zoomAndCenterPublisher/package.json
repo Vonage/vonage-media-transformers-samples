@@ -12,7 +12,7 @@
     "vite": "^2.9.15"
   },
   "dependencies": {
-    "@vonage/ml-transformers": "4.1.0",
+    "@vonage/ml-transformers": "5.1.0",
     "@vonage/vivid": "^2.35.0"
   }
 }

@@ -21,8 +21,8 @@
     },
     "dependencies": {
         "@opentok/client": "^2.23.9",
-        "@vonage/media-processor": "^2.0.0",
-        "@vonage/ml-transformers": "^4.0.1",
+        "@vonage/media-processor": "2.0.3",
+        "@vonage/ml-transformers": "5.1.0",
         "@vonage/vivid": "^2.36.1",
         "twgl.js": "^5.2.0"
     }

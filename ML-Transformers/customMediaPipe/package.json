@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@mediapipe/drawing_utils": "0.3.1620248257",
-    "@vonage/ml-transformers": "4.1.0",
+    "@vonage/ml-transformers": "5.1.0",
     "@vonage/vivid": "^2.34.1"
   },
   "devDependencies": {
