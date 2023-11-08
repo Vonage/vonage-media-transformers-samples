@@ -71,6 +71,10 @@
                 width: 370px;
             }
 
+            #step-unsupported {
+                padding-top: 60px;
+            }
+            #step-1,
             #step-2,
             #step-3 {
                 display: none;
@@ -122,6 +126,12 @@
                 <vwc-card class="maincard" elevation="0">
                     <div slot="main" gutters="xs" class="maincardlayout">
                         <vwc-layout class="left-column" column-basis="block" gutters="xs">
+                            <div id="step-unsupported" style="display: none">
+                                <vwc-text font-face="headline-6"
+                                    >Your browser is not supported. <br />Please, use a Chromium
+                                    based browser.</vwc-text
+                                >
+                            </div>
                             <div id="step-1">
                                 <vwc-file-picker
                                     drop-zone=""

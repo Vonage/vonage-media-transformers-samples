@@ -4,6 +4,11 @@ import { Source } from "./source";
 const $ = document.querySelector.bind(document);
 
 async function main() {
+    if (!isSupported()) {
+        ($("#step-unsupported") as any)!.style.display = "block";
+        return;
+    }
+
     const $step1 = $("#step-1") as HTMLDivElement;
     const $step2 = $("#step-2") as HTMLDivElement;
     const $step3 = $("#step-3") as HTMLDivElement;
@@ -16,6 +21,7 @@ async function main() {
     const $restart = $("#restart") as HTMLButtonElement;
     const $switchMultithread = $("#switch-multithread") as any;
 
+    show($step1);
     $inputFile.onchange = () => {
         hide($step1);
         show($step2);
@@ -25,7 +31,7 @@ async function main() {
         }
 
         const file: File = $inputFile.files[0];
-        if (file.type !== "audio/wav") {
+        if (!["audio/wav", "audio/x-wav"].includes(file.type)) {
             alert("Wrong file type. Please, select a wav file");
             throw "Wrong file type. Please, select a wav file";
         }
@@ -117,4 +123,9 @@ function bindButtonToLink(id: string, link: string) {
             window.open(link, "_blank")?.focus();
         });
     }
+}
+
+function isSupported(): boolean {
+    const audio = document.createElement("audio") as any;
+    return audio.captureStream !== undefined;
 }
