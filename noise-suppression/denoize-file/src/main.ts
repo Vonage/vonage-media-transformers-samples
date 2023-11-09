@@ -72,6 +72,7 @@ async function main() {
                     };
                     $latency.innerHTML = (await result.pipeline.getLatency()) + "ns";
                     show($step3);
+                    await result.pipeline.close();
                 });
 
                 source.play();
