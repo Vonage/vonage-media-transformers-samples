@@ -91,7 +91,7 @@ async function main() {
 
     bindButtonToLink(
         "githubButton",
-        "https://github.com/Vonage/vonage-media-transformers-samples/tree/main/noise-suppression/process-file"
+        "https://github.com/Vonage/vonage-media-transformers-samples/tree/main/noise-suppression/denoize-file"
     );
     bindButtonToLink("npmButton", "https://www.npmjs.com/package/@vonage/noise-suppression");
 
