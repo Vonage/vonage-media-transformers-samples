@@ -1,0 +1,231 @@
+<html>
+    <head>
+        <style>
+            body {
+                margin: 0px;
+            }
+
+            .headline {
+                text-align: center;
+            }
+
+            vwc-top-app-bar img {
+                margin-left: 16px;
+            }
+
+            .maincard {
+                margin: 10 auto;
+                width: 58%;
+                max-width: 1120px;
+                height: fit-content;
+                display: block;
+            }
+
+            .maincardlayout {
+                display: grid;
+                grid-template-columns: 4fr 6fr;
+            }
+
+            .video-wrapper {
+                aspect-ratio: 1.1;
+                background-image: url(images/vonage.png);
+                background-repeat: no-repeat;
+                background-position: center;
+                background-color: var(--vvd-color-canvas);
+                background-size: 100% auto;
+                border-radius: 4px;
+                overflow: hidden;
+                border: 1px solid var(--vvd-color-neutral-30);
+            }
+
+            .video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            #sensitivity_slider {
+                width: 200px;
+            }
+
+            .component-container {
+                margin: auto;
+                display: inline-block;
+                padding: 1rem;
+                border: solid 1px #eee;
+                box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+                margin-top: 8px;
+            }
+            vwc-file-picker {
+                margin-bottom: 10px;
+                display: block;
+            }
+            #step-1,
+            #step-2,
+            #step-3 {
+                min-height: 200px;
+            }
+
+            .left-column {
+                width: 370px;
+            }
+
+            #step-unsupported {
+                padding-top: 60px;
+            }
+            #step-1,
+            #step-2,
+            #step-3 {
+                display: none;
+            }
+            #step-2 {
+                padding-top: 60px;
+                box-sizing: border-box;
+            }
+        </style>
+
+        <script type="module">
+            import "@vonage/vwc-top-app-bar";
+            import "@vonage/vwc-layout";
+            import "@vonage/vwc-text";
+            import "@vonage/vwc-banner";
+            import "@vonage/vwc-card";
+            import "@vonage/vwc-switch";
+            import "@vonage/vwc-slider";
+            import "@vonage/vwc-file-picker";
+            import "@vonage/vwc-linear-progress";
+            import "@vonage/vwc-audio";
+            import "@vonage/vwc-list/vwc-list-item";
+        </script>
+
+        <title>Noise Suppression sample app - Denoize file</title>
+        <link rel="icon" href="vonage.png" />
+    </head>
+
+    <body>
+        <vwc-top-app-bar alternate>
+            <img
+                slot="navigationIcon"
+                height="24"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQI9k8NKq3KoOs1VkwSYwPwwQbisiS_K-0jtBUyml13k7EBy8Aekz7G7I1vqceWf5kEQ&usqp=CAU"
+            />
+            <div>
+                <vwc-layout gutters="xs" column-basis="block">
+                    <vwc-text font-face="subtitle-1" class="headline" tight
+                        >This sample app will process an audio file with noise
+                        suppression.</vwc-text
+                    >
+                    <vwc-text font-face="subtitle-2" class="headline" tight
+                        >Select a file, the processing will start automatically.<br />
+                        When ready, you can listen the processed result or download it as a
+                        file.</vwc-text
+                    >
+                </vwc-layout>
+
+                <vwc-card class="maincard" elevation="0">
+                    <div slot="main" gutters="xs" class="maincardlayout">
+                        <vwc-layout class="left-column" column-basis="block" gutters="xs">
+                            <div id="step-unsupported" style="display: none">
+                                <vwc-text font-face="headline-6"
+                                    >Your browser is not supported. <br />Please, use a Chromium
+                                    based browser.</vwc-text
+                                >
+                            </div>
+                            <div id="step-1">
+                                <vwc-file-picker
+                                    drop-zone=""
+                                    label=""
+                                    helper=""
+                                    notafileerror="only file/s drop allowed"
+                                    toomanyfileserror="only one file allowed"
+                                >
+                                    <input id="input-file" type="file" />
+                                    <span slot="dd-hint"></span>
+                                    <vwc-button
+                                        slot="button"
+                                        type="button"
+                                        layout="filled"
+                                        icon="upload"
+                                        trailingicon=""
+                                        unelevated=""
+                                    >
+                                        Select wav file
+                                        <button type="button" style="display: none"></button>
+                                    </vwc-button>
+                                </vwc-file-picker>
+                                <vwc-layout
+                                    column-spacing="md"
+                                    style="--layout-grid-template-columns: 1fr 1fr"
+                                >
+                                    <vwc-text font-face="subtitle-4" tight
+                                        >Use multithread</vwc-text
+                                    >
+                                    <vwc-switch
+                                        id="switch-multithread"
+                                        style="justify-self: end"
+                                        checked
+                                    ></vwc-switch>
+                                </vwc-layout>
+                            </div>
+                            <div id="step-2">
+                                <vwc-text font-face="headline-6"> Processing... </vwc-text>
+                                <vwc-linear-progress
+                                    id="progress"
+                                    progress="0"
+                                ></vwc-linear-progress>
+                            </div>
+                            <div id="step-3">
+                                <vwc-text font-face="subtitle-4" tight
+                                    >Average latency: <span id="latency"></span><br
+                                /></vwc-text>
+                                <div class="component-container">
+                                    <vwc-audio id="audio-player" timestamp=""></vwc-audio>
+                                </div>
+                                <vwc-button
+                                    label="Download processed file"
+                                    layout="filled"
+                                    icon="open-line"
+                                    trailingIcon
+                                    id="download-processed"
+                                ></vwc-button>
+                                <vwc-button
+                                    label="Restart"
+                                    layout="filled"
+                                    id="restart"
+                                ></vwc-button>
+                            </div>
+                        </vwc-layout>
+                        <vwc-layout column-basis="block" gutters="xs">
+                            <vwc-button
+                                connotation="cta"
+                                label="View code in GitHub"
+                                layout="filled"
+                                icon="open-line"
+                                trailingIcon
+                                id="githubButton"
+                            ></vwc-button>
+                            <vwc-button
+                                connotation="cta"
+                                label="View package"
+                                layout="filled"
+                                icon="open-line"
+                                trailingIcon
+                                id="npmButton"
+                            ></vwc-button>
+                            <vwc-button
+                                connotation="cta"
+                                label="Use Vivid"
+                                layout="filled"
+                                icon="open-line"
+                                trailingIcon
+                                id="vividButton"
+                            ></vwc-button
+                        ></vwc-layout>
+                    </div>
+                </vwc-card>
+            </div>
+        </vwc-top-app-bar>
+        <script type="module" src="./src/main.ts"></script>
+    </body>
+</html>
