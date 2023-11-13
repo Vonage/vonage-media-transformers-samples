@@ -83,6 +83,14 @@
                 padding-top: 60px;
                 box-sizing: border-box;
             }
+
+            .version {
+                margin-top: -10px;
+                text-align: right;
+            }
+            #downloadSamplesbButton {
+                margin-top: 10px;
+            }
         </style>
 
         <script type="module">
@@ -167,6 +175,13 @@
                                         checked
                                     ></vwc-switch>
                                 </vwc-layout>
+                                <vwc-button
+                                    label="Download sample audio files"
+                                    layout="filled"
+                                    icon="stack-solid"
+                                    trailingIcon
+                                    id="downloadSamplesbButton"
+                                ></vwc-button>
                             </div>
                             <div id="step-2">
                                 <vwc-text font-face="headline-6"> Processing... </vwc-text>
@@ -220,7 +235,9 @@
                                 icon="open-line"
                                 trailingIcon
                                 id="vividButton"
-                            ></vwc-button
+                            ></vwc-button>
+                            <vwc-text font-face="subtitle-6" tight class="version"
+                                >vonage/noise-suppression v1.0.0-beta.4<br /></vwc-text
                         ></vwc-layout>
                     </div>
                 </vwc-card>
