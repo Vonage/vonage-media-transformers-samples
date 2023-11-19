@@ -210,3 +210,8 @@ examples/unity/UnityVideoProject/UserSettings
 .DS_Store
 examples/unity/ios/Pods
 examples/unity/ios/Unity-iPhone
+Unity/ios/Pods
+Unity/ios/UnityFramework.framework
+Unity/UnityVideoProject/ios_build
+Unity/UnityVideoProject/Library
+Unity/UnityVideoProject/Temp

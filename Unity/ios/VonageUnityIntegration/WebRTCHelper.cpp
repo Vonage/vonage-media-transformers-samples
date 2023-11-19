@@ -49,8 +49,8 @@ bool WebRTCHelper::init(webrtc::VideoTrackSourceInterface *videoSource, std::uni
     _video_track->AddOrUpdateSink(_local_sink.get(), rtc::VideoSinkWants());
     
     auto video_processor_ = new vonage::VideoProcessor();
-    
-    _video_transformers.push_back(std::make_shared<vonage::VonageUnityVideoTransformer>());
+    _transformer_observer = std::make_unique<TransformerObserver>();
+    _video_transformers.push_back(std::make_shared<vonage::VonageUnityVideoTransformer>(_transformer_observer.get()));
     video_processor_->SetTransformers(_video_transformers);
     if (video_processor_->SetTrack(_video_track) == false) {
         RTC_LOG_T_F(LS_WARNING) << "Video processor set track method failed";
@@ -68,5 +68,21 @@ rtc::Thread* WebRTCHelper::getNetworkThread(){
 
 rtc::Thread* WebRTCHelper::getSignalingThread(){
     return _signal.get();
+}
+
+TransformerObserver::TransformerObserver() : webrtc::BaseFrameTransformerObserver(rtc::Thread::Current()){
+    
+}
+
+TransformerObserver::~TransformerObserver(){
+    
+}
+
+void TransformerObserver::OnError(webrtc::MediaProcessorErrorCode code, const std::string &message){
+    RTC_LOG_T_F(LS_ERROR) << "TransformerObserver code: " << code << " message: " << message;
+}
+
+void TransformerObserver::OnWarning(webrtc::MediaProcessorWarningCode code, const std::string &message){
+    RTC_LOG_T_F(LS_WARNING) << "TransformerObserver code: " << code << " message: " << message;
 }
 
