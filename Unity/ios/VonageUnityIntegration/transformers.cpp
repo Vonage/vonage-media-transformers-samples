@@ -15,6 +15,21 @@
 
 namespace vonage {
 
+    int GetRotation(webrtc::VideoRotation rotation){
+        switch (rotation) {
+            case webrtc::VideoRotation::kVideoRotation_0:
+                return 0;
+            case webrtc::VideoRotation::kVideoRotation_90:
+                return 90;
+            case webrtc::VideoRotation::kVideoRotation_180:
+                return 180;
+            case webrtc::VideoRotation::kVideoRotation_270:
+                return 270;
+            default:
+                break;
+        }
+        return 0;
+    }
     // VonageUnityVideoTransformer
     VonageUnityVideoTransformer::VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer) : webrtc::BaseFrameTransformer<webrtc::VideoFrame>(observer) {
         inputArgbBuffer_ = new uint32_t[NUM_PIXELS];
@@ -65,7 +80,7 @@ namespace vonage {
                            UNITY_HEIGHT);
         
         // Send converted ARGB video frame buffer to Unity
-        [NSClassFromString(@"FrameworkLibAPI") setInputBufferCpp:inputArgbBuffer_];
+        [NSClassFromString(@"FrameworkLibAPI") setInputBufferCpp:inputArgbBuffer_ andRotation:GetRotation(target_frame->rotation())];
       
         // Tell Unity to update texture rendering using the updated input buffer
         [gUfw sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];

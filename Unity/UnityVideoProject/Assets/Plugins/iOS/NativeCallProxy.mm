@@ -21,6 +21,7 @@ public:
         outputArray_ = nullptr;
         inputArraySize_ = 0;
         outputArraySize_ = 0;
+        rotation_ = 0;
         newBufferDataAvailable_ = false;
     }
     
@@ -90,6 +91,14 @@ public:
 
         memcpy(output, bufferData, outputArraySize_ * sizeof(uint32_t));
     }
+
+    void setRotation(uint32_t rotation){
+        rotation_ = rotation;
+    }
+
+    int getRotation(){
+        return rotation_;
+    }
     
 private:
     std::unique_ptr<uint32_t> inputArray_;
@@ -97,6 +106,7 @@ private:
     
     uint32_t inputArraySize_;
     uint32_t outputArraySize_;
+    int rotation_;
     
     bool newBufferDataAvailable_;
     
@@ -117,6 +127,10 @@ extern "C"{
     void __stdcall getInputBufferCS(uint32_t* outBuffer){
         unityBridge::getBridge()->copyInputArray(outBuffer);
         unityBridge::getBridge()->setNewBufferDataAvailable(false);
+    }
+
+    int __stdcall getRotationCS(){
+        return unityBridge::getBridge()->getRotation();
     }
 
     void __stdcall setInputBufferDataCS(uint32_t* bufferData){
@@ -153,13 +167,14 @@ extern "C"{
     return bridge->getOutput();
 }
 
-+ (void) setInputBufferCpp: (uint32_t*) buffer
++ (void) setInputBufferCpp:(uint32_t*) buffer andRotation:(int)rotation
 {
     auto bridge = unityBridge::getBridge();
     
     if(bridge == nullptr) return;
     
     bridge->setInputBufferData(buffer);
+    bridge->setRotation(rotation);
     bridge->setNewBufferDataAvailable(true);
 }
 
