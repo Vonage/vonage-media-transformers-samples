@@ -10,7 +10,7 @@ __attribute__ ((visibility("default")))
 @interface FrameworkLibAPI : NSObject
 // call it any time after UnityFrameworkLoad to set object implementing NativeCallsProtocol methods
 + (uint32_t*) getInputBufferCpp;
-+ (void) setInputBufferCpp: (uint32_t*) buffer;
++ (void) setInputBufferCpp:(uint32_t*)buffer andRotation:(int)rotation;
 + (uint32_t*) getOutputBufferCpp;
 @end
 

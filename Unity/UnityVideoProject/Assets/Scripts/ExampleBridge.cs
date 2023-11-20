@@ -28,6 +28,9 @@ public class ExampleBridge : MonoBehaviour
     private static extern void getInputBufferCS(UInt32[] outBuffer);
 
     [DllImport("__Internal")]
+    private static extern int getRotationCS();
+
+    [DllImport("__Internal")]
     private static extern void setInputBufferDataCS(UInt32[] bufferData);
 
     [DllImport("__Internal")]
@@ -82,6 +85,7 @@ public class ExampleBridge : MonoBehaviour
         try
         {
 #if !UNITY_WEBGL
+            int rotation = getRotationCS();
             getInputBufferCS(inputArray);
 #endif
             for (int i = 0; i < inputArray.Length; i++)
@@ -90,6 +94,10 @@ public class ExampleBridge : MonoBehaviour
                 texturePixels[i].r = (byte)((inputArray[i] >> 16) & 0xFF);
                 texturePixels[i].g = (byte)((inputArray[i] >> 8) & 0xFF);
                 texturePixels[i].b = (byte)((inputArray[i]) & 0xFF);
+            }
+
+            if(rotation == 90){
+                System.Array.Reverse(texturePixels, 0, texturePixels.Length);
             }
 
             texture.SetPixels32(0, 0, width, height, texturePixels, 0);

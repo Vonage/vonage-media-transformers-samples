@@ -11,9 +11,10 @@
 #include <sdk/objc/native/api/video_capturer.h>
 #include <sdk/objc/native/api/video_renderer.h>
 #include <sdk/objc/components/renderer/metal/RTCMTLVideoView.h>
+#include <sdk/objc/components/capturer/RTCCameraVideoCapturer.h>
+#import "RTCFakeCameraVideoCapturer.h"
 
 @interface ViewController ()
-@property(nonatomic) RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer) * capturer;
 @property(nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>* localVideoView;
 
 @end
@@ -21,6 +22,7 @@
 @implementation ViewController {
     UIView *_view;
     std::unique_ptr<WebRTCHelper> _webrtcHelper;
+    std::unique_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> _local_sink;
 }
 
 @synthesize capturer = _capturer;
@@ -49,16 +51,61 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-
-    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)) , dispatch_get_main_queue(), ^() {
+#if TARGET_OS_SIMULATOR
         self.capturer = [[RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer) alloc] init];
-        
-        std::unique_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
-        rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
-        
-        [self.capturer startCaptureWithFps];
-        self->_webrtcHelper->init(video_track_source.get(), std::move(local_sink));
+#else
+        self.capturer = [[RTC_OBJC_TYPE(RTCCameraVideoCapturer) alloc] init];
+#endif
+        self->_local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
+        if([self->_capturer isKindOfClass:[RTC_OBJC_TYPE(RTCCameraVideoCapturer) class]]){
+            RTC_OBJC_TYPE(RTCCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(RTCCameraVideoCapturer)*)self->_capturer;
+            AVCaptureDevice *selectedDevice = nil;
+            NSArray<AVCaptureDevice *> *captureDevices = [RTC_OBJC_TYPE(RTCCameraVideoCapturer) captureDevices];
+            for (AVCaptureDevice *device in captureDevices) {
+                if (device.position == AVCaptureDevicePositionFront){
+                    selectedDevice = device;
+                    break;
+                }
+                
+            }
+            
+            AVCaptureDeviceFormat *selectedFormat = nil;
+            int targetWidth = 640;
+            int targetHeight = 480;
+            int currentDiff = INT_MAX;
+            NSArray<AVCaptureDeviceFormat *> *formats = [RTC_OBJC_TYPE(RTCCameraVideoCapturer) supportedFormatsForDevice:selectedDevice];
+            for (AVCaptureDeviceFormat *format in formats) {
+                CMVideoDimensions dimension = CMVideoFormatDescriptionGetDimensions(format.formatDescription);
+                bool isCorrectFps = false;
+                for(AVFrameRateRange* frameRate in format.videoSupportedFrameRateRanges){
+                    if(frameRate.maxFrameRate == 30){
+                        isCorrectFps = true;
+                        break;
+                    }
+                }
+                if(isCorrectFps){
+                    int diff = abs(targetWidth - dimension.width) + abs(targetHeight - dimension.height);
+                    if (diff < currentDiff) {
+                        selectedFormat = format;
+                        currentDiff = diff;
+                    }
+                }
+            }
+            NSError* error;
+            AVCaptureDeviceInput* device_input = [AVCaptureDeviceInput deviceInputWithDevice:selectedDevice error:&error];
+            [local_capturer startCaptureWithDevice:selectedDevice format:selectedFormat input:device_input fps:30 completionHandler:^(NSError * _Nullable error) {
+                if(!error){
+                    rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
+                    self->_webrtcHelper->init(video_track_source.get(), std::move(self->_local_sink));
+                }
+            }];
+        } else {
+            RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer)*)self->_capturer;
+            [local_capturer stopCapture];
+            rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
+            self->_webrtcHelper->init(video_track_source.get(), std::move(self->_local_sink));
+        }
     });
 }
 

@@ -8,11 +8,22 @@
 #ifndef WEBRTC_HELPER_H_
 #define WEBRTC_HELPER_H_
 #include <api/peer_connection_interface.h>
-
+#include <modules/vonage/api/crypto/sframe/vonage_sframe_observer.h>
 
 namespace webrtc {
 class PeerConnectionFactoryInterface;
 }
+
+class TransformerObserver : public webrtc::BaseFrameTransformerObserver {
+public:
+    TransformerObserver();
+    virtual ~TransformerObserver();
+    
+    // BaseFrameTransformerObsever implementation.
+    void OnWarning(webrtc::MediaProcessorWarningCode code, const std::string& message) override;
+    void OnError(webrtc::MediaProcessorErrorCode code, const std::string& message) override;
+};
+
 class WebRTCHelper{
 public:
     WebRTCHelper();
@@ -35,5 +46,6 @@ private:
     std::unique_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> _local_sink;
     
     std::vector<std::shared_ptr<webrtc::BaseFrameTransformer<webrtc::VideoFrame>>> _video_transformers;
+    std::unique_ptr<TransformerObserver> _transformer_observer;
 };
 #endif

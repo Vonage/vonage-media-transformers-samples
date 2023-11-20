@@ -50,7 +50,7 @@ extern const int NUM_FRAMES = 137;
     [self.timer invalidate];
 }
 
-- (void)startCaptureWithFps{
+- (void)startCapture{
     
     self.timer = [NSTimer scheduledTimerWithTimeInterval:0.03 repeats:YES block:^(NSTimer * _Nonnull timer) {
         dispatch_async(dispatch_get_main_queue(),^{

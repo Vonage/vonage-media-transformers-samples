@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A5397922B0A179C00BA60A5 /* UnityFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A53978F2B0A136700BA60A5 /* UnityFramework.framework */; };
+		0A5397932B0A179C00BA60A5 /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A53978F2B0A136700BA60A5 /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AC611E6228F848CD00B00CEA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6128F848CD00B00CEA /* AppDelegate.m */; };
 		AC611E6528F848CD00B00CEA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6428F848CD00B00CEA /* SceneDelegate.m */; };
 		AC611E6828F848CD00B00CEA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6728F848CD00B00CEA /* ViewController.mm */; };
@@ -26,12 +28,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		ACB168302908646A000DED73 /* Embed Frameworks */ = {
+		0A5397942B0A179C00BA60A5 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				0A5397932B0A179C00BA60A5 /* UnityFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -41,6 +44,7 @@
 /* Begin PBXFileReference section */
 		00AE298E8E96D45A82B4A983 /* Pods-VonageUnityIntegration.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.debug.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.debug.xcconfig"; sourceTree = "<group>"; };
 		088419715A3F0D1D131AD324 /* Pods-VonageUnityIntegration.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.release.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.release.xcconfig"; sourceTree = "<group>"; };
+		0A53978F2B0A136700BA60A5 /* UnityFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UnityFramework.framework; sourceTree = "<group>"; };
 		2F6617A591F4819C7629EDDD /* Pods-VonageUnityIntegration.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.debug.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.debug.xcconfig"; sourceTree = "<group>"; };
 		A5F95F2B1AEC4862ADE63016 /* Pods_VonageUnityIntegration.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VonageUnityIntegration.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC611E5D28F848CD00B00CEA /* VonageUnityIntegration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VonageUnityIntegration.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -74,6 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A5397922B0A179C00BA60A5 /* UnityFramework.framework in Frameworks */,
 				AC611E8028F98CEE00B00CEA /* QuartzCore.framework in Frameworks */,
 				AC611E7A28F98C1200B00CEA /* AVFoundation.framework in Frameworks */,
 				AC611E7E28F98CA600B00CEA /* UIKit.framework in Frameworks */,
@@ -89,6 +94,7 @@
 		3358E8ED3C0073701B2A50D2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0A53978F2B0A136700BA60A5 /* UnityFramework.framework */,
 				AC611E8128F98D1A00B00CEA /* Metal.framework */,
 				AC611E7F28F98CEE00B00CEA /* QuartzCore.framework */,
 				AC611E7D28F98CA600B00CEA /* UIKit.framework */,
@@ -163,7 +169,7 @@
 				AC611E5928F848CD00B00CEA /* Sources */,
 				AC611E5A28F848CD00B00CEA /* Frameworks */,
 				AC611E5B28F848CD00B00CEA /* Resources */,
-				ACB168302908646A000DED73 /* Embed Frameworks */,
+				0A5397942B0A179C00BA60A5 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
