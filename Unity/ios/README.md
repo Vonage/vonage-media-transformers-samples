@@ -3,7 +3,7 @@ This sample application shows how to use insertable streams (video) in ios app t
 ### Prerequisite:
 - Unity - this sample was built with Unity *2021.3.6f1* (make sure iOS is installed)
 ### Building Unity:
-- Open Unity `UnityVideoProject` from `examples/unity/UnityVideoProject`
+- Open Unity `UnityVideoProject` from `Unity/UnityVideoProject`
 - From file menu select build settings.
 - Select iOS from platform list.
 - Switch the platform.
