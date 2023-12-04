@@ -1,16 +1,16 @@
 PODS:
-  - VonageWebRTC (99.10.34)
+  - VonageWebRTC (99.10.0-dev.346)
 
 DEPENDENCIES:
-  - VonageWebRTC (= 99.10.34)
+  - VonageWebRTC (= 99.10.0-dev.346)
 
 SPEC REPOS:
   trunk:
     - VonageWebRTC
 
 SPEC CHECKSUMS:
-  VonageWebRTC: 2de2989af18b3d3a173d2dca6cee6dd52da4f8e5
+  VonageWebRTC: e9d0255c38dc15140d6b9cfecffe4a296afd8e03
 
-PODFILE CHECKSUM: 1edbafd4d8487117ae4218d69b6954bb9836cd65
+PODFILE CHECKSUM: 4797ad85b14c75978a834c6a93f225a46bc09d01
 
 COCOAPODS: 1.11.3

@@ -25,24 +25,14 @@ public:
         newBufferDataAvailable_ = false;
     }
     
-    uint32_t* getInput(){
-        if(inputArraySize_ == 0) return nullptr;
-        
-        if(inputArray_ != nullptr){
-            return inputArray_.get();
+    void getOutput(std::unique_ptr<uint32_t[]>& buffer, uint32_t& size){
+        size = 0;
+        buffer = nullptr;
+        if(outputArray_ && outputArraySize_ > 0){
+            size = outputArraySize_;
+            buffer = std::make_unique<uint32_t[]>(outputArraySize_);
+            memcpy(buffer.get(), outputArray_.get(), outputArraySize_ * sizeof(uint32_t));
         }
-        
-        return nullptr;
-    }
-
-    uint32_t* getOutput(){
-        if(outputArraySize_ == 0) return nullptr;
-        
-        if(outputArray_ != nullptr){
-            return outputArray_.get();
-        }
-        
-        return nullptr;
     }
 
     bool isNewBufferDataAvailable()
@@ -55,41 +45,65 @@ public:
         newBufferDataAvailable_ = value;
     }
     
-    void initInputBuffer(uint32_t size){
-        inputArraySize_ = size;
-        inputArray_ = std::unique_ptr<uint32_t>(new uint32_t[size]);
-        memset(inputArray_.get(), 0, size * sizeof(uint32_t));
+    void initInputBuffer(uint32_t rgb_size, uint32_t augmented_size){
+        inputArraySize_ = rgb_size;
+        if(inputArraySize_ > 0){
+            inputArray_ = std::make_unique<uint32_t[]>(inputArraySize_);
+            memset(inputArray_.get(), 0, inputArraySize_ * sizeof(uint32_t));
+        }
+
+        inputAugmentedArraySize_ = augmented_size;
+        if(inputAugmentedArraySize_ > 0){
+            inputAugmentedArray_ = std::make_unique<uint8_t[]>(inputAugmentedArraySize_);
+            memset(inputAugmentedArray_.get(), 0, inputAugmentedArraySize_ * sizeof(uint8_t));
+        }
     }
 
     void initOutputBuffer(uint32_t size){
         outputArraySize_ = size;
-        outputArray_ = std::unique_ptr<uint32_t>(new uint32_t[size]);
-        memset(outputArray_.get(), 0, size * sizeof(uint32_t));
+        if(outputArraySize_ > 0){
+            outputArray_ = std::make_unique<uint32_t[]>(outputArraySize_);
+            memset(outputArray_.get(), 0, size * sizeof(uint32_t));
+        }
     }
 
-    void copyInputArray(uint32_t *outArray)
+    void copyInputArray(uint32_t *outArray, uint8_t* outAugmentedBuffer)
     {
-        if(inputArray_ == nullptr) return;
+        if(outArray && inputArray_ && inputArraySize_ > 0){
+            memcpy(outArray, inputArray_.get(), inputArraySize_ * sizeof(uint32_t));
+        } 
         
-        memcpy(outArray, unityBridge::getBridge()->getInput(), inputArraySize_ * sizeof(uint32_t));
+        if(outAugmentedBuffer && inputAugmentedArray_ && inputAugmentedArraySize_ > 0){
+            memcpy(outAugmentedBuffer, inputAugmentedArray_.get(), inputAugmentedArraySize_ * sizeof(uint8_t));
+        }
     }
 
-    void setInputBufferData(uint32_t *bufferData)
-    {
-        auto input = unityBridge::getBridge()->getInput();
+    void setInputBufferData(uint32_t *bufferData, uint32_t size){
+        if(inputArray_ && inputArraySize_ > 0){
+            memset(inputArray_.get(), 0, inputArraySize_ * sizeof(uint32_t));
+            if(size > 0){
+                uint32_t final_size = size > inputArraySize_ ? inputArraySize_ : size;
+                memcpy(inputArray_.get(), bufferData, final_size * sizeof(uint32_t));
+            }
+        }
+    }
 
-        if(input == nullptr) return;
-
-        memcpy(input, bufferData, inputArraySize_ * sizeof(uint32_t));
+    void setInputAugmentedBufferData(uint8_t* bufferData, uint32_t size){
+        if(inputAugmentedArray_ && inputAugmentedArraySize_ > 0){
+            memset(inputAugmentedArray_.get(), 0, inputAugmentedArraySize_ * sizeof(uint8_t));
+            if(size > 0){
+                uint32_t final_size = size > inputAugmentedArraySize_ ? inputAugmentedArraySize_ : size;
+                memcpy(inputAugmentedArray_.get(), bufferData, final_size * sizeof(uint8_t));
+            }
+        }
     }
 
     void setOutputBufferData(uint32_t *bufferData)
     {
-        auto output = unityBridge::getBridge()->getOutput();
-
-        if(output == nullptr) return;
-
-        memcpy(output, bufferData, outputArraySize_ * sizeof(uint32_t));
+        if(bufferData && outputArray_ && outputArraySize_ > 0){
+            memset(outputArray_.get(), 0, outputArraySize_ * sizeof(uint32_t));
+            memcpy(outputArray_.get(), bufferData, outputArraySize_ * sizeof(uint32_t));
+        }
     }
 
     void setRotation(uint32_t rotation){
@@ -101,40 +115,37 @@ public:
     }
     
 private:
-    std::unique_ptr<uint32_t> inputArray_;
-    std::unique_ptr<uint32_t> outputArray_;
+    std::unique_ptr<uint32_t[]> inputArray_;
+    std::unique_ptr<uint8_t[]> inputAugmentedArray_;
+    std::unique_ptr<uint32_t[]> outputArray_;
     
     uint32_t inputArraySize_;
+    uint32_t inputAugmentedArraySize_;
     uint32_t outputArraySize_;
     int rotation_;
     
-    bool newBufferDataAvailable_;
-    
+    bool newBufferDataAvailable_;  
 };
 
 unityBridgePtr unityBridge::instance_ = std::make_shared<unityBridge>();
 
 extern "C"{
 
-    void __stdcall initInputBufferCS(uint32_t size){
-        unityBridge::getBridge()->initInputBuffer(size);
+    void __stdcall initInputBuffersCS(uint32_t rgb_size, uint32_t augmented_size){
+        unityBridge::getBridge()->initInputBuffer(rgb_size, augmented_size);
     }
 
-        void __stdcall initOutputBufferCS(uint32_t size){
+    void __stdcall initOutputBufferCS(uint32_t size){
         unityBridge::getBridge()->initOutputBuffer(size);
     }
 
-    void __stdcall getInputBufferCS(uint32_t* outBuffer){
-        unityBridge::getBridge()->copyInputArray(outBuffer);
+    void __stdcall getInputBufferCS(uint32_t* outBuffer, uint8_t* outAugmentedBuffer){
+        unityBridge::getBridge()->copyInputArray(outBuffer, outAugmentedBuffer);
         unityBridge::getBridge()->setNewBufferDataAvailable(false);
     }
 
     int __stdcall getRotationCS(){
         return unityBridge::getBridge()->getRotation();
-    }
-
-    void __stdcall setInputBufferDataCS(uint32_t* bufferData){
-        unityBridge::getBridge()->setInputBufferData(bufferData);
     }
 
     void __stdcall setOutputBufferDataCS(uint32_t* bufferData){
@@ -149,31 +160,25 @@ extern "C"{
 
 @implementation FrameworkLibAPI
 
-+ (uint32_t*) getInputBufferCpp
++ (void) getOutputBufferCpp:(std::unique_ptr<uint32_t[]>&)buffer size:(uint32_t&)size
 {
+    buffer = nullptr;
+    size = 0;
     auto bridge = unityBridge::getBridge();
     
-    if(bridge == nullptr) return nullptr;
+    if(bridge == nullptr) return;
     
-    return bridge->getInput();
+    return bridge->getOutput(buffer, size);
 }
 
-+ (uint32_t*) getOutputBufferCpp
-{
-    auto bridge = unityBridge::getBridge();
-    
-    if(bridge == nullptr) return nullptr;
-    
-    return bridge->getOutput();
-}
-
-+ (void) setInputBufferCpp:(uint32_t*) buffer andRotation:(int)rotation
++ (void) setInputBufferCpp:(uint32_t*)buffer rgbSize:(uint32_t)rgb_size augmentedBuffer:(uint8_t*)augmentedBuffer augmentedSize:(uint32_t)augmented_size rotation:(int)rotation
 {
     auto bridge = unityBridge::getBridge();
     
     if(bridge == nullptr) return;
     
-    bridge->setInputBufferData(buffer);
+    bridge->setInputBufferData(buffer, rgb_size);
+    bridge->setInputAugmentedBufferData(augmentedBuffer, augmented_size);
     bridge->setRotation(rotation);
     bridge->setNewBufferDataAvailable(true);
 }

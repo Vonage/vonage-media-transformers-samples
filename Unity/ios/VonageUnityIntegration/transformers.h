@@ -9,6 +9,15 @@ namespace webrtc {
 }
 
 namespace vonage {
+
+class DecompressAugmentedData{
+public:
+    virtual bool decompress(const uint8_t* inputArray,
+                            uint32_t inputSize,
+                            std::unique_ptr<uint8_t[]>& outputArray,
+                            uint32_t& outputSize) = 0;
+};
+
 class TransformerObserver : public webrtc::BaseFrameTransformerObserver {
 public:
     TransformerObserver();
@@ -21,7 +30,7 @@ public:
 
 class VonageUnityVideoTransformer : public webrtc::BaseFrameTransformer<webrtc::VideoFrame> {
 public:
-    VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer);
+    VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor);
     virtual ~VonageUnityVideoTransformer();
     
     // webrtc::BaseFrameTransformer
@@ -29,7 +38,7 @@ public:
     bool SetTransformerConfig(const vonage::MLTransformerBaseConfig* config) override;
     
 private:
-    uint32_t *inputArgbBuffer_;
+    std::shared_ptr<DecompressAugmentedData> decompressor_;
 };
 }
 

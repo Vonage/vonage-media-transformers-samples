@@ -19,19 +19,16 @@ public class ExampleBridge : MonoBehaviour
 #else
 
     [DllImport("__Internal")]
-    private static extern void initInputBufferCS(UInt32 size);
+    private static extern void initInputBuffersCS(UInt32 rgb_size, UInt32 augmented_size);
 
     [DllImport("__Internal")]
     private static extern void initOutputBufferCS(UInt32 size);
 
     [DllImport("__Internal")]
-    private static extern void getInputBufferCS(UInt32[] outBuffer);
+    private static extern void getInputBufferCS(UInt32[] outBuffer, byte[] outAugmentedBuffer);
 
     [DllImport("__Internal")]
     private static extern int getRotationCS();
-
-    [DllImport("__Internal")]
-    private static extern void setInputBufferDataCS(UInt32[] bufferData);
 
     [DllImport("__Internal")]
     private static extern void setOutputBufferDataCS(UInt32[] bufferData);
@@ -41,16 +38,15 @@ public class ExampleBridge : MonoBehaviour
 
 #endif
 
-
-
     const int width = 640;
     const int height = 480;
 
     private const int numTexturePixels = width * height;
+    private const int numAugmentedBytes = width * height * 2;
 
     UInt32[] inputArray = new UInt32[numTexturePixels];
+    byte[] inputAugmentedArray = new byte[numAugmentedBytes];
     UInt32[] outputArray = new UInt32[numTexturePixels];
-
 
     private Texture2D texture, texture2;
     private RawImage img;
@@ -63,7 +59,7 @@ public class ExampleBridge : MonoBehaviour
 #if UNITY_WEBGL
         SetUnityData(inputArray, inputArray.Length, outputArray, outputArray.Length, width, height);
 #else
-        initInputBufferCS(numTexturePixels);
+        initInputBuffersCS(numTexturePixels, numAugmentedBytes);
         initOutputBufferCS(numTexturePixels);
 #endif
         img = myPlane.GetComponent<RawImage>();
@@ -86,7 +82,7 @@ public class ExampleBridge : MonoBehaviour
         {
 #if !UNITY_WEBGL
             int rotation = getRotationCS();
-            getInputBufferCS(inputArray);
+            getInputBufferCS(inputArray, inputAugmentedArray);
 #endif
             for (int i = 0; i < inputArray.Length; i++)
             {

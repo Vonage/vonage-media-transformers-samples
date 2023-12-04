@@ -5,6 +5,8 @@
 #include <api/video/i420_buffer.h>
 #include <api/video/video_frame.h>
 #include <rtc_base/logging.h>
+#include <modules/video_coding/codecs/multiplex/include/augmented_video_frame_buffer.h>
+
 #include <third_party/libyuv/include/libyuv.h>
 #include <UnityFramework/NativeCallProxy.h>
 
@@ -31,13 +33,10 @@ namespace vonage {
         return 0;
     }
     // VonageUnityVideoTransformer
-    VonageUnityVideoTransformer::VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer) : webrtc::BaseFrameTransformer<webrtc::VideoFrame>(observer) {
-        inputArgbBuffer_ = new uint32_t[NUM_PIXELS];
+    VonageUnityVideoTransformer::VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor) : webrtc::BaseFrameTransformer<webrtc::VideoFrame>(observer), decompressor_(decompressor){
     }
 
     VonageUnityVideoTransformer::~VonageUnityVideoTransformer() {
-        delete[] inputArgbBuffer_;
-        
     }
 
     bool VonageUnityVideoTransformer::SetTransformerConfig(const vonage::MLTransformerBaseConfig *config){
@@ -59,6 +58,14 @@ namespace vonage {
             RTC_LOG_T_F(LS_WARNING) << "Video frame is null";
             return;
         }
+        std::unique_ptr<uint8_t[]> augmented_data;
+        uint32_t augmented_size = 0;
+        if(decompressor_ && target_frame->video_frame_buffer()->IsAugmented()){
+            webrtc::AugmentedVideoFrameBuffer* augemnted_video_frame = static_cast<webrtc::AugmentedVideoFrameBuffer*>(target_frame->video_frame_buffer().get());
+            if(!decompressor_->decompress(augemnted_video_frame->GetAugmentingData(), augemnted_video_frame->GetAugmentingDataSize(), augmented_data, augmented_size)){
+                
+            }
+        }
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> org_buffer(target_frame->video_frame_buffer());
         rtc::scoped_refptr<webrtc::I420BufferInterface> i420Buffer;
         if(org_buffer->width() != UNITY_WIDTH || org_buffer->height() != UNITY_HEIGHT){
@@ -67,6 +74,8 @@ namespace vonage {
             i420Buffer = org_buffer->ToI420();
         }
         
+        std::unique_ptr<uint8_t[]> in_argb_data = std::make_unique<uint8_t[]>(NUM_PIXELS * 4);
+        
         // Convert video frame buffer from YUV to ARGB buffer to be used by Unity
         libyuv::I420ToARGB(i420Buffer->DataY(),
                            i420Buffer->StrideY(),
@@ -74,25 +83,26 @@ namespace vonage {
                            i420Buffer->StrideU(),
                            i420Buffer->DataV(),
                            i420Buffer->StrideV(),
-                           (uint8_t*)inputArgbBuffer_,
+                           in_argb_data.get(),
                            UNITY_WIDTH * 4,
                            UNITY_WIDTH,
                            UNITY_HEIGHT);
         
         // Send converted ARGB video frame buffer to Unity
-        [NSClassFromString(@"FrameworkLibAPI") setInputBufferCpp:inputArgbBuffer_ andRotation:GetRotation(target_frame->rotation())];
-      
+        [FrameworkLibAPI setInputBufferCpp:(uint32_t*)in_argb_data.get() rgbSize:NUM_PIXELS augmentedBuffer:augmented_data.get() augmentedSize:augmented_size rotation:GetRotation(target_frame->rotation())];
         // Tell Unity to update texture rendering using the updated input buffer
         [gUfw sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
          
         //Get Unity 3D scene rendering as ARGB buffer
-        auto outputArgbBuffer = [NSClassFromString(@"FrameworkLibAPI") getOutputBufferCpp];
+        std::unique_ptr<uint32_t[]> out_argb_data;
+        uint32_t out_size = 0;
+        [FrameworkLibAPI getOutputBufferCpp:out_argb_data size:out_size];
       
-        if(outputArgbBuffer != NULL)
+        if(out_argb_data && out_size > 0)
         {
             rtc::scoped_refptr<webrtc::I420Buffer> output_video_frame_buffer = webrtc::I420Buffer::Create(UNITY_WIDTH, UNITY_HEIGHT);
             //Convert 3D scene ARGB buffer received from Unity to YUV
-            libyuv::ARGBToI420((uint8_t*)outputArgbBuffer,
+            libyuv::ARGBToI420((uint8_t*)out_argb_data.get(),
                                UNITY_WIDTH * 4,
                                output_video_frame_buffer->MutableDataY(),
                                output_video_frame_buffer->StrideY(),
