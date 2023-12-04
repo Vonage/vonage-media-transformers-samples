@@ -15,6 +15,7 @@ This sample application shows how to use insertable streams (video) in ios app t
 - Open the generated project `Unity-iPhone.xcodeproj`.
 - In file inspector select Data folder and set target membership to `UnityFramework`.
 - In file inspector select `Libraries/Plugins/iOS/NativeCallProxy.h` and set target membership to `UnityFramework` and `Public`.
+- In the project `build settings` for target `UnityFramework` set `c++ language` to `c++17` and set `c language` to `gnu11`.
 - Open terminal, change directory to the directory containing `Unity-iPhone.xcodeproj` and run this command to build Unity framework:
 ```
 xcodebuild -configuration Debug -target UnityFramework -sdk iphoneos
