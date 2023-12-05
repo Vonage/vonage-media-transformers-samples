@@ -63,7 +63,7 @@ public:
     }
 };
 
-WebRTCHelper::WebRTCHelper(){
+WebRTCHelper::WebRTCHelper(WebRTCHelperObserver* observer) : _observer(observer){
     RTC_LOG(LS_VERBOSE) << "WebRTCHelper";
     _worker = rtc::Thread::Create();
     _worker->SetName("worker_thread", nullptr);
@@ -172,6 +172,12 @@ bool WebRTCHelper::init(rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> vi
     CreateOffer();
     
     return true;
+}
+
+void WebRTCHelper::requestStats(){
+    if(_observer){
+        _peer_connection->GetStats(this);
+    }
 }
 
 rtc::Thread* WebRTCHelper::getWorkerThread(){
@@ -310,5 +316,11 @@ void WebRTCHelper::OnSuccess(webrtc::SessionDescriptionInterface* desc) {
             return;
         default:
             break;
+    }
+}
+
+void WebRTCHelper::OnStatsDelivered(const rtc::scoped_refptr<const webrtc::RTCStatsReport> &report){
+    if(_observer){
+        _observer->OnStats(report->ToJson());
     }
 }

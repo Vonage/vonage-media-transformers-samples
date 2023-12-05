@@ -100,6 +100,7 @@ namespace vonage {
       
         if(out_argb_data && out_size > 0)
         {
+            target_frame->set_rotation(webrtc::VideoRotation::kVideoRotation_90);
             rtc::scoped_refptr<webrtc::I420Buffer> output_video_frame_buffer = webrtc::I420Buffer::Create(UNITY_WIDTH, UNITY_HEIGHT);
             //Convert 3D scene ARGB buffer received from Unity to YUV
             libyuv::ARGBToI420((uint8_t*)out_argb_data.get(),

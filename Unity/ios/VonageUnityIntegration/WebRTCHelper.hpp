@@ -21,11 +21,16 @@ class CreateSessionDescriptionObserverImpl;
 class SetSessionDescriptionObserverImpl;
 class RTCLogTrace;
 
-class WebRTCHelper : public webrtc::PeerConnectionObserver{
+class WebRTCHelperObserver{
+public:
+    virtual void OnStats(const std::string& stats) = 0;
+};
+
+class WebRTCHelper : public webrtc::PeerConnectionObserver, public webrtc::RTCStatsCollectorCallback {
 public:
     friend class CreateSessionDescriptionObserverImpl;
     
-    WebRTCHelper();
+    WebRTCHelper(WebRTCHelperObserver* observer);
     virtual ~WebRTCHelper();
     
     bool init(rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_source,
@@ -38,6 +43,8 @@ public:
     rtc::Thread* getNetworkThread();
     rtc::Thread* getSignalingThread();
     
+    void requestStats();
+    
 private:
     void CreateOffer();
     void SetLocalDescription(const webrtc::SdpType& type, const std::string& sdp);
@@ -45,13 +52,15 @@ private:
     void AddTracks();
     void OnSuccess(webrtc::SessionDescriptionInterface* desc);
     
-    // PeerConnectionObserver implementation.
+    // PeerConnectionObserver.
     void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override;
     void OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver, const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>& streams) override;
     void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
     void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
     void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
     
+    //RTCStatsCollectorCallback.
+    void OnStatsDelivered(const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report) override;
 private:
     std::unique_ptr<rtc::Thread> _worker;
     std::unique_ptr<rtc::Thread> _network;
@@ -71,5 +80,6 @@ private:
     rtc::scoped_refptr<CreateSessionDescriptionObserverImpl> _create_session_description_observer;
     rtc::scoped_refptr<SetSessionDescriptionObserverImpl> _set_session_description_observer;
     std::unique_ptr<RTCLogTrace> _logger;
+    WebRTCHelperObserver* _observer;
 };
 #endif
