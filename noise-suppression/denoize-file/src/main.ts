@@ -61,7 +61,7 @@ async function main() {
                 source.addEventListener("ended", async (e: any) => {
                     hide($step2);
 
-                    const wav = result.pipeline.getWav();
+                    const wav = await result.pipeline.getWav();
                     $audioPlayer.src = wav;
                     $downloadProcessed.onclick = () => {
                         const link = document.createElement("a");
