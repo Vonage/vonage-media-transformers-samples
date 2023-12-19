@@ -13,7 +13,8 @@ public class ExampleBridge : MonoBehaviour
 
     public GameObject panelRenderer;
 
-#if UNITY_WEBGL
+#if UNITY_ANDROID
+#elif UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern void SetUnityData(UInt32[] inputArray, int inputSize, UInt32[] outputArray, int outputSize, int width, int height);
 #else
@@ -60,7 +61,9 @@ public class ExampleBridge : MonoBehaviour
 
     private void Start()
     {
-#if UNITY_WEBGL
+#if UNITY_ANDROID
+
+#elif UNITY_WEBGL
         SetUnityData(inputArray, inputArray.Length, outputArray, outputArray.Length, width, height);
 #else
         initInputBufferCS(numTexturePixels);
@@ -84,7 +87,9 @@ public class ExampleBridge : MonoBehaviour
     {
         try
         {
-#if !UNITY_WEBGL
+#if UNITY_ANDROID
+            int rotation = 0;
+#elif !UNITY_WEBGL
             int rotation = getRotationCS();
             getInputBufferCS(inputArray);
 #endif
@@ -124,8 +129,9 @@ public class ExampleBridge : MonoBehaviour
         {
             outputArray[i] = BitConverter.ToUInt32(new byte[] { pixels[i].b, pixels[i].g, pixels[i].r, pixels[i].a }, 0);
         }
+#if UNITY_ANDROID
 
-#if !UNITY_WEBGL
+#elif !UNITY_WEBGL
         setOutputBufferDataCS(outputArray);
 #endif
     }
