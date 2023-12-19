@@ -21,7 +21,8 @@ public:
         outputArray_ = nullptr;
         inputArraySize_ = 0;
         outputArraySize_ = 0;
-        rotation_ = 0;
+        inputRotation_ = outputRotation_ = 0;
+        inputWidth_ = inputHeight_ = outputWidth_ = outputHeight_ = 0;
         newBufferDataAvailable_ = false;
     }
     
@@ -106,12 +107,52 @@ public:
         }
     }
 
-    void setRotation(uint32_t rotation){
-        rotation_ = rotation;
+    void setInputRotation(uint32_t rotation){
+        inputRotation_ = rotation;
     }
 
-    int getRotation(){
-        return rotation_;
+    int getInputRotation(){
+        return inputRotation_;
+    }
+    
+    void setOutputRotation(uint32_t rotation){
+        outputRotation_ = rotation;
+    }
+
+    int getOutputRotation(){
+        return outputRotation_;
+    }
+    
+    void setInputWidth(const int32_t& width){
+        inputWidth_ = width;
+    }
+    
+    uint32_t getInputWidth() const{
+        return inputWidth_;
+    }
+    
+    void setInputHeight(const int32_t& height){
+        inputHeight_ = height;
+    }
+    
+    uint32_t getInputHeight() const{
+        return inputHeight_;
+    }
+    
+    void setOutputWidth(const int32_t& width){
+        outputWidth_ = width;
+    }
+    
+    uint32_t getOutputWidth() const{
+        return outputWidth_;
+    }
+    
+    void setOutputHeight(const int32_t& height){
+        outputHeight_ = height;
+    }
+    
+    uint32_t getOutputHeight() const{
+        return outputHeight_;
     }
     
 private:
@@ -122,7 +163,13 @@ private:
     uint32_t inputArraySize_;
     uint32_t inputAugmentedArraySize_;
     uint32_t outputArraySize_;
-    int rotation_;
+    uint8_t inputRotation_;
+    uint8_t outputRotation_;
+    
+    uint32_t inputWidth_;
+    uint32_t inputHeight_;
+    uint32_t outputWidth_;
+    uint32_t outputHeight_;
     
     bool newBufferDataAvailable_;  
 };
@@ -144,8 +191,28 @@ extern "C"{
         unityBridge::getBridge()->setNewBufferDataAvailable(false);
     }
 
-    int __stdcall getRotationCS(){
-        return unityBridge::getBridge()->getRotation();
+    int __stdcall getInputRotationCS(){
+        return unityBridge::getBridge()->getInputRotation();
+    }
+
+    void __stdcall setOutputRotationCS(uint32_t rotation){
+        unityBridge::getBridge()->setOutputRotation(rotation);
+    }
+
+    void __stdcall setInputWidthCS(uint32_t width){
+        unityBridge::getBridge()->setInputWidth(width);
+    }
+
+    void __stdcall setInputHeightCS(uint32_t height){
+        unityBridge::getBridge()->setInputHeight(height);
+    }
+
+    void __stdcall setOutputWidthCS(uint32_t width){
+        unityBridge::getBridge()->setOutputWidth(width);
+    }
+
+    void __stdcall setOutputHeightCS(uint32_t height){
+        unityBridge::getBridge()->setOutputHeight(height);
     }
 
     void __stdcall setOutputBufferDataCS(uint32_t* bufferData){
@@ -179,8 +246,25 @@ extern "C"{
     
     bridge->setInputBufferData(buffer, rgb_size);
     bridge->setInputAugmentedBufferData(augmentedBuffer, augmented_size);
-    bridge->setRotation(rotation);
+    bridge->setInputRotation(rotation);
     bridge->setNewBufferDataAvailable(true);
+}
+
++ (void)getInputWidth:(uint32_t &)width height:(uint32_t &)height {
+    auto bridge = unityBridge::getBridge();
+    width = height = 0;
+    if(bridge == nullptr) return;
+    width = bridge->getInputWidth();
+    height = bridge->getInputHeight();
+}
+
++ (void)getOutputWidth:(uint32_t &)width height:(uint32_t &)height rotation:(uint8_t&)rotation {
+    auto bridge = unityBridge::getBridge();
+    width = height = rotation = 0;
+    if(bridge == nullptr) return;
+    width = bridge->getOutputWidth();
+    height = bridge->getOutputHeight();
+    rotation = bridge->getOutputRotation();
 }
 
 @end

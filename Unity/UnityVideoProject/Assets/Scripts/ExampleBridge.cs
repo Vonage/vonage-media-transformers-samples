@@ -28,7 +28,22 @@ public class ExampleBridge : MonoBehaviour
     private static extern void getInputBufferCS(UInt32[] outBuffer, byte[] outAugmentedBuffer);
 
     [DllImport("__Internal")]
-    private static extern int getRotationCS();
+    private static extern int getInputRotationCS();
+
+    [DllImport("__Internal")]
+    private static extern void setOutputRotationCS(UInt32 rotation);
+
+    [DllImport("__Internal")]
+    private static extern void setInputWidthCS(UInt32 width);
+
+    [DllImport("__Internal")]
+    private static extern void setInputHeightCS(UInt32 height);
+
+    [DllImport("__Internal")]
+    private static extern void setOutputWidthCS(UInt32 width);
+
+    [DllImport("__Internal")]
+    private static extern void setOutputHeightCS(UInt32 height);
 
     [DllImport("__Internal")]
     private static extern void setOutputBufferDataCS(UInt32[] bufferData);
@@ -38,15 +53,20 @@ public class ExampleBridge : MonoBehaviour
 
 #endif
 
-    const int width = 640;
-    const int height = 480;
+    const int inputWidth = 640;
+    const int inputHeight = 480;
 
-    private const int numTexturePixels = width * height;
-    private const int numAugmentedBytes = width * height * 2;
+    const int outputWidth = 640;
+    const int outputHeight = 480;
+    const int outputRotation = 90;
 
-    UInt32[] inputArray = new UInt32[numTexturePixels];
-    byte[] inputAugmentedArray = new byte[numAugmentedBytes];
-    UInt32[] outputArray = new UInt32[numTexturePixels];
+    private const int inputNumTexturePixels = inputWidth * inputHeight;
+    private const int inputNumAugmentedBytes = inputWidth * inputHeight * 2;
+    private const int outputNumTexturePixels = outputWidth * outputHeight;
+
+    UInt32[] inputArray = new UInt32[inputNumTexturePixels];
+    byte[] inputAugmentedArray = new byte[inputNumAugmentedBytes];
+    UInt32[] outputArray = new UInt32[outputNumTexturePixels];
 
     private Texture2D texture, texture2;
     private RawImage img;
@@ -59,21 +79,26 @@ public class ExampleBridge : MonoBehaviour
 #if UNITY_WEBGL
         SetUnityData(inputArray, inputArray.Length, outputArray, outputArray.Length, width, height);
 #else
-        initInputBuffersCS(numTexturePixels, numAugmentedBytes);
-        initOutputBufferCS(numTexturePixels);
+        setInputWidthCS(inputWidth);
+        setInputHeightCS(inputHeight);
+        setOutputWidthCS(outputWidth);
+        setOutputHeightCS(outputHeight);
+
+        initInputBuffersCS(inputNumTexturePixels, inputNumAugmentedBytes);
+        initOutputBufferCS(outputNumTexturePixels);
 #endif
         img = myPlane.GetComponent<RawImage>();
-        texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
+        texture = new Texture2D(inputWidth, inputHeight, TextureFormat.RGBA32, false)
         {
             wrapMode = TextureWrapMode.Clamp,
             filterMode = FilterMode.Point,
             anisoLevel = 1
         };
 
-        texturePixels = new Color32[numTexturePixels];
+        texturePixels = new Color32[inputNumTexturePixels];
 
-        texture2 = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        rect = new Rect(0, 0, width, height);
+        texture2 = new Texture2D(outputWidth, outputHeight, TextureFormat.RGBA32, false);
+        rect = new Rect(0, 0, outputWidth, outputHeight);
     }
 
     public void SetTexture()
@@ -81,7 +106,7 @@ public class ExampleBridge : MonoBehaviour
         try
         {
 #if !UNITY_WEBGL
-            int rotation = getRotationCS();
+            int rotation = getInputRotationCS();
             getInputBufferCS(inputArray, inputAugmentedArray);
 #endif
             for (int i = 0; i < inputArray.Length; i++)
@@ -96,7 +121,7 @@ public class ExampleBridge : MonoBehaviour
                 System.Array.Reverse(texturePixels, 0, texturePixels.Length);
             }
 
-            texture.SetPixels32(0, 0, width, height, texturePixels, 0);
+            texture.SetPixels32(0, 0, inputWidth, inputHeight, texturePixels, 0);
             texture.Apply();
             img.texture = texture;
 
@@ -122,6 +147,7 @@ public class ExampleBridge : MonoBehaviour
         }
 
 #if !UNITY_WEBGL
+        setOutputRotationCS(outputRotation);
         setOutputBufferDataCS(outputArray);
 #endif
     }
