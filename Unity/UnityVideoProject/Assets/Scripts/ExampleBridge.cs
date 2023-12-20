@@ -3,10 +3,13 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using UnityEngine.UI;
 using System;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
 
 public class ExampleBridge : MonoBehaviour
 {
-
+    
     public GameObject myPlane;
     
     public RenderTexture src_render_texture;
@@ -25,7 +28,7 @@ public class ExampleBridge : MonoBehaviour
     private static extern void initOutputBufferCS(UInt32 size);
 
     [DllImport("__Internal")]
-    private static extern void getInputBufferCS(UInt32[] outBuffer, byte[] outAugmentedBuffer);
+    private static extern void getInputBufferCS(byte[] outBuffer, byte[] outAugmentedBuffer);
 
     [DllImport("__Internal")]
     private static extern int getInputRotationCS();
@@ -46,7 +49,7 @@ public class ExampleBridge : MonoBehaviour
     private static extern void setOutputHeightCS(UInt32 height);
 
     [DllImport("__Internal")]
-    private static extern void setOutputBufferDataCS(UInt32[] bufferData);
+    private static extern void setOutputBufferDataCS(byte[] bufferData);
 
     [DllImport("__Internal")]
     private static extern bool isNewBufferDataAvailable();
@@ -56,22 +59,20 @@ public class ExampleBridge : MonoBehaviour
     const int inputWidth = 640;
     const int inputHeight = 480;
 
-    const int outputWidth = 640;
-    const int outputHeight = 480;
+    const int outputWidth = 1280;
+    const int outputHeight = 720;
     const int outputRotation = 90;
 
-    private const int inputNumTexturePixels = inputWidth * inputHeight;
+    private const int inputNumTexturePixels = inputWidth * inputHeight * 4;
     private const int inputNumAugmentedBytes = inputWidth * inputHeight * 2;
-    private const int outputNumTexturePixels = outputWidth * outputHeight;
+    private const int outputNumTexturePixels = outputWidth * outputHeight * 4;
 
-    UInt32[] inputArray = new UInt32[inputNumTexturePixels];
+    byte[] inputArray = new byte[inputNumTexturePixels];
     byte[] inputAugmentedArray = new byte[inputNumAugmentedBytes];
-    UInt32[] outputArray = new UInt32[outputNumTexturePixels];
+    byte[] outputArray = new byte[outputNumTexturePixels];
 
     private Texture2D texture, texture2;
     private RawImage img;
-    private Color32[] texturePixels;
-
     Rect rect;
 
     private void Start()
@@ -88,16 +89,14 @@ public class ExampleBridge : MonoBehaviour
         initOutputBufferCS(outputNumTexturePixels);
 #endif
         img = myPlane.GetComponent<RawImage>();
-        texture = new Texture2D(inputWidth, inputHeight, TextureFormat.RGBA32, false)
+        texture = new Texture2D(inputWidth, inputHeight, TextureFormat.BGRA32, false)
         {
             wrapMode = TextureWrapMode.Clamp,
             filterMode = FilterMode.Point,
             anisoLevel = 1
         };
 
-        texturePixels = new Color32[inputNumTexturePixels];
-
-        texture2 = new Texture2D(outputWidth, outputHeight, TextureFormat.RGBA32, false);
+        texture2 = new Texture2D(outputWidth, outputHeight, TextureFormat.BGRA32, false);
         rect = new Rect(0, 0, outputWidth, outputHeight);
     }
 
@@ -109,19 +108,8 @@ public class ExampleBridge : MonoBehaviour
             int rotation = getInputRotationCS();
             getInputBufferCS(inputArray, inputAugmentedArray);
 #endif
-            for (int i = 0; i < inputArray.Length; i++)
-            {
-                texturePixels[i].a = (byte)((inputArray[i] >> 24) & 0xFF);
-                texturePixels[i].r = (byte)((inputArray[i] >> 16) & 0xFF);
-                texturePixels[i].g = (byte)((inputArray[i] >> 8) & 0xFF);
-                texturePixels[i].b = (byte)((inputArray[i]) & 0xFF);
-            }
+            texture.LoadRawTextureData(inputArray);
 
-            if(rotation == 90){
-                System.Array.Reverse(texturePixels, 0, texturePixels.Length);
-            }
-
-            texture.SetPixels32(0, 0, inputWidth, inputHeight, texturePixels, 0);
             texture.Apply();
             img.texture = texture;
 
@@ -139,12 +127,7 @@ public class ExampleBridge : MonoBehaviour
         texture2.ReadPixels(rect, 0, 0);
         texture2.Apply();
         RenderTexture.active = null;
-        Color32[] pixels = texture2.GetPixels32(0);
-        Array.Reverse(pixels, 0, pixels.Length);
-        for (int i = 0; i < outputArray.Length; i++)
-        {
-            outputArray[i] = BitConverter.ToUInt32(new byte[] { pixels[i].b, pixels[i].g, pixels[i].r, pixels[i].a }, 0);
-        }
+        outputArray = texture2.GetRawTextureData();
 
 #if !UNITY_WEBGL
         setOutputRotationCS(outputRotation);

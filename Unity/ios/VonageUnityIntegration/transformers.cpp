@@ -78,12 +78,12 @@ namespace vonage {
         }
         uint32_t input_width = 0;
         uint32_t input_heigth = 0;
-        uint32_t input_num_pixels = 0;
+        uint32_t input_num_bytes = 0;
         [FrameworkLibAPI getInputWidth:input_width height:input_heigth];
         if(input_width == 0 || input_heigth == 0){
             return;
         }
-        input_num_pixels = input_width * input_heigth;
+        input_num_bytes = input_width * input_heigth * 4;
         rtc::scoped_refptr<webrtc::VideoFrameBuffer> org_buffer(target_frame->video_frame_buffer());
         rtc::scoped_refptr<webrtc::I420BufferInterface> i420Buffer;
         if(org_buffer->width() != input_width || org_buffer->height() != input_heigth){
@@ -92,7 +92,7 @@ namespace vonage {
             i420Buffer = org_buffer->ToI420();
         }
         
-        std::unique_ptr<uint8_t[]> in_argb_data = std::make_unique<uint8_t[]>(input_num_pixels * 4);
+        std::unique_ptr<uint8_t[]> in_argb_data = std::make_unique<uint8_t[]>(input_num_bytes);
         
         // Convert video frame buffer from YUV to ARGB buffer to be used by Unity
         libyuv::I420ToARGB(i420Buffer->DataY(),
@@ -107,12 +107,12 @@ namespace vonage {
                            input_heigth);
         
         // Send converted ARGB video frame buffer to Unity
-        [FrameworkLibAPI setInputBufferCpp:(uint32_t*)in_argb_data.get() rgbSize:input_num_pixels augmentedBuffer:augmented_data.get() augmentedSize:augmented_size rotation:GetRotation(target_frame->rotation())];
+        [FrameworkLibAPI setInputBufferCpp:in_argb_data.get() rgbSize:(input_num_bytes) augmentedBuffer:augmented_data.get() augmentedSize:augmented_size rotation:GetRotation(target_frame->rotation())];
         // Tell Unity to update texture rendering using the updated input buffer
         [gUfw sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
          
         //Get Unity 3D scene rendering as ARGB buffer
-        std::unique_ptr<uint32_t[]> out_argb_data;
+        std::unique_ptr<uint8_t[]> out_argb_data;
         uint32_t out_size = 0;
         [FrameworkLibAPI getOutputBufferCpp:out_argb_data size:out_size];
       
@@ -128,7 +128,7 @@ namespace vonage {
             target_frame->set_rotation(GetRotation(output_rotation));
             rtc::scoped_refptr<webrtc::I420Buffer> output_video_frame_buffer = webrtc::I420Buffer::Create(output_width, output_heigth);
             //Convert 3D scene ARGB buffer received from Unity to YUV
-            libyuv::ARGBToI420((uint8_t*)out_argb_data.get(),
+            libyuv::ARGBToI420(out_argb_data.get(),
                                output_width * 4,
                                output_video_frame_buffer->MutableDataY(),
                                output_video_frame_buffer->StrideY(),
