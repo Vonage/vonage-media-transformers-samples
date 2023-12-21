@@ -3,9 +3,6 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using UnityEngine.UI;
 using System;
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Jobs;
 
 public class ExampleBridge : MonoBehaviour
 {
@@ -59,17 +56,17 @@ public class ExampleBridge : MonoBehaviour
     const int inputWidth = 640;
     const int inputHeight = 480;
 
-    const int outputWidth = 1280;
-    const int outputHeight = 720;
+    int outputWidth = 0;
+    int outputHeight = 0;
     const int outputRotation = 90;
 
     private const int inputNumTexturePixels = inputWidth * inputHeight * 4;
     private const int inputNumAugmentedBytes = inputWidth * inputHeight * 2;
-    private const int outputNumTexturePixels = outputWidth * outputHeight * 4;
+    private int outputNumTexturePixels = 0;
 
     byte[] inputArray = new byte[inputNumTexturePixels];
     byte[] inputAugmentedArray = new byte[inputNumAugmentedBytes];
-    byte[] outputArray = new byte[outputNumTexturePixels];
+    byte[] outputArray;
 
     private Texture2D texture, texture2;
     private RawImage img;
@@ -82,11 +79,9 @@ public class ExampleBridge : MonoBehaviour
 #else
         setInputWidthCS(inputWidth);
         setInputHeightCS(inputHeight);
-        setOutputWidthCS(outputWidth);
-        setOutputHeightCS(outputHeight);
-
+        
         initInputBuffersCS(inputNumTexturePixels, inputNumAugmentedBytes);
-        initOutputBufferCS(outputNumTexturePixels);
+        
 #endif
         img = myPlane.GetComponent<RawImage>();
         texture = new Texture2D(inputWidth, inputHeight, TextureFormat.BGRA32, false)
@@ -95,9 +90,6 @@ public class ExampleBridge : MonoBehaviour
             filterMode = FilterMode.Point,
             anisoLevel = 1
         };
-
-        texture2 = new Texture2D(outputWidth, outputHeight, TextureFormat.BGRA32, false);
-        rect = new Rect(0, 0, outputWidth, outputHeight);
     }
 
     public void SetTexture()
@@ -123,6 +115,18 @@ public class ExampleBridge : MonoBehaviour
 
     void CopyOutputArray()
     {
+        if(outputWidth != src_render_texture.width || outputHeight != src_render_texture.height){
+            outputWidth = src_render_texture.width;
+            outputHeight = src_render_texture.height;
+            outputNumTexturePixels = outputWidth * outputHeight * 4;
+            texture2 = new Texture2D(outputWidth, outputHeight, TextureFormat.BGRA32, false);
+            rect = new Rect(0, 0, outputWidth, outputHeight);
+            setOutputWidthCS((uint)outputWidth);
+            setOutputHeightCS((uint)outputHeight);
+            initOutputBufferCS((uint)outputNumTexturePixels);
+            outputArray = new byte[outputNumTexturePixels];
+        }
+        
         RenderTexture.active = src_render_texture;
         texture2.ReadPixels(rect, 0, 0);
         texture2.Apply();
