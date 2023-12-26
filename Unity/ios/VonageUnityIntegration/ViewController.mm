@@ -16,11 +16,10 @@
 #import <sdk/objc/native/api/video_renderer.h>
 #import <sdk/objc/base/RTCMacros.h>
 
+#import <AugmentedCompression.h>
+
 #import "transformers.h"
 
-#define COMPRESSED_SIZE 320 * 1024
-
-#define DEPTH_SIZE 640 * 480 * 2 //width*height*sizeof(16bit)
 
 class GeneralObserver;
 
@@ -33,23 +32,14 @@ public:
                   uint32_t inputSize,
                   std::unique_ptr<uint8_t[]>& outputArray,
                   uint32_t& outputSize){
-        outputSize = inputSize > COMPRESSED_SIZE ? COMPRESSED_SIZE : inputSize;
-        outputArray = std::make_unique<uint8_t[]>(outputSize);
-        memset(outputArray.get(), 0, outputSize);
-        memcpy(outputArray.get(), inputArray.get(), outputSize);
-        return true;
+        return Holographic::Compression::compress(inputArray, inputSize, outputArray, outputSize);
     }
     
     bool decompress(const uint8_t* inputArray,
                     uint32_t inputSize,
                     std::unique_ptr<uint8_t[]>& outputArray,
                     uint32_t& outputSize) override{
-        
-        outputSize = DEPTH_SIZE;
-        outputArray = std::make_unique<uint8_t[]>(outputSize);
-        memset(outputArray.get(), 1, outputSize);
-        memcpy(outputArray.get(), inputArray, inputSize);
-        return true;
+        return Holographic::Compression::decompress(inputArray, inputSize, outputArray, outputSize);
     }
 };
 
