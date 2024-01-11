@@ -10,12 +10,28 @@
 		B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
 		FFD5AE032B508A290022E578 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE022B508A290022E578 /* AppDelegate.m */; };
 		FFD5AE062B508A290022E578 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE052B508A290022E578 /* SceneDelegate.m */; };
-		FFD5AE092B508A290022E578 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE082B508A290022E578 /* ViewController.m */; };
 		FFD5AE0C2B508A290022E578 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0A2B508A290022E578 /* Main.storyboard */; };
 		FFD5AE0E2B508A2A0022E578 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0D2B508A2A0022E578 /* Assets.xcassets */; };
 		FFD5AE112B508A2A0022E578 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0F2B508A2A0022E578 /* LaunchScreen.storyboard */; };
 		FFD5AE142B508A2A0022E578 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE132B508A2A0022E578 /* main.m */; };
+		FFD5AE1B2B5091A60022E578 /* UnityFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */; };
+		FFD5AE1C2B5091A60022E578 /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FFD5AE1F2B50921E0022E578 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE1E2B50921E0022E578 /* ViewController.mm */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FFD5AE1D2B5091A60022E578 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				FFD5AE1C2B5091A60022E578 /* UnityFramework.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		7B28DD9A1F97378434EE39C3 /* Pods-holo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.release.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.release.xcconfig"; sourceTree = "<group>"; };
@@ -27,12 +43,13 @@
 		FFD5AE042B508A290022E578 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
 		FFD5AE052B508A290022E578 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 		FFD5AE072B508A290022E578 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		FFD5AE082B508A290022E578 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		FFD5AE0B2B508A290022E578 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FFD5AE0D2B508A2A0022E578 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FFD5AE102B508A2A0022E578 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FFD5AE122B508A2A0022E578 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FFD5AE132B508A2A0022E578 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnityFramework.framework; path = "../Unity-iPhone/UnityFramework.framework"; sourceTree = "<group>"; };
+		FFD5AE1E2B50921E0022E578 /* ViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */,
+				FFD5AE1B2B5091A60022E578 /* UnityFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,6 +78,7 @@
 		E8E801E85EBC7E34169295CD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */,
 				98C133DA068FF28B3C2429D3 /* Pods_holo.framework */,
 			);
 			name = Frameworks;
@@ -91,7 +110,7 @@
 				FFD5AE042B508A290022E578 /* SceneDelegate.h */,
 				FFD5AE052B508A290022E578 /* SceneDelegate.m */,
 				FFD5AE072B508A290022E578 /* ViewController.h */,
-				FFD5AE082B508A290022E578 /* ViewController.m */,
+				FFD5AE1E2B50921E0022E578 /* ViewController.mm */,
 				FFD5AE0A2B508A290022E578 /* Main.storyboard */,
 				FFD5AE0D2B508A2A0022E578 /* Assets.xcassets */,
 				FFD5AE0F2B508A2A0022E578 /* LaunchScreen.storyboard */,
@@ -113,6 +132,7 @@
 				FFD5ADFB2B508A290022E578 /* Frameworks */,
 				FFD5ADFC2B508A290022E578 /* Resources */,
 				ABA70F5ABCDCC011B746DB0B /* [CP] Copy Pods Resources */,
+				FFD5AE1D2B5091A60022E578 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -215,7 +235,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FFD5AE092B508A290022E578 /* ViewController.m in Sources */,
+				FFD5AE1F2B50921E0022E578 /* ViewController.mm in Sources */,
 				FFD5AE032B508A290022E578 /* AppDelegate.m in Sources */,
 				FFD5AE142B508A2A0022E578 /* main.m in Sources */,
 				FFD5AE062B508A290022E578 /* SceneDelegate.m in Sources */,
@@ -371,7 +391,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PR6C39UQ38;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/..",
+					"$(PROJECT_DIR)/../Unity-iPhone",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = holo/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
@@ -410,7 +437,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PR6C39UQ38;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/..",
+					"$(PROJECT_DIR)/../Unity-iPhone",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = holo/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
