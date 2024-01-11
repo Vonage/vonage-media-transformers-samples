@@ -162,10 +162,13 @@ public:
             int currentDiff = INT_MAX;
             NSArray<AVCaptureDeviceFormat *> *formats = [RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) supportedFormatsForDevice:selectedDevice];
             for (AVCaptureDeviceFormat *format in formats) {
+                if([format.supportedDepthDataFormats count] == 0){
+                    continue;
+                }
                 CMVideoDimensions dimension = CMVideoFormatDescriptionGetDimensions(format.formatDescription);
                 bool isCorrectFps = false;
                 for(AVFrameRateRange* frameRate in format.videoSupportedFrameRateRanges){
-                    if(frameRate.maxFrameRate == 30){
+                    if(frameRate.maxFrameRate <= 60){
                         isCorrectFps = true;
                         break;
                     }
@@ -179,8 +182,18 @@ public:
                 }
             }
             NSError* error;
+            
+            NSArray<AVCaptureDeviceFormat *> *depthFormats = selectedFormat.supportedDepthDataFormats;
+            NSArray<AVCaptureDeviceFormat *> *filtered = [depthFormats filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(AVCaptureDeviceFormat *evaluatedObject, NSDictionary<NSString *, id> *bindings) {
+                return CMFormatDescriptionGetMediaSubType(evaluatedObject.formatDescription) == kCVPixelFormatType_DepthFloat32 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).width == 640 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).height == 480;
+            }]];
+
+            AVCaptureDeviceFormat* depthFormat = nil;
+            if([filtered count] == 1){
+                depthFormat = filtered[0];
+            }
             AVCaptureDeviceInput* device_input = [AVCaptureDeviceInput deviceInputWithDevice:selectedDevice error:&error];
-            [local_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:AVCaptureSessionPreset640x480 videoDeviceInput:device_input videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_32BGRA CompletionHandler:^(NSError * _Nullable error) {
+            [local_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:AVCaptureSessionPreset640x480 videoDeviceInput:device_input videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_32BGRA depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
                 if(!error){
                     rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
                     self->_webrtcHelper->init(video_track_source.get(), std::move(self->_local_sink), std::move(self->_remote_sink), self->transformer_, true);
