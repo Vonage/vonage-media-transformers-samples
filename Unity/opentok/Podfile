@@ -1,0 +1,10 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+workspace 'holo.xcworkspace'
+
+target 'holo' do
+  platform :ios, '13.0'
+  project 'holo/holo.xcodeproj'
+  use_frameworks! :linkage => :static
+  pod 'OTXCFramework', '= 2.27.0'
+end

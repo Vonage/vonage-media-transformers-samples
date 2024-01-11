@@ -1,0 +1,16 @@
+PODS:
+  - OTXCFramework (2.27.0)
+
+DEPENDENCIES:
+  - OTXCFramework (= 2.27.0)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - OTXCFramework
+
+SPEC CHECKSUMS:
+  OTXCFramework: ad02cf0bcab6260f7058ffafec61ef757e956f84
+
+PODFILE CHECKSUM: 62c55de6329cc9a869b80c17e680e25a8ab45699
+
+COCOAPODS: 1.12.1
