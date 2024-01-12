@@ -2,6 +2,8 @@
 
 #import <OpenTok/OpenTok.h>
 
+#import "Renderer.h"
+
 // *** Fill the following variables using your own Project info  ***
 // ***          https://dashboard.tokbox.com/projects            ***
 // Replace with your OpenTok API key
@@ -15,6 +17,7 @@ static NSString* const kToken = @"";
 @property (nonatomic) OTSession *session;
 @property (nonatomic) OTPublisher *publisher;
 @property (nonatomic) OTSubscriber *subscriber;
+@property (nonatomic) Renderer *renderer;
 @end
 
 @implementation ViewController
@@ -100,7 +103,9 @@ static double widgetWidth = 320;
  */
 - (void)doSubscribe:(OTStream*)stream
 {
+    _renderer = [[Renderer alloc] init];
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
+    [_subscriber setVideoRender:_renderer];
 
     OTError *error = nil;
     [_session subscribe:_subscriber error:&error];
@@ -118,6 +123,7 @@ static double widgetWidth = 320;
  */
 - (void)cleanupSubscriber
 {
+    [_renderer clearRenderBuffer];
     [_subscriber.view removeFromSuperview];
     _subscriber = nil;
 }
