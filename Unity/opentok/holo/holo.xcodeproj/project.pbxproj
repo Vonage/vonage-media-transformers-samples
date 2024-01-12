@@ -17,6 +17,7 @@
 		FFD5AE1B2B5091A60022E578 /* UnityFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */; };
 		FFD5AE1C2B5091A60022E578 /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FFD5AE1F2B50921E0022E578 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE1E2B50921E0022E578 /* ViewController.mm */; };
+		FFD5AE422B516A800022E578 /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE412B516A800022E578 /* Renderer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -50,6 +51,8 @@
 		FFD5AE132B508A2A0022E578 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UnityFramework.framework; path = "../Unity-iPhone/UnityFramework.framework"; sourceTree = "<group>"; };
 		FFD5AE1E2B50921E0022E578 /* ViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
+		FFD5AE402B516A800022E578 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
+		FFD5AE412B516A800022E578 /* Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Renderer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +108,8 @@
 		FFD5AE002B508A290022E578 /* holo */ = {
 			isa = PBXGroup;
 			children = (
+				FFD5AE402B516A800022E578 /* Renderer.h */,
+				FFD5AE412B516A800022E578 /* Renderer.m */,
 				FFD5AE012B508A290022E578 /* AppDelegate.h */,
 				FFD5AE022B508A290022E578 /* AppDelegate.m */,
 				FFD5AE042B508A290022E578 /* SceneDelegate.h */,
@@ -238,6 +243,7 @@
 				FFD5AE1F2B50921E0022E578 /* ViewController.mm in Sources */,
 				FFD5AE032B508A290022E578 /* AppDelegate.m in Sources */,
 				FFD5AE142B508A2A0022E578 /* main.m in Sources */,
+				FFD5AE422B516A800022E578 /* Renderer.m in Sources */,
 				FFD5AE062B508A290022E578 /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -387,6 +393,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PR6C39UQ38;
@@ -399,6 +406,7 @@
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = holo/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
@@ -433,6 +441,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PR6C39UQ38;
@@ -445,6 +454,7 @@
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = holo/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
