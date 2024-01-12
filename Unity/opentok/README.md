@@ -2,6 +2,8 @@
 
 ## Introduction
 
+The app here is just a simple one to one (two ways) video chat application.
+
 Find here some useful information about how to set up holo app build and run.
 
 This apps depends on the OpenTok SDK for iOS and integrates Unity into it (hence
