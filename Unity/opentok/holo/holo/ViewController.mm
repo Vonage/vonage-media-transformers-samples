@@ -112,7 +112,8 @@ static double widgetWidth = 320;
         [self showAlert:[error localizedDescription]];
     }
 
-    [self.view addSubview:_publisher.view];
+//    [self.view addSubview:_publisher.view];
+    [_localVideoView addSubview:_publisher.view];
     [_publisher.view setFrame:CGRectMake(0, 0, widgetWidth, widgetHeight)];
 }
 
@@ -123,7 +124,6 @@ static double widgetWidth = 320;
 - (void)cleanupPublisher {
     [_publisher.view removeFromSuperview];
     _publisher = nil;
-    // this is a good place to notify the end-user that publishing has stopped.
 }
 
 /**
@@ -168,7 +168,7 @@ static double widgetWidth = 320;
 
     // Step 2: We have successfully connected, now instantiate a publisher and
     // begin pushing A/V streams into OpenTok.
-//    [self doPublish];
+    [self doPublish];
 }
 
 - (void)sessionDidDisconnect:(OTSession*)session

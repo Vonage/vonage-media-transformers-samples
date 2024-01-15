@@ -104,9 +104,8 @@ namespace vonage {
         NSLog(@"[holo]: Renderer %p renderVideoFrame frame is null", self);
         return;
     }
-    // TODO: Remove console logging below.
-    NSLog(@"[holo]: Renderer %p renderVideoFrame frame width is %u", self, frame.format.imageWidth);
-    NSLog(@"[holo]: Renderer %p renderVideoFrame frame heigth is %u", self, frame.format.imageHeight);
+//    NSLog(@"[holo]: Renderer %p renderVideoFrame frame width is %u", self, frame.format.imageWidth);
+//    NSLog(@"[holo]: Renderer %p renderVideoFrame frame heigth is %u", self, frame.format.imageHeight);
     rtc::scoped_refptr<webrtc::VideoFrameBuffer> inputWebrtcVideoFrameBuffer = webrtc::I420Buffer::Copy(frame.format.imageWidth,
                                                                                                         frame.format.imageHeight,
                                                                                                         static_cast<uint8_t*>([frame.planes pointerAtIndex:0]),
@@ -122,14 +121,13 @@ namespace vonage {
     uint32_t inputWidth = 0;
     uint32_t inputHeigth = 0;
     [FrameworkLibAPI getInputWidth:inputWidth height:inputHeigth];
-    // TODO: Remove console logging below.
-    NSLog(@"[holo]: Renderer %p renderVideoFrame inputWidth is %u and inputHeigth is %u", self, inputWidth, inputHeigth);
+//    NSLog(@"[holo]: Renderer %p renderVideoFrame inputWidth is %u and inputHeigth is %u", self, inputWidth, inputHeigth);
     if ((inputWidth == 0) || (inputHeigth == 0)) {
         NSLog(@"[holo]: Renderer %p renderVideoFrame inputWidth is %u and inputHeigth is %u", self, inputWidth, inputHeigth);
         return;
     }
     if ((inputWidth != frame.format.imageWidth) || (inputHeigth != frame.format.imageHeight)) {
-        inputWebrtcVideoFrameBuffer = inputWebrtcVideoFrameBuffer->Scale(frame.format.imageWidth, frame.format.imageHeight);
+        inputWebrtcVideoFrameBuffer = inputWebrtcVideoFrameBuffer->Scale(inputWidth, inputHeigth);
     }
     uint32_t inputNumBytes = inputWidth * inputHeigth * 4;
     std::unique_ptr<uint8_t[]> argbInData = std::make_unique<uint8_t[]>(inputNumBytes);
@@ -153,8 +151,7 @@ namespace vonage {
         return;
     }
     NSData *data = [frame metadata];
-    // TODO: Remove console logging below.
-    NSLog(@"[holo]: Renderer %p renderVideoFrame frame augmented data ptr is %p and size is %lu", self, data.bytes, static_cast<size_t>(data.length));
+//    NSLog(@"[holo]: Renderer %p renderVideoFrame frame augmented data ptr is %p and size is %lu", self, data.bytes, static_cast<size_t>(data.length));
     [FrameworkLibAPI setInputBufferCpp:argbInData.get()
                                rgbSize:(inputNumBytes)
                        augmentedBuffer:static_cast<uint8_t*>(const_cast<void*>(data.bytes))
@@ -164,8 +161,7 @@ namespace vonage {
     std::unique_ptr<uint8_t[]> argbOutputData;
     uint32_t argbOutputDataSize = 0;
     [FrameworkLibAPI getOutputBufferCpp:argbOutputData size:argbOutputDataSize];
-    // TODO: Remove console logging below.
-    NSLog(@"[holo]: Renderer %p renderVideoFrame argbOutputData ptr is %p and argbOutputDataSize is %u", self, argbOutputData.get(), argbOutputDataSize);
+//    NSLog(@"[holo]: Renderer %p renderVideoFrame argbOutputData ptr is %p and argbOutputDataSize is %u", self, argbOutputData.get(), argbOutputDataSize);
     if ((argbOutputData.get() == nullptr) || (argbOutputDataSize == 0)) {
         NSLog(@"[holo]: Renderer %p renderVideoFrame argbOutputData ptr is %p and argbOutputDataSize is %u", self, argbOutputData.get(), argbOutputDataSize);
         return;
@@ -174,8 +170,7 @@ namespace vonage {
     uint32_t outputHeigth = 0;
     uint8_t outputRotation = 0;
     [FrameworkLibAPI getOutputWidth:outputWidth height:outputHeigth rotation:outputRotation];
-    // TODO: Remove console logging below.
-    NSLog(@"[holo]: Renderer %p renderVideoFrame outputWidth is %u and outputHeigth is %u", self, outputWidth, outputHeigth);
+//    NSLog(@"[holo]: Renderer %p renderVideoFrame outputWidth is %u and outputHeigth is %u", self, outputWidth, outputHeigth);
     if ((outputWidth == 0) || (outputHeigth == 0)) {
         NSLog(@"[holo]: Renderer %p renderVideoFrame outputWidth is %u and outputHeigth is %u", self, outputWidth, outputHeigth);
         return;
