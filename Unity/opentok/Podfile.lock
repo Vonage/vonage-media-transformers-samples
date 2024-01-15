@@ -1,16 +1,24 @@
 PODS:
   - OTXCFramework (2.27.0)
+  - VonageMLTransformers (3.1.0-dev.344):
+    - VonageWebRTC (= 99.10.0-dev.351)
+  - VonageWebRTC (99.10.0-dev.351)
 
 DEPENDENCIES:
   - OTXCFramework (= 2.27.0)
+  - VonageMLTransformers (= 3.1.0-dev.344)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - OTXCFramework
+    - VonageMLTransformers
+    - VonageWebRTC
 
 SPEC CHECKSUMS:
   OTXCFramework: ad02cf0bcab6260f7058ffafec61ef757e956f84
+  VonageMLTransformers: 3d8b09224ac88fbaacc5b8394001feab8954f91d
+  VonageWebRTC: f98fc420cbd6bf399b3694cacfeed326b5ee1940
 
-PODFILE CHECKSUM: 62c55de6329cc9a869b80c17e680e25a8ab45699
+PODFILE CHECKSUM: 29bc161bfe00e246e335dd48334c5510e77eda71
 
 COCOAPODS: 1.12.1

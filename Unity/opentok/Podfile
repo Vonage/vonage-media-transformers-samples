@@ -6,5 +6,7 @@ target 'holo' do
   platform :ios, '13.0'
   project 'holo/holo.xcodeproj'
   use_frameworks! :linkage => :static
+  # VonageMLTransformers 3.1.0-dev.344 installs WebRTC 99.10.0-dev.351
+  pod 'VonageMLTransformers', '= 3.1.0-dev.344'
   pod 'OTXCFramework', '= 2.27.0'
 end
