@@ -45,28 +45,11 @@ namespace vonage {
         }
         return webrtc::VideoRotation::kVideoRotation_0;
     }
-
-    webrtc::VideoRotation GetWebRTCRotation(OTVideoOrientation rotation){
-        switch (rotation) {
-            case OTVideoOrientationUp:
-                return webrtc::VideoRotation::kVideoRotation_0;
-            case OTVideoOrientationLeft:
-                return webrtc::VideoRotation::kVideoRotation_90;
-            case OTVideoOrientationDown:
-                return webrtc::VideoRotation::kVideoRotation_180;
-            case OTVideoOrientationRight:
-                return webrtc::VideoRotation::kVideoRotation_270;
-            default:
-                break;
-        }
-        return webrtc::VideoRotation::kVideoRotation_0;
-    }
 }
 
 @interface Renderer ()
-@property(nonatomic, weak) id<RTC_OBJC_TYPE(RTCMTLRenderer)> renderer;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>* videoView;
-@property(nonatomic, weak) id<RendererDelegate> delegate;
+@property (nonatomic, weak) id<RendererDelegate> delegate;
 @end
 
 @implementation Renderer {
@@ -202,10 +185,6 @@ namespace vonage {
     if (_videoView) {
         [_videoView renderFrame:webrtc::NativeToObjCVideoFrame(outputWebrtcVideoFrame)];
     }
-}
-
-- (void)updateInnerRenderer:(nullable id<VGRTCMTLRenderer>)renderer {
-    self.renderer = renderer;
 }
 
 - (void)updateDelegate:(nullable id<RendererDelegate>)delegate {
