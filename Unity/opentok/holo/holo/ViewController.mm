@@ -2,6 +2,8 @@
 
 #import <OpenTok/OpenTok.h>
 
+#import <sdk/objc/components/renderer/metal/RTCMTLVideoView.h>
+
 #import "Renderer.h"
 
 // *** Fill the following variables using your own Project info  ***
@@ -13,18 +15,47 @@ static NSString* const kSessionId = @"";
 // Replace with your generated token
 static NSString* const kToken = @"";
 
-@interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate>
-@property (nonatomic) OTSession *session;
-@property (nonatomic) OTPublisher *publisher;
-@property (nonatomic) OTSubscriber *subscriber;
-@property (nonatomic) Renderer *renderer;
-@end
-
-@implementation ViewController
 static double widgetHeight = 240;
 static double widgetWidth = 320;
 
+@interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate>
+@property (nonatomic) OTSession *session;
+@property (nonatomic) OTPublisher *publisher;
+@property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
+@property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *remoteVideoView;
+@property (nonatomic) Renderer *renderer;
+@property (nonatomic) OTSubscriber *subscriber;
+@end
+
+@implementation ViewController {
+    UIView *_view;
+}
+
 #pragma mark - View lifecycle
+
+- (void)loadView {
+    _view = [[UIView alloc] initWithFrame:CGRectZero];
+    _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
+    _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_view addSubview:_remoteVideoView];
+
+    _localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
+    _localVideoView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_view addSubview:_localVideoView];
+
+    UILayoutGuide *margin = _view.layoutMarginsGuide;
+    [_remoteVideoView.leadingAnchor constraintEqualToAnchor:margin.leadingAnchor].active = YES;
+    [_remoteVideoView.topAnchor constraintEqualToAnchor:margin.topAnchor].active = YES;
+    [_remoteVideoView.trailingAnchor constraintEqualToAnchor:margin.trailingAnchor].active = YES;
+    [_remoteVideoView.bottomAnchor constraintEqualToAnchor:margin.bottomAnchor].active = YES;
+
+    [_localVideoView.leadingAnchor constraintEqualToAnchor:margin.leadingAnchor constant:8.0].active = YES;
+    [_localVideoView.topAnchor constraintEqualToAnchor:margin.topAnchor constant:8.0].active = YES;
+    [_localVideoView.widthAnchor constraintEqualToConstant:120].active = YES;
+    [_localVideoView.heightAnchor constraintEqualToConstant:120].active = YES;
+
+    self.view = _view;
+}
 
 - (void)viewDidLoad
 {
@@ -104,6 +135,7 @@ static double widgetWidth = 320;
 - (void)doSubscribe:(OTStream*)stream
 {
     _renderer = [[Renderer alloc] init];
+    [_renderer updateView:_remoteVideoView];
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
     [_subscriber setVideoRender:_renderer];
 
@@ -124,7 +156,7 @@ static double widgetWidth = 320;
 - (void)cleanupSubscriber
 {
     [_renderer clearRenderBuffer];
-    [_subscriber.view removeFromSuperview];
+//    [_subscriber.view removeFromSuperview];
     _subscriber = nil;
 }
 
@@ -136,7 +168,7 @@ static double widgetWidth = 320;
 
     // Step 2: We have successfully connected, now instantiate a publisher and
     // begin pushing A/V streams into OpenTok.
-    [self doPublish];
+//    [self doPublish];
 }
 
 - (void)sessionDidDisconnect:(OTSession*)session
@@ -200,9 +232,9 @@ didFailWithError:(OTError*)error
     NSLog(@"subscriberDidConnectToStream (%@)",
           subscriber.stream.connection.connectionId);
     assert(_subscriber == subscriber);
-    [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
-                                         widgetHeight)];
-    [self.view addSubview:_subscriber.view];
+//    [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
+//                                         widgetHeight)];
+//    [self.view addSubview:_subscriber.view];
 }
 
 - (void)subscriber:(OTSubscriberKit*)subscriber
