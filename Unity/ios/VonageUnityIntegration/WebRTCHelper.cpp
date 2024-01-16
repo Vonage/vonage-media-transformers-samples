@@ -290,6 +290,7 @@ void WebRTCHelper::OnIceCandidate(const webrtc::IceCandidateInterface* candidate
         std::unique_ptr<webrtc::JsepIceCandidate> loopback_candidate = std::make_unique<webrtc::JsepIceCandidate>(in_candidate->sdp_mid(), in_candidate->sdp_mline_index(), in_candidate->candidate());
         cricket::Candidate new_candidate(loopback_candidate->candidate());
         new_candidate.set_id(rtc::CreateRandomString(8));
+        new_candidate.set_network_type(rtc::AdapterType::ADAPTER_TYPE_UNKNOWN);
         loopback_candidate->SetCandidate(new_candidate);
         if (!_peer_connection->AddIceCandidate(loopback_candidate.get())) {
             RTC_LOG_T_F(LS_ERROR) << "Failed to apply the received candidate";
