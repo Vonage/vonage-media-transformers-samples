@@ -4,6 +4,7 @@
 
 #import <sdk/objc/components/renderer/metal/RTCMTLVideoView.h>
 
+#import "Capturer.h"
 #import "Renderer.h"
 
 // *** Fill the following variables using your own Project info  ***
@@ -103,6 +104,8 @@ static double widgetWidth = 320;
 {
     OTPublisherSettings *settings = [[OTPublisherSettings alloc] init];
     settings.name = [UIDevice currentDevice].name;
+    Capturer* capturer = [[Capturer alloc] init];
+    settings.videoCapture = capturer;
     _publisher = [[OTPublisher alloc] initWithDelegate:self settings:settings];
 
     OTError *error = nil;

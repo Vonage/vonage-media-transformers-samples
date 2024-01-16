@@ -18,6 +18,7 @@
 		FFD5AE1C2B5091A60022E578 /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FFD5AE1F2B50921E0022E578 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE1E2B50921E0022E578 /* ViewController.mm */; };
 		FFD5AE422B516A800022E578 /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE412B516A800022E578 /* Renderer.m */; };
+		FFFFC1AE2B56A33D00BEB84E /* Capturer.mm in Sources */ = {isa = PBXBuildFile; fileRef = FFFFC1AC2B56A33D00BEB84E /* Capturer.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +54,8 @@
 		FFD5AE1E2B50921E0022E578 /* ViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		FFD5AE402B516A800022E578 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
 		FFD5AE412B516A800022E578 /* Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Renderer.m; sourceTree = "<group>"; };
+		FFFFC1AC2B56A33D00BEB84E /* Capturer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Capturer.mm; sourceTree = "<group>"; };
+		FFFFC1AD2B56A33D00BEB84E /* Capturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Capturer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +111,8 @@
 		FFD5AE002B508A290022E578 /* holo */ = {
 			isa = PBXGroup;
 			children = (
+				FFFFC1AD2B56A33D00BEB84E /* Capturer.h */,
+				FFFFC1AC2B56A33D00BEB84E /* Capturer.mm */,
 				FFD5AE402B516A800022E578 /* Renderer.h */,
 				FFD5AE412B516A800022E578 /* Renderer.m */,
 				FFD5AE012B508A290022E578 /* AppDelegate.h */,
@@ -225,6 +230,7 @@
 				FFD5AE1F2B50921E0022E578 /* ViewController.mm in Sources */,
 				FFD5AE032B508A290022E578 /* AppDelegate.m in Sources */,
 				FFD5AE142B508A2A0022E578 /* main.m in Sources */,
+				FFFFC1AE2B56A33D00BEB84E /* Capturer.mm in Sources */,
 				FFD5AE422B516A800022E578 /* Renderer.m in Sources */,
 				FFD5AE062B508A290022E578 /* SceneDelegate.m in Sources */,
 			);

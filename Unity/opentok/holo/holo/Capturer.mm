@@ -1,0 +1,281 @@
+#import "Capturer.h"
+
+#include <memory>
+
+#import <sdk/objc/base/RTCVideoFrameBuffer.h>
+#import <sdk/objc/components/video_frame_buffer/RTCCVPixelBuffer.h>
+#import <sdk/objc/vonage/capturer/VonageRTCCameraVideoCapturer.h>
+
+#define COMPRESSED_SIZE 320 * 1024
+
+typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
+
+    OTCapturerSuccess = 0,
+
+    /** Publisher couldn't access to the camera */
+    OTCapturerError = 1650,
+
+    /** Publisher's capturer is not capturing frames */
+    OTCapturerNoFramesCaptured = 1660,
+
+    /** Publisher's capturer authorization failed */
+    OTCapturerAuthorizationDenied = 1670,
+};
+
+@interface DepthDataCompressor : NSObject<RTC_OBJC_TYPE(RTCVideoDepthDataDelegate)>
+
+@end
+
+@implementation DepthDataCompressor
+
+- (BOOL)compressInputArray:(const std::unique_ptr<uint8_t[]> &)inputArray inputSize:(uint32_t)inputSize outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
+//    NSLog(@"[holo]: DepthDataCompressor compressInputArray inputSize is %u", inputSize);
+    outputSize = inputSize > COMPRESSED_SIZE ? COMPRESSED_SIZE : inputSize;
+    outputArray = std::make_unique<uint8_t[]>(outputSize);
+    memset(outputArray.get(), 0, outputSize);
+    memcpy(outputArray.get(), inputArray.get(), outputSize);
+    return YES;
+}
+
+@end
+
+@interface Capturer()
+@property (nonatomic) RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) *capturer;
+@property (nonatomic) DepthDataCompressor *depthDataCompressor;
+
+- (void) setupListenerBlocks;
+@end
+
+@implementation Capturer {
+    __weak id<OTVideoCaptureConsumer> _videoCaptureConsumer;
+    OTVideoFrame* _videoFrame;
+    
+    uint32_t _captureWidth;
+    uint32_t _captureHeight;
+    NSString* _capturePreset;
+    
+    BOOL _capturing;
+    
+//    uint8_t* _blackFrame;
+    
+    enum OTCapturerErrorCode _captureErrorCode;
+    }
+
+@synthesize videoCaptureConsumer = _videoCaptureConsumer;
+@synthesize videoContentHint;
+
+-(id)init {
+    self = [super init];
+    if (self) {
+        _capture_queue = dispatch_queue_create("com.vonage.holo.Capturer",
+                                               DISPATCH_QUEUE_SERIAL);
+        _videoFrame = [[OTVideoFrame alloc] initWithFormat:
+                      [OTVideoFormat videoFormatNV12WithWidth:_captureWidth
+                                                       height:_captureHeight]];
+    }
+    return self;
+}
+
+- (int32_t)captureSettings:(OTVideoFormat*)videoFormat {
+    videoFormat.pixelFormat = OTPixelFormatNV12;
+    videoFormat.imageWidth = _captureWidth;
+    videoFormat.imageHeight = _captureHeight;
+    return 0;
+}
+
+- (void)dealloc {
+    [self stopCapture];
+    [self releaseCapture];
+    
+    if (_capture_queue) {
+        _capture_queue = nil;
+    }
+    _videoFrame = nil;
+}
+
+- (void)updateCaptureFormatWithWidth:(uint32_t)width height:(uint32_t)height
+{
+    _captureWidth = width;
+    _captureHeight = height;
+    [_videoFrame setFormat:[OTVideoFormat
+                           videoFormatNV12WithWidth:_captureWidth
+                           height:_captureHeight]];
+    
+}
+
+- (void)releaseCapture {
+    [self stopCapture];
+    
+//    free(_blackFrame);
+}
+
+- (void)initCapture {
+    _capturer = [[RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) alloc] init];
+    _depthDataCompressor = [[DepthDataCompressor alloc] init];
+
+    [_capturer setDelegate:self];
+    [_capturer updateDepthDelegate:_depthDataCompressor];
+}
+
+- (BOOL) isCaptureStarted {
+    return _capturing;
+}
+
+- (int32_t) startCapture {
+    _capturing = YES;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC),
+                   dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        AVCaptureDeviceType deviceType = AVCaptureDeviceTypeBuiltInTrueDepthCamera;
+        AVCaptureDeviceDiscoverySession* deviceDiscoverySession = [AVCaptureDeviceDiscoverySession
+            discoverySessionWithDeviceTypes:@[ deviceType ]
+                                  mediaType:AVMediaTypeVideo
+                                   position:AVCaptureDevicePositionFront];
+        AVCaptureDevice* selectedDevice =
+            [deviceDiscoverySession devices]
+                ? [deviceDiscoverySession devices].firstObject
+                : [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+
+        AVCaptureDeviceFormat *selectedFormat = nil;
+        int targetWidth = 320;
+        int targetHeight = 240;
+        int currentDiff = INT_MAX;
+        NSArray<AVCaptureDeviceFormat *> *formats = [RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) supportedFormatsForDevice:selectedDevice];
+        for (AVCaptureDeviceFormat *format in formats) {
+            if([format.supportedDepthDataFormats count] == 0){
+                continue;
+            }
+            CMVideoDimensions dimension = CMVideoFormatDescriptionGetDimensions(format.formatDescription);
+            bool isCorrectFps = false;
+            for(AVFrameRateRange* frameRate in format.videoSupportedFrameRateRanges){
+                if(frameRate.maxFrameRate <= 60){
+                    isCorrectFps = true;
+                    break;
+                }
+            }
+            if(isCorrectFps){
+                int diff = abs(targetWidth - dimension.width) + abs(targetHeight - dimension.height);
+                if (diff < currentDiff) {
+                    selectedFormat = format;
+                    currentDiff = diff;
+                }
+            }
+        }
+        NSError* error;
+
+        NSArray<AVCaptureDeviceFormat *> *depthFormats = selectedFormat.supportedDepthDataFormats;
+        NSArray<AVCaptureDeviceFormat *> *filtered = [depthFormats filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(AVCaptureDeviceFormat *evaluatedObject, NSDictionary<NSString *, id> *bindings) {
+            return CMFormatDescriptionGetMediaSubType(evaluatedObject.formatDescription) == kCVPixelFormatType_DepthFloat32 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).width == 640 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).height == 480;
+        }]];
+        AVCaptureDeviceFormat* depthFormat = nil;
+        if([filtered count] == 1){
+            depthFormat = filtered[0];
+        }
+        AVCaptureDeviceInput* videoDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:selectedDevice error:&error];
+        if(error != nil){
+            OTError *err = [OTError errorWithDomain:OT_PUBLISHER_ERROR_DOMAIN
+                                               code:OTCapturerError
+                                           userInfo:nil];
+            [self callDelegateOnError:err captureError:nil];
+            NSError *captureError = nil;
+            return;
+        }
+        [_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:AVCaptureSessionPreset640x480 videoDeviceInput:videoDeviceInput videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
+            if(error){
+                OTError *err = [OTError errorWithDomain:OT_PUBLISHER_ERROR_DOMAIN
+                                                   code:OTCapturerError
+                                               userInfo:nil];
+                [self callDelegateOnError:err captureError:nil];
+                NSError *captureError = nil;
+            }
+        }];
+    });
+    return 0;
+}
+
+- (int32_t) stopCapture {
+    _capturing = NO;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^(void){
+        [_capturer stopWithCompletionHandler:^{
+        }];
+    });
+    return 0;
+}
+
+-(void)callDelegateOnError:(OTError*)error captureError:(NSError *)captureError {
+    _captureErrorCode = (enum OTCapturerErrorCode)error.code;
+}
+
+-(enum OTCapturerErrorCode)captureError
+{
+    return _captureErrorCode;
+}
+
+- (void)capturer:(nonnull RTC_OBJC_TYPE(RTCVideoCapturer) *)capturer didCaptureVideoFrame:(nonnull RTC_OBJC_TYPE(RTCVideoFrame) *)videoFrame {
+//    NSLog(@"[holo]: Capturer %p capturer New frame captured", self);
+
+    if ([videoFrame.buffer isKindOfClass:[RTC_OBJC_TYPE(RTCCVPixelBuffer) class]]) {
+        CVPixelBufferRef buffer = ((RTC_OBJC_TYPE(RTCCVPixelBuffer) *)videoFrame.buffer).pixelBuffer;
+        OTVideoOrientation orientation = OTVideoOrientationUp;
+        switch ([videoFrame rotation]) {
+            case RTCVideoRotation_0:
+                orientation = OTVideoOrientationUp;
+                break;
+            case RTCVideoRotation_90:
+                orientation = OTVideoOrientationLeft;
+                break;
+            case RTCVideoRotation_180:
+                orientation = OTVideoOrientationDown;
+                break;
+            case RTCVideoRotation_270:
+                orientation = OTVideoOrientationRight;
+                break;
+
+            default:
+                orientation = OTVideoOrientationUp;
+                break;
+        }
+        NSData *data = nil;
+        if ([videoFrame isAugmented]) {
+            data = [NSData dataWithBytes:[videoFrame augmentingData] length:[videoFrame augmentingDataSize]];
+            NSLog(@"[holo]: Capturer %p capturer augmented data size is %lu", self, static_cast<size_t>(data.length));
+        }
+        // TODO: Review the way we build the timestamp we provide through CMTimeMake (not sure is correct).
+        [_videoCaptureConsumer consumeImageBuffer:buffer
+                                      orientation:orientation
+                                        timestamp: CMTimeMake([videoFrame timeStampNs], CMTimeScale(NSEC_PER_SEC))
+                                         metadata:data];
+
+    }
+//    int blackFrameWidth = 320;
+//    int blackFrameHeight = 240;
+//
+//    uint8_t* yPlane = _blackFrame;
+//    uint8_t* uvPlane =
+//    &(_blackFrame[(blackFrameHeight * blackFrameWidth)]);
+//
+//    memset(yPlane, 0x00, blackFrameWidth * blackFrameHeight);
+//    memset(uvPlane, 0x7F, blackFrameWidth * blackFrameHeight / 2);
+//
+//    double now = CACurrentMediaTime();
+//    _videoFrame.timestamp =
+//    CMTimeMake((now - _blackFrameTimeStarted) * 90000, 90000);
+//    _videoFrame.format.imageWidth = blackFrameWidth;
+//    _videoFrame.format.imageHeight = blackFrameHeight;
+//
+//    _videoFrame.format.estimatedFramesPerSecond = 4;
+//    _videoFrame.format.estimatedCaptureDelay = 0;
+//    _videoFrame.orientation = OTVideoOrientationUp;
+//
+//    [_videoFrame clearPlanes];
+//
+//    [_videoFrame.planes addPointer:yPlane];
+//    [_videoFrame.planes addPointer:uvPlane];
+//
+//    [_videoCaptureConsumer consumeFrame:_videoFrame];
+}
+
+- (void)setupListenerBlocks {
+}
+
+@end
+
