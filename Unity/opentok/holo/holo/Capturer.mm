@@ -29,7 +29,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 @implementation DepthDataCompressor
 
 - (BOOL)compressInputArray:(const std::unique_ptr<uint8_t[]> &)inputArray inputSize:(uint32_t)inputSize outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
-//    NSLog(@"[holo]: DepthDataCompressor compressInputArray inputSize is %u", inputSize);
+    //    NSLog(@"[holo]: DepthDataCompressor compressInputArray inputSize is %u", inputSize);
     outputSize = inputSize > COMPRESSED_SIZE ? COMPRESSED_SIZE : inputSize;
     outputArray = std::make_unique<uint8_t[]>(outputSize);
     memset(outputArray.get(), 0, outputSize);
@@ -49,17 +49,17 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 @implementation Capturer {
     __weak id<OTVideoCaptureConsumer> _videoCaptureConsumer;
     OTVideoFrame* _videoFrame;
-    
+
     uint32_t _captureWidth;
     uint32_t _captureHeight;
     NSString* _capturePreset;
-    
+
     BOOL _capturing;
-    
-//    uint8_t* _blackFrame;
-    
+
+    //    uint8_t* _blackFrame;
+
     enum OTCapturerErrorCode _captureErrorCode;
-    }
+}
 
 @synthesize videoCaptureConsumer = _videoCaptureConsumer;
 @synthesize videoContentHint;
@@ -67,46 +67,27 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 -(id)init {
     self = [super init];
     if (self) {
+        _capturePreset = AVCaptureSessionPreset640x480;
+        [[self class] dimensionsForCapturePreset:_capturePreset
+                                           width:&_captureWidth
+                                          height:&_captureHeight];
         _capture_queue = dispatch_queue_create("com.vonage.holo.Capturer",
                                                DISPATCH_QUEUE_SERIAL);
         _videoFrame = [[OTVideoFrame alloc] initWithFormat:
-                      [OTVideoFormat videoFormatNV12WithWidth:_captureWidth
-                                                       height:_captureHeight]];
+                       [OTVideoFormat videoFormatNV12WithWidth:_captureWidth
+                                                        height:_captureHeight]];
     }
     return self;
-}
-
-- (int32_t)captureSettings:(OTVideoFormat*)videoFormat {
-    videoFormat.pixelFormat = OTPixelFormatNV12;
-    videoFormat.imageWidth = _captureWidth;
-    videoFormat.imageHeight = _captureHeight;
-    return 0;
 }
 
 - (void)dealloc {
     [self stopCapture];
     [self releaseCapture];
-    
+
     if (_capture_queue) {
         _capture_queue = nil;
     }
     _videoFrame = nil;
-}
-
-- (void)updateCaptureFormatWithWidth:(uint32_t)width height:(uint32_t)height
-{
-    _captureWidth = width;
-    _captureHeight = height;
-    [_videoFrame setFormat:[OTVideoFormat
-                           videoFormatNV12WithWidth:_captureWidth
-                           height:_captureHeight]];
-    
-}
-
-- (void)releaseCapture {
-    [self stopCapture];
-    
-//    free(_blackFrame);
 }
 
 - (void)initCapture {
@@ -117,27 +98,29 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
     [_capturer updateDepthDelegate:_depthDataCompressor];
 }
 
-- (BOOL) isCaptureStarted {
-    return _capturing;
+- (void)releaseCapture {
+    [self stopCapture];
+
+    //    free(_blackFrame);
 }
 
-- (int32_t) startCapture {
+- (int32_t)startCapture {
     _capturing = YES;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC),
                    dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         AVCaptureDeviceType deviceType = AVCaptureDeviceTypeBuiltInTrueDepthCamera;
         AVCaptureDeviceDiscoverySession* deviceDiscoverySession = [AVCaptureDeviceDiscoverySession
-            discoverySessionWithDeviceTypes:@[ deviceType ]
-                                  mediaType:AVMediaTypeVideo
-                                   position:AVCaptureDevicePositionFront];
+                                                                   discoverySessionWithDeviceTypes:@[ deviceType ]
+                                                                   mediaType:AVMediaTypeVideo
+                                                                   position:AVCaptureDevicePositionFront];
         AVCaptureDevice* selectedDevice =
-            [deviceDiscoverySession devices]
-                ? [deviceDiscoverySession devices].firstObject
-                : [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+        [deviceDiscoverySession devices]
+        ? [deviceDiscoverySession devices].firstObject
+        : [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
         AVCaptureDeviceFormat *selectedFormat = nil;
-        int targetWidth = 320;
-        int targetHeight = 240;
+        int targetWidth = 640;
+        int targetHeight = 480;
         int currentDiff = INT_MAX;
         NSArray<AVCaptureDeviceFormat *> *formats = [RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) supportedFormatsForDevice:selectedDevice];
         for (AVCaptureDeviceFormat *format in formats) {
@@ -176,23 +159,23 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
                                                code:OTCapturerError
                                            userInfo:nil];
             [self callDelegateOnError:err captureError:nil];
-            NSError *captureError = nil;
+            [self showCapturerError:err];
             return;
         }
-        [_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:AVCaptureSessionPreset640x480 videoDeviceInput:videoDeviceInput videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
+        [_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:_capturePreset videoDeviceInput:videoDeviceInput videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
             if(error){
                 OTError *err = [OTError errorWithDomain:OT_PUBLISHER_ERROR_DOMAIN
                                                    code:OTCapturerError
                                                userInfo:nil];
                 [self callDelegateOnError:err captureError:nil];
-                NSError *captureError = nil;
+                [self showCapturerError:err];
             }
         }];
     });
     return 0;
 }
 
-- (int32_t) stopCapture {
+- (int32_t)stopCapture {
     _capturing = NO;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^(void){
         [_capturer stopWithCompletionHandler:^{
@@ -201,17 +184,35 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
     return 0;
 }
 
+- (BOOL)isCaptureStarted {
+    return _capturing;
+}
+
+- (int32_t)captureSettings:(OTVideoFormat*)videoFormat {
+    videoFormat.pixelFormat = OTPixelFormatNV12;
+    videoFormat.imageWidth = _captureWidth;
+    videoFormat.imageHeight = _captureHeight;
+    return 0;
+}
+
+- (void)updateCaptureFormatWithWidth:(uint32_t)width height:(uint32_t)height {
+    _captureWidth = width;
+    _captureHeight = height;
+    [_videoFrame setFormat:[OTVideoFormat
+                            videoFormatNV12WithWidth:_captureWidth
+                            height:_captureHeight]];
+}
+
 -(void)callDelegateOnError:(OTError*)error captureError:(NSError *)captureError {
     _captureErrorCode = (enum OTCapturerErrorCode)error.code;
 }
 
--(enum OTCapturerErrorCode)captureError
-{
+-(enum OTCapturerErrorCode)captureError {
     return _captureErrorCode;
 }
 
 - (void)capturer:(nonnull RTC_OBJC_TYPE(RTCVideoCapturer) *)capturer didCaptureVideoFrame:(nonnull RTC_OBJC_TYPE(RTCVideoFrame) *)videoFrame {
-//    NSLog(@"[holo]: Capturer %p capturer New frame captured", self);
+    //    NSLog(@"[holo]: Capturer %p capturer New frame captured", self);
 
     if ([videoFrame.buffer isKindOfClass:[RTC_OBJC_TYPE(RTCCVPixelBuffer) class]]) {
         CVPixelBufferRef buffer = ((RTC_OBJC_TYPE(RTCCVPixelBuffer) *)videoFrame.buffer).pixelBuffer;
@@ -246,36 +247,136 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
                                          metadata:data];
 
     }
-//    int blackFrameWidth = 320;
-//    int blackFrameHeight = 240;
-//
-//    uint8_t* yPlane = _blackFrame;
-//    uint8_t* uvPlane =
-//    &(_blackFrame[(blackFrameHeight * blackFrameWidth)]);
-//
-//    memset(yPlane, 0x00, blackFrameWidth * blackFrameHeight);
-//    memset(uvPlane, 0x7F, blackFrameWidth * blackFrameHeight / 2);
-//
-//    double now = CACurrentMediaTime();
-//    _videoFrame.timestamp =
-//    CMTimeMake((now - _blackFrameTimeStarted) * 90000, 90000);
-//    _videoFrame.format.imageWidth = blackFrameWidth;
-//    _videoFrame.format.imageHeight = blackFrameHeight;
-//
-//    _videoFrame.format.estimatedFramesPerSecond = 4;
-//    _videoFrame.format.estimatedCaptureDelay = 0;
-//    _videoFrame.orientation = OTVideoOrientationUp;
-//
-//    [_videoFrame clearPlanes];
-//
-//    [_videoFrame.planes addPointer:yPlane];
-//    [_videoFrame.planes addPointer:uvPlane];
-//
-//    [_videoCaptureConsumer consumeFrame:_videoFrame];
+    //    int blackFrameWidth = 320;
+    //    int blackFrameHeight = 240;
+    //
+    //    uint8_t* yPlane = _blackFrame;
+    //    uint8_t* uvPlane =
+    //    &(_blackFrame[(blackFrameHeight * blackFrameWidth)]);
+    //
+    //    memset(yPlane, 0x00, blackFrameWidth * blackFrameHeight);
+    //    memset(uvPlane, 0x7F, blackFrameWidth * blackFrameHeight / 2);
+    //
+    //    double now = CACurrentMediaTime();
+    //    _videoFrame.timestamp =
+    //    CMTimeMake((now - _blackFrameTimeStarted) * 90000, 90000);
+    //    _videoFrame.format.imageWidth = blackFrameWidth;
+    //    _videoFrame.format.imageHeight = blackFrameHeight;
+    //
+    //    _videoFrame.format.estimatedFramesPerSecond = 4;
+    //    _videoFrame.format.estimatedCaptureDelay = 0;
+    //    _videoFrame.orientation = OTVideoOrientationUp;
+    //
+    //    [_videoFrame clearPlanes];
+    //
+    //    [_videoFrame.planes addPointer:yPlane];
+    //    [_videoFrame.planes addPointer:uvPlane];
+    //
+    //    [_videoCaptureConsumer consumeFrame:_videoFrame];
 }
 
 - (void)setupListenerBlocks {
 }
 
-@end
+- (void)showCapturerError:(OTError*)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"[holo] Capturer"
+                                                                                 message:[NSString stringWithFormat:
+                                                                                          @"Capturer failed with error : %@", error.description]
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *actionOk = [UIAlertAction actionWithTitle:@"Ok"
+                                                           style:UIAlertActionStyleDefault
+                                                         handler:nil];
+        [alertController addAction:actionOk];
+        [[[UIApplication sharedApplication] delegate].window.rootViewController
+         presentViewController:alertController
+         animated:YES completion:nil];
+    });
+}
 
+- (NSString*)captureSessionPreset {
+    return _capturePreset;
+}
+
+- (void)setCaptureSessionPreset:(NSString*)preset {
+}
+
+- (NSArray *)availableCaptureSessionPresets {
+    NSArray *allSessionPresets = [NSArray arrayWithObjects:
+                                  AVCaptureSessionPreset352x288,
+                                  AVCaptureSessionPreset640x480,
+                                  AVCaptureSessionPreset1280x720,
+                                  AVCaptureSessionPreset1920x1080,
+                                  AVCaptureSessionPresetPhoto,
+                                  AVCaptureSessionPresetHigh,
+                                  AVCaptureSessionPresetMedium,
+                                  AVCaptureSessionPresetLow,
+                                  nil];
+    return allSessionPresets;
+}
+
+- (double)activeFrameRate {
+    return 30.0;
+}
+
+- (BOOL)isAvailableActiveFrameRate:(double)frameRate {
+    return NO;
+}
+
+- (AVCaptureDevicePosition)cameraPosition {
+    return AVCaptureDevicePositionFront;
+}
+
+- (void)setCameraPosition:(AVCaptureDevicePosition) position {
+}
+
+- (NSArray*)availableCameraPositions {
+    NSArray* devices = [[AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeBuiltInTrueDepthCamera] mediaType:AVMediaTypeVideo position:AVCaptureDevicePositionUnspecified] devices];
+    NSMutableSet* result = [NSMutableSet setWithCapacity:devices.count];
+    for (AVCaptureDevice* device in devices) {
+        [result addObject:[NSNumber numberWithInt:device.position]];
+    }
+    return [result allObjects];
+}
+
+- (BOOL)toggleCameraPosition {
+    return NO;
+}
+
++ (void)dimensionsForCapturePreset:(NSString*)preset
+                             width:(uint32_t*)width
+                            height:(uint32_t*)height {
+    if ([preset isEqualToString:AVCaptureSessionPreset352x288]) {
+        *width = 352;
+        *height = 288;
+    } else if ([preset isEqualToString:AVCaptureSessionPreset640x480]) {
+        *width = 640;
+        *height = 480;
+    } else if ([preset isEqualToString:AVCaptureSessionPreset1280x720]) {
+        *width = 1280;
+        *height = 720;
+    } else if ([preset isEqualToString:AVCaptureSessionPreset1920x1080]) {
+        *width = 1920;
+        *height = 1080;
+    } else if ([preset isEqualToString:AVCaptureSessionPresetPhoto]) {
+        // see AVCaptureSessionPresetLow
+        *width = 1920;
+        *height = 1080;
+    } else if ([preset isEqualToString:AVCaptureSessionPresetHigh]) {
+        // see AVCaptureSessionPresetLow
+        *width = 640;
+        *height = 480;
+    } else if ([preset isEqualToString:AVCaptureSessionPresetMedium]) {
+        // see AVCaptureSessionPresetLow
+        *width = 480;
+        *height = 360;
+    } else if ([preset isEqualToString:AVCaptureSessionPresetLow]) {
+        // WARNING: This is a guess. might be wrong for certain devices.
+        // We'll use updeateCaptureFormatWithWidth:height if actual output
+        // differs from expected value
+        *width = 192;
+        *height = 144;
+    }
+}
+
+@end
