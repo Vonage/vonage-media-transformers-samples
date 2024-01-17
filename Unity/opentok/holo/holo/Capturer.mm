@@ -189,10 +189,14 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 
 - (int32_t)stopCapture {
     _capturing = NO;
+    NSCondition *condition = [[NSCondition alloc] init];
+    [condition lock];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^(void){
         [_capturer stopWithCompletionHandler:^{
+            [condition signal];
         }];
     });
+    [condition wait];
     return 0;
 }
 

@@ -305,4 +305,14 @@ didFailWithError:(OTError*)error
     });
 }
 
+-(void) viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [_session unsubscribe:_subscriber error:nil];
+    _subscriber = nil;
+    [_session unpublish:_publisher error:nil];
+    _publisher = nil;
+    [_session disconnect:nil];
+    _session = nil;
+}
+
 @end
