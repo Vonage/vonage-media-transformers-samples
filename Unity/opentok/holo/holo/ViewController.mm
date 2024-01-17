@@ -11,6 +11,8 @@
 #import "Renderer.h"
 #endif
 
+#import "Logger.h"
+
 // *** Fill the following variables using your own Project info  ***
 // ***          https://dashboard.tokbox.com/projects            ***
 // Replace with your OpenTok API key
@@ -67,6 +69,8 @@ static double widgetWidth = 320;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+//    [[OpenTokLogger alloc] init];
 
     // Step 1: As the view comes into the foreground, initialize a new instance
     // of OTSession and begin the connection process.
