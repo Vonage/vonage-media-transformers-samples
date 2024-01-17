@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
+		FFD1CC152B581DF100AA8CC8 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD1CC142B581DF100AA8CC8 /* Logger.m */; };
+		FFD1CC162B581DF100AA8CC8 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD1CC142B581DF100AA8CC8 /* Logger.m */; };
 		FFD5AE032B508A290022E578 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE022B508A290022E578 /* AppDelegate.m */; };
 		FFD5AE062B508A290022E578 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE052B508A290022E578 /* SceneDelegate.m */; };
 		FFD5AE0C2B508A290022E578 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0A2B508A290022E578 /* Main.storyboard */; };
@@ -47,6 +49,8 @@
 		7B28DD9A1F97378434EE39C3 /* Pods-holo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.release.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.release.xcconfig"; sourceTree = "<group>"; };
 		98C133DA068FF28B3C2429D3 /* Pods_holo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_holo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8557926F3F09E425707A484 /* Pods-holo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.debug.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.debug.xcconfig"; sourceTree = "<group>"; };
+		FFD1CC132B581DF100AA8CC8 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
+		FFD1CC142B581DF100AA8CC8 /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logger.m; sourceTree = "<group>"; };
 		FFD5ADFE2B508A290022E578 /* holo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = holo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD5AE012B508A290022E578 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FFD5AE022B508A290022E578 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -129,6 +133,8 @@
 		FFD5AE002B508A290022E578 /* holo */ = {
 			isa = PBXGroup;
 			children = (
+				FFD1CC132B581DF100AA8CC8 /* Logger.h */,
+				FFD1CC142B581DF100AA8CC8 /* Logger.m */,
 				FFFFC1AD2B56A33D00BEB84E /* Capturer.h */,
 				FFFFC1AC2B56A33D00BEB84E /* Capturer.mm */,
 				FFD5AE402B516A800022E578 /* Renderer.h */,
@@ -301,6 +307,7 @@
 				FFD5AE142B508A2A0022E578 /* main.m in Sources */,
 				FFFFC1AE2B56A33D00BEB84E /* Capturer.mm in Sources */,
 				FFD5AE422B516A800022E578 /* Renderer.m in Sources */,
+				FFD1CC152B581DF100AA8CC8 /* Logger.m in Sources */,
 				FFD5AE062B508A290022E578 /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -313,6 +320,7 @@
 				FFFFC1D52B57D5FE00BEB84E /* AppDelegate.m in Sources */,
 				FFFFC1D62B57D5FE00BEB84E /* main.m in Sources */,
 				FFFFC1D92B57D5FE00BEB84E /* SceneDelegate.m in Sources */,
+				FFD1CC162B581DF100AA8CC8 /* Logger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -254,7 +254,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
         NSData *data = nil;
         if ([videoFrame isAugmented]) {
             data = [NSData dataWithBytes:[videoFrame augmentingData] length:[videoFrame augmentingDataSize]];
-            NSLog(@"[holo]: Capturer %p capturer augmented data size is %lu", self, static_cast<size_t>(data.length));
+//            NSLog(@"[holo]: Capturer %p capturer augmented data size is %lu", self, static_cast<size_t>(data.length));
         }
         // TODO: Review the way we build the timestamp we provide through CMTimeMake (not sure is correct).
         [_videoCaptureConsumer consumeImageBuffer:buffer
