@@ -56,8 +56,6 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 
     BOOL _capturing;
 
-    //    uint8_t* _blackFrame;
-
     enum OTCapturerErrorCode _captureErrorCode;
 }
 
@@ -68,6 +66,22 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
     self = [super init];
     if (self) {
         _capturePreset = AVCaptureSessionPreset640x480;
+        [[self class] dimensionsForCapturePreset:_capturePreset
+                                           width:&_captureWidth
+                                          height:&_captureHeight];
+        _capture_queue = dispatch_queue_create("com.vonage.holo.Capturer",
+                                               DISPATCH_QUEUE_SERIAL);
+        _videoFrame = [[OTVideoFrame alloc] initWithFormat:
+                       [OTVideoFormat videoFormatNV12WithWidth:_captureWidth
+                                                        height:_captureHeight]];
+    }
+    return self;
+}
+
+-(id)initWithCapturePreset: (NSString*)preset {
+    self = [super init];
+    if (self) {
+        _capturePreset = preset;
         [[self class] dimensionsForCapturePreset:_capturePreset
                                            width:&_captureWidth
                                           height:&_captureHeight];
@@ -100,8 +114,6 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 
 - (void)releaseCapture {
     [self stopCapture];
-
-    //    free(_blackFrame);
 }
 
 - (int32_t)startCapture {
@@ -119,8 +131,8 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
         : [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
         AVCaptureDeviceFormat *selectedFormat = nil;
-        int targetWidth = 640;
-        int targetHeight = 480;
+        int targetWidth = _captureWidth;
+        int targetHeight = _captureHeight;
         int currentDiff = INT_MAX;
         NSArray<AVCaptureDeviceFormat *> *formats = [RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) supportedFormatsForDevice:selectedDevice];
         for (AVCaptureDeviceFormat *format in formats) {
@@ -212,7 +224,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 }
 
 - (void)capturer:(nonnull RTC_OBJC_TYPE(RTCVideoCapturer) *)capturer didCaptureVideoFrame:(nonnull RTC_OBJC_TYPE(RTCVideoFrame) *)videoFrame {
-    //    NSLog(@"[holo]: Capturer %p capturer New frame captured", self);
+//        NSLog(@"[holo]: Capturer %p capturer New frame captured (width %d and height %d)", self, videoFrame.width, videoFrame.height);
 
     if ([videoFrame.buffer isKindOfClass:[RTC_OBJC_TYPE(RTCCVPixelBuffer) class]]) {
         CVPixelBufferRef buffer = ((RTC_OBJC_TYPE(RTCCVPixelBuffer) *)videoFrame.buffer).pixelBuffer;
@@ -247,32 +259,6 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
                                          metadata:data];
 
     }
-    //    int blackFrameWidth = 320;
-    //    int blackFrameHeight = 240;
-    //
-    //    uint8_t* yPlane = _blackFrame;
-    //    uint8_t* uvPlane =
-    //    &(_blackFrame[(blackFrameHeight * blackFrameWidth)]);
-    //
-    //    memset(yPlane, 0x00, blackFrameWidth * blackFrameHeight);
-    //    memset(uvPlane, 0x7F, blackFrameWidth * blackFrameHeight / 2);
-    //
-    //    double now = CACurrentMediaTime();
-    //    _videoFrame.timestamp =
-    //    CMTimeMake((now - _blackFrameTimeStarted) * 90000, 90000);
-    //    _videoFrame.format.imageWidth = blackFrameWidth;
-    //    _videoFrame.format.imageHeight = blackFrameHeight;
-    //
-    //    _videoFrame.format.estimatedFramesPerSecond = 4;
-    //    _videoFrame.format.estimatedCaptureDelay = 0;
-    //    _videoFrame.orientation = OTVideoOrientationUp;
-    //
-    //    [_videoFrame clearPlanes];
-    //
-    //    [_videoFrame.planes addPointer:yPlane];
-    //    [_videoFrame.planes addPointer:uvPlane];
-    //
-    //    [_videoCaptureConsumer consumeFrame:_videoFrame];
 }
 
 - (void)setupListenerBlocks {

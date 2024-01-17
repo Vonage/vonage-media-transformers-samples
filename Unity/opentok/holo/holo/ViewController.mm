@@ -111,7 +111,7 @@ static double widgetWidth = 320;
     OTPublisherSettings *settings = [[OTPublisherSettings alloc] init];
     settings.name = [UIDevice currentDevice].name;
 #if !(TARGET_IPHONE_SIMULATOR)
-    Capturer* capturer = [[Capturer alloc] init];
+    Capturer* capturer = [[Capturer alloc] initWithCapturePreset:AVCaptureSessionPreset1280x720];
     settings.videoCapture = capturer;
 #endif
     _publisher = [[OTPublisher alloc] initWithDelegate:self settings:settings];
