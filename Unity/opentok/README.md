@@ -57,6 +57,16 @@ we mentioned before in file at [Unity/opentok/holo/holo/ViewController.mm](https
 
 Within Xcode go to Product then Build and let it build.
 
+**Note:** There are two different schemes for the app `holo` and `holosim`.
+Scheme `holo` cannot work when targeting iOS simulator and scheme `holosim`
+cannot when targeting a real iPhone device. Make sure you select a working
+combination.
+
 ## Run the app
 
 Run the app in any iPhone device enabled with the TrueDepth camera.
+
+**Note:** There are two different schemes for the app `holo` and `holosim`.
+Scheme `holo` cannot work when targeting iOS simulator and scheme `holosim`
+cannot when targeting a real iPhone device. Make sure you select a working
+combination.

@@ -1,11 +1,15 @@
 #import "ViewController.h"
 
+#import <TargetConditionals.h>
+
 #import <OpenTok/OpenTok.h>
 
 #import <sdk/objc/components/renderer/metal/RTCMTLVideoView.h>
 
+#if !(TARGET_IPHONE_SIMULATOR)
 #import "Capturer.h"
 #import "Renderer.h"
+#endif
 
 // *** Fill the following variables using your own Project info  ***
 // ***          https://dashboard.tokbox.com/projects            ***
@@ -24,7 +28,9 @@ static double widgetWidth = 320;
 @property (nonatomic) OTPublisher *publisher;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *remoteVideoView;
+#if !(TARGET_IPHONE_SIMULATOR)
 @property (nonatomic) Renderer *renderer;
+#endif
 @property (nonatomic) OTSubscriber *subscriber;
 @end
 
@@ -104,8 +110,10 @@ static double widgetWidth = 320;
 {
     OTPublisherSettings *settings = [[OTPublisherSettings alloc] init];
     settings.name = [UIDevice currentDevice].name;
+#if !(TARGET_IPHONE_SIMULATOR)
     Capturer* capturer = [[Capturer alloc] init];
     settings.videoCapture = capturer;
+#endif
     _publisher = [[OTPublisher alloc] initWithDelegate:self settings:settings];
 
     OTError *error = nil;
@@ -115,8 +123,11 @@ static double widgetWidth = 320;
         [self showAlert:[error localizedDescription]];
     }
 
-//    [self.view addSubview:_publisher.view];
+#if !(TARGET_IPHONE_SIMULATOR)
     [_localVideoView addSubview:_publisher.view];
+#else
+    [self.view addSubview:_publisher.view];
+#endif
     [_publisher.view setFrame:CGRectMake(0, 0, widgetWidth, widgetHeight)];
 }
 
@@ -137,10 +148,14 @@ static double widgetWidth = 320;
  */
 - (void)doSubscribe:(OTStream*)stream
 {
+#if !(TARGET_IPHONE_SIMULATOR)
     _renderer = [[Renderer alloc] init];
     [_renderer updateView:_remoteVideoView];
+#endif
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
+#if !(TARGET_IPHONE_SIMULATOR)
     [_subscriber setVideoRender:_renderer];
+#endif
 
     OTError *error = nil;
     [_session subscribe:_subscriber error:&error];
@@ -158,8 +173,11 @@ static double widgetWidth = 320;
  */
 - (void)cleanupSubscriber
 {
+#if !(TARGET_IPHONE_SIMULATOR)
     [_renderer clearRenderBuffer];
-//    [_subscriber.view removeFromSuperview];
+#else
+    [_subscriber.view removeFromSuperview];
+#endif
     _subscriber = nil;
 }
 
@@ -235,9 +253,11 @@ didFailWithError:(OTError*)error
     NSLog(@"subscriberDidConnectToStream (%@)",
           subscriber.stream.connection.connectionId);
     assert(_subscriber == subscriber);
-//    [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
-//                                         widgetHeight)];
-//    [self.view addSubview:_subscriber.view];
+#if (TARGET_IPHONE_SIMULATOR)
+    [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
+                                         widgetHeight)];
+    [self.view addSubview:_subscriber.view];
+#endif
 }
 
 - (void)subscriber:(OTSubscriberKit*)subscriber

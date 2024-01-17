@@ -19,6 +19,14 @@
 		FFD5AE1F2B50921E0022E578 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE1E2B50921E0022E578 /* ViewController.mm */; };
 		FFD5AE422B516A800022E578 /* Renderer.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE412B516A800022E578 /* Renderer.m */; };
 		FFFFC1AE2B56A33D00BEB84E /* Capturer.mm in Sources */ = {isa = PBXBuildFile; fileRef = FFFFC1AC2B56A33D00BEB84E /* Capturer.mm */; };
+		FFFFC1D42B57D5FE00BEB84E /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE1E2B50921E0022E578 /* ViewController.mm */; };
+		FFFFC1D52B57D5FE00BEB84E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE022B508A290022E578 /* AppDelegate.m */; };
+		FFFFC1D62B57D5FE00BEB84E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE132B508A2A0022E578 /* main.m */; };
+		FFFFC1D92B57D5FE00BEB84E /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE052B508A290022E578 /* SceneDelegate.m */; };
+		FFFFC1DB2B57D5FE00BEB84E /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
+		FFFFC1DE2B57D5FE00BEB84E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0F2B508A2A0022E578 /* LaunchScreen.storyboard */; };
+		FFFFC1DF2B57D5FE00BEB84E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0D2B508A2A0022E578 /* Assets.xcassets */; };
+		FFFFC1E02B57D5FE00BEB84E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0A2B508A290022E578 /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -56,6 +64,7 @@
 		FFD5AE412B516A800022E578 /* Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Renderer.m; sourceTree = "<group>"; };
 		FFFFC1AC2B56A33D00BEB84E /* Capturer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Capturer.mm; sourceTree = "<group>"; };
 		FFFFC1AD2B56A33D00BEB84E /* Capturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Capturer.h; sourceTree = "<group>"; };
+		FFFFC1E62B57D5FE00BEB84E /* holosim.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = holosim.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +74,14 @@
 			files = (
 				B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */,
 				FFD5AE1B2B5091A60022E578 /* UnityFramework.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFFFC1DA2B57D5FE00BEB84E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFFFC1DB2B57D5FE00BEB84E /* Pods_holo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				FFD5ADFE2B508A290022E578 /* holo.app */,
+				FFFFC1E62B57D5FE00BEB84E /* holosim.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,6 +170,24 @@
 			productReference = FFD5ADFE2B508A290022E578 /* holo.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FFFFC1D12B57D5FE00BEB84E /* holosim */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFFFC1E32B57D5FE00BEB84E /* Build configuration list for PBXNativeTarget "holosim" */;
+			buildPhases = (
+				FFFFC1D22B57D5FE00BEB84E /* [CP] Check Pods Manifest.lock */,
+				FFFFC1D32B57D5FE00BEB84E /* Sources */,
+				FFFFC1DA2B57D5FE00BEB84E /* Frameworks */,
+				FFFFC1DD2B57D5FE00BEB84E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = holosim;
+			productName = holo;
+			productReference = FFFFC1E62B57D5FE00BEB84E /* holosim.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -180,6 +216,7 @@
 			projectRoot = "";
 			targets = (
 				FFD5ADFD2B508A290022E578 /* holo */,
+				FFFFC1D12B57D5FE00BEB84E /* holosim */,
 			);
 		};
 /* End PBXProject section */
@@ -195,10 +232,42 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FFFFC1DD2B57D5FE00BEB84E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFFFC1DE2B57D5FE00BEB84E /* LaunchScreen.storyboard in Resources */,
+				FFFFC1DF2B57D5FE00BEB84E /* Assets.xcassets in Resources */,
+				FFFFC1E02B57D5FE00BEB84E /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		7D8424E74774D4069298E804 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-holo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FFFFC1D22B57D5FE00BEB84E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -233,6 +302,17 @@
 				FFFFC1AE2B56A33D00BEB84E /* Capturer.mm in Sources */,
 				FFD5AE422B516A800022E578 /* Renderer.m in Sources */,
 				FFD5AE062B508A290022E578 /* SceneDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFFFC1D32B57D5FE00BEB84E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFFFC1D42B57D5FE00BEB84E /* ViewController.mm in Sources */,
+				FFFFC1D52B57D5FE00BEB84E /* AppDelegate.m in Sources */,
+				FFFFC1D62B57D5FE00BEB84E /* main.m in Sources */,
+				FFFFC1D92B57D5FE00BEB84E /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -422,7 +502,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -474,7 +554,111 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		FFFFC1E42B57D5FE00BEB84E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8557926F3F09E425707A484 /* Pods-holo.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PR6C39UQ38;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/..",
+					"$(PROJECT_DIR)/../Unity-iPhone",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/third_party/libyuv/include",
+				);
+				INFOPLIST_FILE = holo/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.holo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		FFFFC1E52B57D5FE00BEB84E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B28DD9A1F97378434EE39C3 /* Pods-holo.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PR6C39UQ38;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/..",
+					"$(PROJECT_DIR)/../Unity-iPhone",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_XCFRAMEWORKS_BUILD_DIR}/VonageWebRTC/VonageWebRTC.framework/Headers/third_party/libyuv/include",
+				);
+				INFOPLIST_FILE = holo/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.holo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -495,6 +679,15 @@
 			buildConfigurations = (
 				FFD5AE182B508A2A0022E578 /* Debug */,
 				FFD5AE192B508A2A0022E578 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFFFC1E32B57D5FE00BEB84E /* Build configuration list for PBXNativeTarget "holosim" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFFFC1E42B57D5FE00BEB84E /* Debug */,
+				FFFFC1E52B57D5FE00BEB84E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

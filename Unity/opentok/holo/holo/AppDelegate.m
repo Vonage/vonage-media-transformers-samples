@@ -1,8 +1,11 @@
 #import "AppDelegate.h"
 
+#import <TargetConditionals.h>
+
 int gArgc = 0;
 char** gArgv = nullptr;
 NSDictionary* appLaunchOpts;
+#if !(TARGET_IPHONE_SIMULATOR)
 UnityFramework* gUfw;
 
 UnityFramework* UnityFrameworkLoad()
@@ -22,6 +25,7 @@ UnityFramework* UnityFrameworkLoad()
     }
     return ufw;
 }
+#endif
 
 @interface AppDelegate ()
 
@@ -33,7 +37,9 @@ UnityFramework* UnityFrameworkLoad()
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     appLaunchOpts = launchOptions;
+#if !(TARGET_IPHONE_SIMULATOR)
     [self initUnity];
+#endif
     return YES;
 }
 
@@ -53,6 +59,8 @@ UnityFramework* UnityFrameworkLoad()
     // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
     // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
 }
+
+#if !(TARGET_IPHONE_SIMULATOR)
 
 - (bool)unityIsInitialized { return [self ufw] && [[self ufw] appController]; }
 
@@ -111,5 +119,7 @@ UnityFramework* UnityFrameworkLoad()
 - (void)applicationWillEnterForeground:(UIApplication *)application { [[[self ufw] appController] applicationWillEnterForeground: application]; }
 - (void)applicationDidBecomeActive:(UIApplication *)application { [[[self ufw] appController] applicationDidBecomeActive: application]; }
 - (void)applicationWillTerminate:(UIApplication *)application { [[[self ufw] appController] applicationWillTerminate: application]; }
+
+#endif
 
 @end
