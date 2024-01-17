@@ -12,6 +12,8 @@
     dispatch_queue_t _capture_queue;
 }
 
+-(id)initWithCapturePreset: (NSString*)preset;
+
 @property (nonatomic, assign) NSString* captureSessionPreset;
 @property (readonly) NSArray* availableCaptureSessionPresets;
 
