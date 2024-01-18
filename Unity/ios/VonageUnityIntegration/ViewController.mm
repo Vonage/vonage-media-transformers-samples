@@ -34,7 +34,13 @@ public:
                   uint32_t& outputSize){
         return Holographic::Compression::compress(inputArray, inputSize, outputArray, outputSize);
     }
-    
+
+    bool compress(CVPixelBufferRef depthDataMap,
+                  std::unique_ptr<uint8_t[]>& outputArray,
+                  uint32_t& outputSize){
+        return Holographic::Compression::compress(depthDataMap, outputArray, outputSize);
+    }
+
     bool decompress(const uint8_t* inputArray,
                     uint32_t inputSize,
                     std::unique_ptr<uint8_t[]>& outputArray,
@@ -65,6 +71,10 @@ public:
                outputArray:(std::unique_ptr<uint8_t[]> &)outputArray
                 outputSize:(uint32_t &)outputSize {
     return compressor_->compress(inputArray, inputSize, outputArray, outputSize);
+}
+
+- (BOOL)compressInputArray:(nonnull CVPixelBufferRef)depthDataMap outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
+    return compressor_->compress(depthDataMap, outputArray, outputSize);
 }
 
 @end
