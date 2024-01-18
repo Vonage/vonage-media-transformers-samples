@@ -10,6 +10,8 @@
 		B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
 		FFD1CC152B581DF100AA8CC8 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD1CC142B581DF100AA8CC8 /* Logger.m */; };
 		FFD1CC162B581DF100AA8CC8 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD1CC142B581DF100AA8CC8 /* Logger.m */; };
+		FFD1CC562B5949C500AA8CC8 /* AugmentedCompression.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFD1CC552B5949C500AA8CC8 /* AugmentedCompression.xcframework */; };
+		FFD1CC572B5949C500AA8CC8 /* AugmentedCompression.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FFD1CC552B5949C500AA8CC8 /* AugmentedCompression.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FFD5AE032B508A290022E578 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE022B508A290022E578 /* AppDelegate.m */; };
 		FFD5AE062B508A290022E578 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE052B508A290022E578 /* SceneDelegate.m */; };
 		FFD5AE0C2B508A290022E578 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0A2B508A290022E578 /* Main.storyboard */; };
@@ -38,6 +40,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				FFD1CC572B5949C500AA8CC8 /* AugmentedCompression.xcframework in Embed Frameworks */,
 				FFD5AE1C2B5091A60022E578 /* UnityFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -51,6 +54,7 @@
 		C8557926F3F09E425707A484 /* Pods-holo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.debug.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.debug.xcconfig"; sourceTree = "<group>"; };
 		FFD1CC132B581DF100AA8CC8 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		FFD1CC142B581DF100AA8CC8 /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logger.m; sourceTree = "<group>"; };
+		FFD1CC552B5949C500AA8CC8 /* AugmentedCompression.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AugmentedCompression.xcframework; path = "../Unity-iPhone/AugmentedCompression.xcframework"; sourceTree = "<group>"; };
 		FFD5ADFE2B508A290022E578 /* holo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = holo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD5AE012B508A290022E578 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FFD5AE022B508A290022E578 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -78,6 +82,7 @@
 			files = (
 				B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */,
 				FFD5AE1B2B5091A60022E578 /* UnityFramework.framework in Frameworks */,
+				FFD1CC562B5949C500AA8CC8 /* AugmentedCompression.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,6 +110,7 @@
 		E8E801E85EBC7E34169295CD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FFD1CC552B5949C500AA8CC8 /* AugmentedCompression.xcframework */,
 				FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */,
 				98C133DA068FF28B3C2429D3 /* Pods_holo.framework */,
 			);
