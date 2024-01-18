@@ -6,6 +6,8 @@
 #import <sdk/objc/components/video_frame_buffer/RTCCVPixelBuffer.h>
 #import <sdk/objc/vonage/capturer/VonageRTCCameraVideoCapturer.h>
 
+#import <AugmentedCompression.h>
+
 #define COMPRESSED_SIZE 320 * 1024
 
 typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
@@ -30,11 +32,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 
 - (BOOL)compressInputArray:(const std::unique_ptr<uint8_t[]> &)inputArray inputSize:(uint32_t)inputSize outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
     //    NSLog(@"[holo]: DepthDataCompressor compressInputArray inputSize is %u", inputSize);
-    outputSize = inputSize > COMPRESSED_SIZE ? COMPRESSED_SIZE : inputSize;
-    outputArray = std::make_unique<uint8_t[]>(outputSize);
-    memset(outputArray.get(), 0, outputSize);
-    memcpy(outputArray.get(), inputArray.get(), outputSize);
-    return YES;
+    return Holographic::Compression::compress(inputArray, inputSize, outputArray, outputSize);
 }
 
 @end

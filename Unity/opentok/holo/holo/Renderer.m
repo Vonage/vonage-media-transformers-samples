@@ -13,6 +13,8 @@
 
 #include <libyuv.h>
 
+#import <AugmentedCompression.h>
+
 #include "AppDelegate.h"
 
 namespace vonage {
@@ -133,12 +135,17 @@ namespace vonage {
         NSLog(@"[holo]: Renderer %p renderVideoFrame libyuv::I420ToARGB call failed", self);
         return;
     }
+    std::unique_ptr<uint8_t[]> depthData;
+    uint32_t depthDataSize = 0;
     NSData *data = [frame metadata];
-//    NSLog(@"[holo]: Renderer %p renderVideoFrame frame augmented data ptr is %p and size is %lu", self, data.bytes, static_cast<size_t>(data.length));
+    if (data && data.bytes && (data.length > 0)) {
+//        NSLog(@"[holo]: Renderer %p renderVideoFrame frame augmented data ptr is %p and size is %lu", self, data.bytes, static_cast<size_t>(data.length));
+        Holographic::Compression::decompress(static_cast<const uint8_t*>(data.bytes), static_cast<uint32_t>(data.length), depthData, depthDataSize);
+    }
     [FrameworkLibAPI setInputBufferCpp:argbInData.get()
-                               rgbSize:(inputNumBytes)
-                       augmentedBuffer:static_cast<uint8_t*>(const_cast<void*>(data.bytes))
-                         augmentedSize:static_cast<uint32_t>(data.length)
+                               rgbSize:inputNumBytes
+                       augmentedBuffer:depthData.get()
+                         augmentedSize:depthDataSize
                               rotation:static_cast<uint32_t>(vonage::GetRotation([frame orientation]))];
     [gUfw sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
     std::unique_ptr<uint8_t[]> argbOutputData;
