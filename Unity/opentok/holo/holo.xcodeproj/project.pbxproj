@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2652B78D629B047AF321A45D /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
+		9D595DD4116701BB26891604 /* Pods_holosim.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CF4DDABE63FA415E165FE0C3 /* Pods_holosim.framework */; };
 		B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
 		FFD1CC152B581DF100AA8CC8 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD1CC142B581DF100AA8CC8 /* Logger.m */; };
 		FFD1CC162B581DF100AA8CC8 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD1CC142B581DF100AA8CC8 /* Logger.m */; };
@@ -27,7 +29,6 @@
 		FFFFC1D52B57D5FE00BEB84E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE022B508A290022E578 /* AppDelegate.m */; };
 		FFFFC1D62B57D5FE00BEB84E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE132B508A2A0022E578 /* main.m */; };
 		FFFFC1D92B57D5FE00BEB84E /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD5AE052B508A290022E578 /* SceneDelegate.m */; };
-		FFFFC1DB2B57D5FE00BEB84E /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
 		FFFFC1DE2B57D5FE00BEB84E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0F2B508A2A0022E578 /* LaunchScreen.storyboard */; };
 		FFFFC1DF2B57D5FE00BEB84E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0D2B508A2A0022E578 /* Assets.xcassets */; };
 		FFFFC1E02B57D5FE00BEB84E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFD5AE0A2B508A290022E578 /* Main.storyboard */; };
@@ -49,9 +50,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7B28DD9A1F97378434EE39C3 /* Pods-holo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.release.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.release.xcconfig"; sourceTree = "<group>"; };
+		216AA2A62DA60522C5597CF0 /* Pods-holo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.release.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.release.xcconfig"; sourceTree = "<group>"; };
 		98C133DA068FF28B3C2429D3 /* Pods_holo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_holo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C8557926F3F09E425707A484 /* Pods-holo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.debug.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.debug.xcconfig"; sourceTree = "<group>"; };
+		B61C364C165EA6E46CE98C96 /* Pods-holosim.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holosim.debug.xcconfig"; path = "Target Support Files/Pods-holosim/Pods-holosim.debug.xcconfig"; sourceTree = "<group>"; };
+		C8AA0DAD912BC929314D181C /* Pods-holosim.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holosim.release.xcconfig"; path = "Target Support Files/Pods-holosim/Pods-holosim.release.xcconfig"; sourceTree = "<group>"; };
+		CF4DDABE63FA415E165FE0C3 /* Pods_holosim.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_holosim.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D38C1F84A01988A2FE91A270 /* Pods-holo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.debug.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.debug.xcconfig"; sourceTree = "<group>"; };
 		FFD1CC132B581DF100AA8CC8 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		FFD1CC142B581DF100AA8CC8 /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logger.m; sourceTree = "<group>"; };
 		FFD1CC552B5949C500AA8CC8 /* AugmentedCompression.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AugmentedCompression.xcframework; path = "../Unity-iPhone/AugmentedCompression.xcframework"; sourceTree = "<group>"; };
@@ -83,6 +87,7 @@
 				B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */,
 				FFD5AE1B2B5091A60022E578 /* UnityFramework.framework in Frameworks */,
 				FFD1CC562B5949C500AA8CC8 /* AugmentedCompression.xcframework in Frameworks */,
+				2652B78D629B047AF321A45D /* Pods_holo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,7 +95,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FFFFC1DB2B57D5FE00BEB84E /* Pods_holo.framework in Frameworks */,
+				9D595DD4116701BB26891604 /* Pods_holosim.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,8 +105,10 @@
 		AA68DEBCA12E0959B459B55B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				C8557926F3F09E425707A484 /* Pods-holo.debug.xcconfig */,
-				7B28DD9A1F97378434EE39C3 /* Pods-holo.release.xcconfig */,
+				D38C1F84A01988A2FE91A270 /* Pods-holo.debug.xcconfig */,
+				216AA2A62DA60522C5597CF0 /* Pods-holo.release.xcconfig */,
+				B61C364C165EA6E46CE98C96 /* Pods-holosim.debug.xcconfig */,
+				C8AA0DAD912BC929314D181C /* Pods-holosim.release.xcconfig */,
 			);
 			name = Pods;
 			path = ../Pods;
@@ -113,6 +120,7 @@
 				FFD1CC552B5949C500AA8CC8 /* AugmentedCompression.xcframework */,
 				FFD5AE1A2B5091A60022E578 /* UnityFramework.framework */,
 				98C133DA068FF28B3C2429D3 /* Pods_holo.framework */,
+				CF4DDABE63FA415E165FE0C3 /* Pods_holosim.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -186,7 +194,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FFFFC1E32B57D5FE00BEB84E /* Build configuration list for PBXNativeTarget "holosim" */;
 			buildPhases = (
-				FFFFC1D22B57D5FE00BEB84E /* [CP] Check Pods Manifest.lock */,
+				7039692B18A1AD7618B308FD /* [CP] Check Pods Manifest.lock */,
 				FFFFC1D32B57D5FE00BEB84E /* Sources */,
 				FFFFC1DA2B57D5FE00BEB84E /* Frameworks */,
 				FFFFC1DD2B57D5FE00BEB84E /* Resources */,
@@ -257,7 +265,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		7D8424E74774D4069298E804 /* [CP] Check Pods Manifest.lock */ = {
+		7039692B18A1AD7618B308FD /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -272,14 +280,14 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-holo-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-holosim-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FFFFC1D22B57D5FE00BEB84E /* [CP] Check Pods Manifest.lock */ = {
+		7D8424E74774D4069298E804 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -470,7 +478,7 @@
 		};
 		FFD5AE182B508A2A0022E578 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C8557926F3F09E425707A484 /* Pods-holo.debug.xcconfig */;
+			baseConfigurationReference = D38C1F84A01988A2FE91A270 /* Pods-holo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -522,7 +530,7 @@
 		};
 		FFD5AE192B508A2A0022E578 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B28DD9A1F97378434EE39C3 /* Pods-holo.release.xcconfig */;
+			baseConfigurationReference = 216AA2A62DA60522C5597CF0 /* Pods-holo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -574,7 +582,7 @@
 		};
 		FFFFC1E42B57D5FE00BEB84E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C8557926F3F09E425707A484 /* Pods-holo.debug.xcconfig */;
+			baseConfigurationReference = B61C364C165EA6E46CE98C96 /* Pods-holosim.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -626,7 +634,7 @@
 		};
 		FFFFC1E52B57D5FE00BEB84E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B28DD9A1F97378434EE39C3 /* Pods-holo.release.xcconfig */;
+			baseConfigurationReference = C8AA0DAD912BC929314D181C /* Pods-holosim.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
