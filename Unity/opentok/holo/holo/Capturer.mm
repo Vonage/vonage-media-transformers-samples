@@ -31,8 +31,11 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 @implementation DepthDataCompressor
 
 - (BOOL)compressInputArray:(const std::unique_ptr<uint8_t[]> &)inputArray inputSize:(uint32_t)inputSize outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
-    //    NSLog(@"[holo]: DepthDataCompressor compressInputArray inputSize is %u", inputSize);
     return Holographic::Compression::compress(inputArray, inputSize, outputArray, outputSize);
+}
+
+- (BOOL)compressInputArray:(nonnull CVPixelBufferRef)depthDataMap outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
+    return Holographic::Compression::compress(depthDataMap, outputArray, outputSize);
 }
 
 @end
