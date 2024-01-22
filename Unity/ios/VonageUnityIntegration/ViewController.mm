@@ -66,13 +66,6 @@ public:
     return self;
 }
 
-- (BOOL)compressInputArray:(const std::unique_ptr<uint8_t[]> &)inputArray
-                 inputSize:(uint32_t)inputSize
-               outputArray:(std::unique_ptr<uint8_t[]> &)outputArray
-                outputSize:(uint32_t &)outputSize {
-    return compressor_->compress(inputArray, inputSize, outputArray, outputSize);
-}
-
 - (BOOL)compressInputArray:(nonnull CVPixelBufferRef)depthDataMap outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
     return compressor_->compress(depthDataMap, outputArray, outputSize);
 }
