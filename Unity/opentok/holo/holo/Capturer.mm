@@ -8,8 +8,6 @@
 
 #import <AugmentedCompression.h>
 
-#define COMPRESSED_SIZE 320 * 1024
-
 typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 
     OTCapturerSuccess = 0,
@@ -30,10 +28,6 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 
 @implementation DepthDataCompressor
 
-- (BOOL)compressInputArray:(const std::unique_ptr<uint8_t[]> &)inputArray inputSize:(uint32_t)inputSize outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
-    return Holographic::Compression::compress(inputArray, inputSize, outputArray, outputSize);
-}
-
 - (BOOL)compressInputArray:(nonnull CVPixelBufferRef)depthDataMap outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
     return Holographic::Compression::compress(depthDataMap, outputArray, outputSize);
 }
@@ -44,7 +38,6 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 @property (nonatomic) RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) *capturer;
 @property (nonatomic) DepthDataCompressor *depthDataCompressor;
 
-- (void) setupListenerBlocks;
 @end
 
 @implementation Capturer {
@@ -64,19 +57,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 @synthesize videoContentHint;
 
 -(id)init {
-    self = [super init];
-    if (self) {
-        _capturePreset = AVCaptureSessionPreset640x480;
-        [[self class] dimensionsForCapturePreset:_capturePreset
-                                           width:&_captureWidth
-                                          height:&_captureHeight];
-        _capture_queue = dispatch_queue_create("com.vonage.holo.Capturer",
-                                               DISPATCH_QUEUE_SERIAL);
-        _videoFrame = [[OTVideoFrame alloc] initWithFormat:
-                       [OTVideoFormat videoFormatNV12WithWidth:_captureWidth
-                                                        height:_captureHeight]];
-    }
-    return self;
+    return [self initWithCapturePreset:AVCaptureSessionPreset640x480];
 }
 
 -(id)initWithCapturePreset: (NSString*)preset {
@@ -132,8 +113,8 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
         : [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
 
         AVCaptureDeviceFormat *selectedFormat = nil;
-        int targetWidth = _captureWidth;
-        int targetHeight = _captureHeight;
+        int targetWidth = self->_captureWidth;
+        int targetHeight = self->_captureHeight;
         int currentDiff = INT_MAX;
         NSArray<AVCaptureDeviceFormat *> *formats = [RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) supportedFormatsForDevice:selectedDevice];
         for (AVCaptureDeviceFormat *format in formats) {
@@ -175,7 +156,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
             [self showCapturerError:err];
             return;
         }
-        [_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:_capturePreset videoDeviceInput:videoDeviceInput videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
+        [self->_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:self->_capturePreset videoDeviceInput:videoDeviceInput videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
             if(error){
                 OTError *err = [OTError errorWithDomain:OT_PUBLISHER_ERROR_DOMAIN
                                                    code:OTCapturerError
@@ -193,7 +174,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
     NSCondition *condition = [[NSCondition alloc] init];
     [condition lock];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^(void){
-        [_capturer stopWithCompletionHandler:^{
+        [self->_capturer stopWithCompletionHandler:^{
             [condition signal];
         }];
     });
@@ -264,9 +245,6 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
                                          metadata:data];
 
     }
-}
-
-- (void)setupListenerBlocks {
 }
 
 - (void)showCapturerError:(OTError*)error {

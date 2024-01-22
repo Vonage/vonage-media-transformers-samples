@@ -198,7 +198,7 @@ namespace vonage {
     self.delegate = delegate;
 }
 
-- (void)updateView:(nullable VGRTCMTLVideoView *)videoView {
+- (void)updateView:(nullable RTC_OBJC_TYPE(RTCMTLVideoView)*)videoView {
     self.videoView = videoView;
 }
 
