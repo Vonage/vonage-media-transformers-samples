@@ -1,0 +1,19 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+workspace 'holo.xcworkspace'
+
+target 'holo' do
+  platform :ios, '13.0'
+  project 'holo/holo.xcodeproj'
+  use_frameworks! :linkage => :static
+  pod 'VonageWebRTC', '= 99.10.0-dev.357'
+  pod 'OTXCFramework', :podspec => 'OTXCFramework.podspec'
+end
+
+target 'holosim' do
+  platform :ios, '13.0'
+  project 'holo/holo.xcodeproj'
+  use_frameworks! :linkage => :static
+  pod 'VonageWebRTC', '= 99.10.0-dev.357'
+  pod 'OTXCFramework', :podspec => 'OTXCFramework.podspec'
+end
