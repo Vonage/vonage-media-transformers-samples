@@ -193,14 +193,6 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
     return 0;
 }
 
-- (void)updateCaptureFormatWithWidth:(uint32_t)width height:(uint32_t)height {
-    _captureWidth = width;
-    _captureHeight = height;
-    [_videoFrame setFormat:[OTVideoFormat
-                            videoFormatNV12WithWidth:_captureWidth
-                            height:_captureHeight]];
-}
-
 -(void)callDelegateOnError:(OTError*)error captureError:(NSError *)captureError {
     _captureErrorCode = (enum OTCapturerErrorCode)error.code;
 }
