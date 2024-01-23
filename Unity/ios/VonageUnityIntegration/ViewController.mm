@@ -28,13 +28,12 @@ public:
     AugmentedCompress() = default;
     virtual ~AugmentedCompress() = default;
     
-    bool compress(const std::unique_ptr<uint8_t[]>& inputArray,
-                  uint32_t inputSize,
+    bool compress(CVPixelBufferRef depthDataMap,
                   std::unique_ptr<uint8_t[]>& outputArray,
                   uint32_t& outputSize){
-        return Holographic::Compression::compress(inputArray, inputSize, outputArray, outputSize);
+        return Holographic::Compression::compress(depthDataMap, outputArray, outputSize);
     }
-    
+
     bool decompress(const uint8_t* inputArray,
                     uint32_t inputSize,
                     std::unique_ptr<uint8_t[]>& outputArray,
@@ -60,11 +59,8 @@ public:
     return self;
 }
 
-- (BOOL)compressInputArray:(const std::unique_ptr<uint8_t[]> &)inputArray
-                 inputSize:(uint32_t)inputSize
-               outputArray:(std::unique_ptr<uint8_t[]> &)outputArray
-                outputSize:(uint32_t &)outputSize {
-    return compressor_->compress(inputArray, inputSize, outputArray, outputSize);
+- (BOOL)compressInputArray:(nonnull CVPixelBufferRef)depthDataMap outputArray:(std::unique_ptr<uint8_t[]> &)outputArray outputSize:(uint32_t &)outputSize {
+    return compressor_->compress(depthDataMap, outputArray, outputSize);
 }
 
 @end

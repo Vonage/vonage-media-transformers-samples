@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		0AA7F9122B18E6B700B944B0 /* UnityFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA7F9112B18E6B600B944B0 /* UnityFramework.framework */; };
 		0AA7F9132B18E6B700B944B0 /* UnityFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA7F9112B18E6B600B944B0 /* UnityFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0AFC0DF32B3AF3E400643E35 /* AugmentedCompression.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AFC0DF22B3AF3E400643E35 /* AugmentedCompression.xcframework */; };
-		0AFC0DF42B3AF3E400643E35 /* AugmentedCompression.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AFC0DF22B3AF3E400643E35 /* AugmentedCompression.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AC611E6228F848CD00B00CEA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6128F848CD00B00CEA /* AppDelegate.m */; };
 		AC611E6528F848CD00B00CEA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6428F848CD00B00CEA /* SceneDelegate.m */; };
 		AC611E6828F848CD00B00CEA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC611E6728F848CD00B00CEA /* ViewController.mm */; };
@@ -27,6 +25,8 @@
 		AC611E8D29004A5700B00CEA /* WebRTCHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */; };
 		AC611E9A2902A7AB00B00CEA /* transformers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E992902A7AB00B00CEA /* transformers.cpp */; };
 		CAD901F71F9E1E7D7B80F82A /* Pods_VonageUnityIntegration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5F95F2B1AEC4862ADE63016 /* Pods_VonageUnityIntegration.framework */; };
+		FFD1CC4F2B59375300AA8CC8 /* AugmentedCompression.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AFC0DF22B3AF3E400643E35 /* AugmentedCompression.xcframework */; };
+		FFD1CC502B59375300AA8CC8 /* AugmentedCompression.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AFC0DF22B3AF3E400643E35 /* AugmentedCompression.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,7 +36,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				0AFC0DF42B3AF3E400643E35 /* AugmentedCompression.xcframework in Embed Frameworks */,
+				FFD1CC502B59375300AA8CC8 /* AugmentedCompression.xcframework in Embed Frameworks */,
 				0AA7F9132B18E6B700B944B0 /* UnityFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -88,7 +88,7 @@
 				AC611E7E28F98CA600B00CEA /* UIKit.framework in Frameworks */,
 				AC611E8228F98D1A00B00CEA /* Metal.framework in Frameworks */,
 				AC611E7C28F98C7900B00CEA /* CoreVideo.framework in Frameworks */,
-				0AFC0DF32B3AF3E400643E35 /* AugmentedCompression.xcframework in Frameworks */,
+				FFD1CC4F2B59375300AA8CC8 /* AugmentedCompression.xcframework in Frameworks */,
 				CAD901F71F9E1E7D7B80F82A /* Pods_VonageUnityIntegration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
