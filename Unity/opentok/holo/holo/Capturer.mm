@@ -263,55 +263,6 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
     });
 }
 
-- (NSString*)captureSessionPreset {
-    return _capturePreset;
-}
-
-- (void)setCaptureSessionPreset:(NSString*)preset {
-}
-
-- (NSArray *)availableCaptureSessionPresets {
-    NSArray *allSessionPresets = [NSArray arrayWithObjects:
-                                  AVCaptureSessionPreset352x288,
-                                  AVCaptureSessionPreset640x480,
-                                  AVCaptureSessionPreset1280x720,
-                                  AVCaptureSessionPreset1920x1080,
-                                  AVCaptureSessionPresetPhoto,
-                                  AVCaptureSessionPresetHigh,
-                                  AVCaptureSessionPresetMedium,
-                                  AVCaptureSessionPresetLow,
-                                  nil];
-    return allSessionPresets;
-}
-
-- (double)activeFrameRate {
-    return 30.0;
-}
-
-- (BOOL)isAvailableActiveFrameRate:(double)frameRate {
-    return NO;
-}
-
-- (AVCaptureDevicePosition)cameraPosition {
-    return AVCaptureDevicePositionFront;
-}
-
-- (void)setCameraPosition:(AVCaptureDevicePosition) position {
-}
-
-- (NSArray*)availableCameraPositions {
-    NSArray* devices = [[AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeBuiltInTrueDepthCamera] mediaType:AVMediaTypeVideo position:AVCaptureDevicePositionUnspecified] devices];
-    NSMutableSet* result = [NSMutableSet setWithCapacity:devices.count];
-    for (AVCaptureDevice* device in devices) {
-        [result addObject:[NSNumber numberWithInt:device.position]];
-    }
-    return [result allObjects];
-}
-
-- (BOOL)toggleCameraPosition {
-    return NO;
-}
-
 + (void)dimensionsForCapturePreset:(NSString*)preset
                              width:(uint32_t*)width
                             height:(uint32_t*)height {
