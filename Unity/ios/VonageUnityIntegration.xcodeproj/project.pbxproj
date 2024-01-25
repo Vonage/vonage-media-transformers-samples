@@ -25,6 +25,7 @@
 		AC611E8D29004A5700B00CEA /* WebRTCHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E8B29004A5700B00CEA /* WebRTCHelper.cpp */; };
 		AC611E9A2902A7AB00B00CEA /* transformers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC611E992902A7AB00B00CEA /* transformers.cpp */; };
 		CAD901F71F9E1E7D7B80F82A /* Pods_VonageUnityIntegration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5F95F2B1AEC4862ADE63016 /* Pods_VonageUnityIntegration.framework */; };
+		FF4371A32B629FE90089848C /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF4371A22B629FE90089848C /* CoreImage.framework */; };
 		FFD1CC4F2B59375300AA8CC8 /* AugmentedCompression.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AFC0DF22B3AF3E400643E35 /* AugmentedCompression.xcframework */; };
 		FFD1CC502B59375300AA8CC8 /* AugmentedCompression.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0AFC0DF22B3AF3E400643E35 /* AugmentedCompression.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -75,6 +76,7 @@
 		AC611E982902A7AB00B00CEA /* transformers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = transformers.h; sourceTree = "<group>"; };
 		AC611E992902A7AB00B00CEA /* transformers.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = transformers.cpp; sourceTree = "<group>"; };
 		BEF13A07D0F672E2F430B8F2 /* Pods-VonageUnityIntegration.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VonageUnityIntegration.release.xcconfig"; path = "Target Support Files/Pods-VonageUnityIntegration/Pods-VonageUnityIntegration.release.xcconfig"; sourceTree = "<group>"; };
+		FF4371A22B629FE90089848C /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +86,7 @@
 			files = (
 				0AA7F9122B18E6B700B944B0 /* UnityFramework.framework in Frameworks */,
 				AC611E8028F98CEE00B00CEA /* QuartzCore.framework in Frameworks */,
+				FF4371A32B629FE90089848C /* CoreImage.framework in Frameworks */,
 				AC611E7A28F98C1200B00CEA /* AVFoundation.framework in Frameworks */,
 				AC611E7E28F98CA600B00CEA /* UIKit.framework in Frameworks */,
 				AC611E8228F98D1A00B00CEA /* Metal.framework in Frameworks */,
@@ -99,6 +102,7 @@
 		3358E8ED3C0073701B2A50D2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FF4371A22B629FE90089848C /* CoreImage.framework */,
 				0AFC0DF22B3AF3E400643E35 /* AugmentedCompression.xcframework */,
 				0AA7F9112B18E6B600B944B0 /* UnityFramework.framework */,
 				AC611E8128F98D1A00B00CEA /* Metal.framework */,
