@@ -106,7 +106,7 @@ namespace vonage {
         return;
     }
 
-#ifdef SKIP_UNITY_INTEGRATION
+#ifndef SKIP_UNITY_INTEGRATION
     uint32_t inputWidth = 0;
     uint32_t inputHeigth = 0;
     [FrameworkLibAPI getInputWidth:inputWidth height:inputHeigth];
@@ -191,12 +191,12 @@ namespace vonage {
 #endif
 
     webrtc::VideoFrame outputWebrtcVideoFrame = webrtc::VideoFrame::Builder()
-#ifdef SKIP_UNITY_INTEGRATION
-        .set_rotation(vonage::GetRotation(vonage::GetRotation([frame orientation])))
-        .set_video_frame_buffer(inputWebrtcVideoFrameBuffer)
-#else
+#ifndef SKIP_UNITY_INTEGRATION
         .set_rotation(vonage::GetRotation(outputRotation))
         .set_video_frame_buffer(outputWebrtcVideoFrameBuffer)
+#else
+        .set_rotation(vonage::GetRotation(vonage::GetRotation([frame orientation])))
+        .set_video_frame_buffer(inputWebrtcVideoFrameBuffer)
 #endif
         .set_timestamp_ms(CMTimeGetSeconds([frame timestamp]) * 1000)
         .build();
