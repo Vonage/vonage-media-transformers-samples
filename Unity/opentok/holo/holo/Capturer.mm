@@ -141,7 +141,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 
         NSArray<AVCaptureDeviceFormat *> *depthFormats = selectedFormat.supportedDepthDataFormats;
         NSArray<AVCaptureDeviceFormat *> *filtered = [depthFormats filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(AVCaptureDeviceFormat *evaluatedObject, NSDictionary<NSString *, id> *bindings) {
-            return CMFormatDescriptionGetMediaSubType(evaluatedObject.formatDescription) == kCVPixelFormatType_DepthFloat32 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).width == 640 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).height == 480;
+            return CMFormatDescriptionGetMediaSubType(evaluatedObject.formatDescription) == kCVPixelFormatType_DepthFloat32 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).width == targetWidth && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).height == targetHeight;
         }]];
         AVCaptureDeviceFormat* depthFormat = nil;
         if([filtered count] == 1){
