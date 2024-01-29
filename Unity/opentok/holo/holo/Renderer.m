@@ -17,6 +17,8 @@
 
 #include "AppDelegate.h"
 
+//#define SKIP_UNITY_INTEGRATION
+
 namespace vonage {
     int GetRotation(OTVideoOrientation rotation){
         switch (rotation) {
@@ -103,6 +105,8 @@ namespace vonage {
         NSLog(@"[holo]: Renderer %p renderVideoFrame inputWebrtcVideoFrameBuffer is null", self);
         return;
     }
+
+#ifndef SKIP_UNITY_INTEGRATION
     uint32_t inputWidth = 0;
     uint32_t inputHeigth = 0;
     [FrameworkLibAPI getInputWidth:inputWidth height:inputHeigth];
@@ -184,9 +188,16 @@ namespace vonage {
         NSLog(@"[holo]: Renderer %p renderVideoFrame libyuv::ARGBToI420 call failed", self);
         return;
     }
+#endif
+
     webrtc::VideoFrame outputWebrtcVideoFrame = webrtc::VideoFrame::Builder()
+#ifndef SKIP_UNITY_INTEGRATION
         .set_rotation(vonage::GetRotation(outputRotation))
         .set_video_frame_buffer(outputWebrtcVideoFrameBuffer)
+#else
+        .set_rotation(vonage::GetRotation(vonage::GetRotation([frame orientation])))
+        .set_video_frame_buffer(inputWebrtcVideoFrameBuffer)
+#endif
         .set_timestamp_ms(CMTimeGetSeconds([frame timestamp]) * 1000)
         .build();
     if (_videoView) {
