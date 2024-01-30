@@ -108,8 +108,8 @@ static double widgetWidth = 320;
             NSError *parseError = nil;
             if (httpResponse.statusCode == 200) {
                 NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&parseError];
-                if ([dict objectForKey:@"applicationId"] ||
-                    [dict objectForKey:@"sessionId"] ||
+                if ([dict objectForKey:@"applicationId"] &&
+                    [dict objectForKey:@"sessionId"] &&
                     [dict objectForKey:@"token"]) {
                     self->credentials.apiKey = [dict objectForKey:@"applicationId"];
                     self->credentials.sessionId = [dict objectForKey:@"sessionId"];
@@ -119,9 +119,11 @@ static double widgetWidth = 320;
                                                              sessionId:self->credentials.sessionId
                                                               delegate:self];
                     [self doConnect];
+                } else {
+                    [self showAlert:@"Failed to receive Video API credentials"];
                 }
             } else {
-                NSString * codeErr = [NSString stringWithFormat:@"Network error code:%ld", (long)httpResponse.statusCode];
+                NSString *codeErr = [NSString stringWithFormat:@"Network error code:%ld", (long)httpResponse.statusCode];
                 [self showAlert:codeErr];
             }
         } else {

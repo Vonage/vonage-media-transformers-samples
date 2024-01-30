@@ -3,13 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>NSAppTransportSecurity</key>
-	<dict/>
-	<key>NSExceptionDomains</key>
 	<dict>
-		<key>3.19.223.109</key>
-		<dict/>
-		<key>NSExceptionAllowsInsecureHTTPLoads</key>
-		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>3.19.223.109</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
