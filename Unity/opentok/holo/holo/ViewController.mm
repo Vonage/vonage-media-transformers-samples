@@ -13,6 +13,12 @@
 
 #import "Logger.h"
 
+typedef struct {
+    NSString* apiKey;
+    NSString* sessionId;
+    NSString* token;
+} HoloCredentials;
+
 // *** Fill the following variables using your own Project info  ***
 // ***          https://dashboard.tokbox.com/projects            ***
 // Replace with your OpenTok API key
@@ -22,10 +28,14 @@ static NSString* const kSessionId = @"";
 // Replace with your generated token
 static NSString* const kToken = @"";
 
+static NSString* const kHoloRoomServiceServerIP = @"3.19.223.109";
+static NSString* const kHoloRoomServiceURI = @"https://3.19.223.109:8080/room/%@/info";
+static NSString* const kHoloRoomName = @"holo";
+
 static double widgetHeight = 240;
 static double widgetWidth = 320;
 
-@interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate>
+@interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate>
 @property (nonatomic) OTSession *session;
 @property (nonatomic) OTPublisher *publisher;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
@@ -38,6 +48,7 @@ static double widgetWidth = 320;
 
 @implementation ViewController {
     UIView *_view;
+    HoloCredentials credentials;
 }
 
 #pragma mark - View lifecycle
@@ -72,12 +83,51 @@ static double widgetWidth = 320;
 
 //    [[OpenTokLogger alloc] init];
 
-    // Step 1: As the view comes into the foreground, initialize a new instance
-    // of OTSession and begin the connection process.
-    _session = [[OTSession alloc] initWithApiKey:kApiKey
-                                       sessionId:kSessionId
-                                        delegate:self];
-    [self doConnect];
+    if (![kApiKey isEqualToString:@""] && ![kSessionId isEqualToString:@""]) {
+        // Step 1: As the view comes into the foreground, initialize a new instance
+        // of OTSession and begin the connection process.
+        _session = [[OTSession alloc] initWithApiKey:kApiKey
+                                           sessionId:kSessionId
+                                            delegate:self];
+        [self doConnect];
+        return;
+    }
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, kHoloRoomName]];
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
+    NSMutableURLRequest *mutableRequest = [urlRequest mutableCopy];
+    [mutableRequest setHTTPMethod: @"GET"];
+    [mutableRequest addValue:@"application/json, text/plain, */*" forHTTPHeaderField:@"Accept"];
+
+    [[session dataTaskWithRequest:mutableRequest
+                completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (!error) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSError *parseError = nil;
+            if (httpResponse.statusCode == 200) {
+                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&parseError];
+                if ([dict objectForKey:@"applicationId"] ||
+                    [dict objectForKey:@"sessionId"] ||
+                    [dict objectForKey:@"token"]) {
+                    self->credentials.apiKey = [dict objectForKey:@"applicationId"];
+                    self->credentials.sessionId = [dict objectForKey:@"sessionId"];
+                    self->credentials.token = [dict objectForKey:@"token"];
+
+                    self->_session = [[OTSession alloc] initWithApiKey:self->credentials.apiKey
+                                                             sessionId:self->credentials.sessionId
+                                                              delegate:self];
+                    [self doConnect];
+                }
+            } else {
+                NSString * codeErr = [NSString stringWithFormat:@"Network error code:%ld", (long)httpResponse.statusCode];
+                [self showAlert:codeErr];
+            }
+        } else {
+            [self showAlert:error.description];
+        }
+    }] resume];
 }
 
 - (BOOL)prefersStatusBarHidden
@@ -97,10 +147,12 @@ static double widgetWidth = 320;
 - (void)doConnect
 {
     OTError *error = nil;
-
-    [_session connectWithToken:kToken error:&error];
-    if (error)
-    {
+    if ([kToken isEqualToString:@""]) {
+        [_session connectWithToken:credentials.token error:&error];
+    } else {
+        [_session connectWithToken:kToken error:&error];
+    }
+    if (error) {
         [self showAlert:[error localizedDescription]];
     }
 }
@@ -317,6 +369,19 @@ didFailWithError:(OTError*)error
     _publisher = nil;
     [_session disconnect:nil];
     _session = nil;
+}
+
+- (void) URLSession:(NSURLSession *)session
+didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
+    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+        if ([challenge.protectionSpace.host isEqualToString:kHoloRoomServiceServerIP]) {
+            NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+            completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+        } else {
+            completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
+        }
+    }
 }
 
 @end
