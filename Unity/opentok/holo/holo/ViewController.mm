@@ -92,8 +92,9 @@ static double widgetWidth = 320;
         [self doConnect];
         return;
     }
-
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, kHoloRoomName]];
+    // TODO: Revert this when AMR is disabled for the application ID used by the room service.
+//    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, kHoloRoomName]];
+    NSURL *url = [NSURL URLWithString:@"http://3.19.223.109:8080"];
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];

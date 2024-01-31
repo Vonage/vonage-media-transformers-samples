@@ -17,7 +17,7 @@
 
 #include "AppDelegate.h"
 
-//#define SKIP_UNITY_INTEGRATION
+#define SKIP_UNITY_INTEGRATION
 
 namespace vonage {
     int GetRotation(OTVideoOrientation rotation){
