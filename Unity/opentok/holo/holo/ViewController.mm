@@ -35,7 +35,7 @@ static NSString* const kHoloRoomName = @"holo";
 static double widgetHeight = 240;
 static double widgetWidth = 320;
 
-@interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate>
+@interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate, OTPublisherKitRtcStatsReportDelegate, OTSubscriberKitRtcStatsReportDelegate>
 @property (nonatomic) OTSession *session;
 @property (nonatomic) OTPublisher *publisher;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
@@ -44,6 +44,8 @@ static double widgetWidth = 320;
 @property (nonatomic) Renderer *renderer;
 #endif
 @property (nonatomic) OTSubscriber *subscriber;
+@property (nonatomic) UILabel* publisherStatsLabel;
+@property (nonatomic) UILabel* subscriberStatsLabel;
 @end
 
 @implementation ViewController {
@@ -73,6 +75,16 @@ static double widgetWidth = 320;
     [_localVideoView.topAnchor constraintEqualToAnchor:margin.topAnchor constant:8.0].active = YES;
     [_localVideoView.widthAnchor constraintEqualToConstant:120].active = YES;
     [_localVideoView.heightAnchor constraintEqualToConstant:120].active = YES;
+
+    _publisherStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
+    [_publisherStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
+    [_publisherStatsLabel setTextColor:[UIColor whiteColor]];
+    [_publisherStatsLabel setBackgroundColor:[UIColor clearColor]];
+
+    _subscriberStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
+    [_subscriberStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
+    [_subscriberStatsLabel setTextColor:[UIColor whiteColor]];
+    [_subscriberStatsLabel setBackgroundColor:[UIColor clearColor]];
 
     self.view = _view;
 }
@@ -174,6 +186,7 @@ static double widgetWidth = 320;
     settings.videoCapture = capturer;
 #endif
     _publisher = [[OTPublisher alloc] initWithDelegate:self settings:settings];
+    _publisher.rtcStatsReportDelegate = self;
 
     OTError *error = nil;
     [_session publish:_publisher error:&error];
@@ -212,6 +225,7 @@ static double widgetWidth = 320;
     [_renderer updateView:_remoteVideoView];
 #endif
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
+    _subscriber.rtcStatsReportDelegate = self;
 #if !(TARGET_IPHONE_SIMULATOR)
     [_subscriber setVideoRender:_renderer];
 #endif
@@ -312,6 +326,11 @@ didFailWithError:(OTError*)error
     NSLog(@"subscriberDidConnectToStream (%@)",
           subscriber.stream.connection.connectionId);
     assert(_subscriber == subscriber);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSTimer scheduledTimerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            [self->_subscriber getRtcStatsReport];
+        }];
+    });
 #if (TARGET_IPHONE_SIMULATOR)
     [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
                                          widgetHeight)];
@@ -333,6 +352,11 @@ didFailWithError:(OTError*)error
     streamCreated:(OTStream *)stream
 {
     NSLog(@"Publishing");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSTimer scheduledTimerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            [self->_publisher getRtcStatsReport];
+        }];
+    });
 }
 
 - (void)publisher:(OTPublisherKit*)publisher
@@ -385,6 +409,77 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
             completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
         }
     }
+}
+
+- (void)publisher:(nonnull OTPublisherKit *)publisher rtcStatsReport:(nonnull NSArray<OTPublisherRtcStats*> *)stats {
+    if ([stats count] == 1) {
+        OTPublisherRtcStats* publisherStats = stats[0];
+        NSString* stats;
+        NSString* outboundStats;
+        @autoreleasepool {
+            NSData *jsonData = [publisherStats.jsonArrayOfReports dataUsingEncoding:NSUTF8StringEncoding];
+            NSError *error = nil;
+            id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+
+            if (!error) {
+                if ([jsonObject isKindOfClass:[NSArray class]]) {
+                    NSArray *jsonArray = (NSArray *)jsonObject;
+                    for(id elemet in jsonArray){
+                        if([elemet isKindOfClass:[NSDictionary class]]){
+                            NSDictionary* jsonElemet = (NSDictionary*) elemet;
+                            NSString* type = jsonElemet[@"type"];
+                            NSString* kind = jsonElemet[@"kind"];
+                            if([type isEqual: @"outbound-rtp"] && [kind isEqual:@"video"]){
+                                NSNumber* fps = jsonElemet[@"framesPerSecond"];
+                                NSNumber* bw = jsonElemet[@"bytesSent"];
+                                outboundStats = [NSString stringWithFormat:@"fps: %@ bytes: %.3f MB",fps, bw.doubleValue / 1048576];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stats = [NSString stringWithFormat:@"Publisher: %@", [outboundStats length] > 0 ? outboundStats : @"NA"];
+
+        [_publisherStatsLabel removeFromSuperview];
+        [_publisherStatsLabel setText:stats];
+        [_publisherStatsLabel setNumberOfLines:0];
+        [_localVideoView addSubview:_publisherStatsLabel];
+    }
+}
+
+- (void)subscriber:(nonnull OTSubscriberKit *)subscriber rtcStatsReport:(nonnull NSString *)jsonArrayOfReports {
+    NSString* stats;
+    NSString* inboundStats;
+    @autoreleasepool {
+        NSData *jsonData = [jsonArrayOfReports dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *error = nil;
+        id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+
+        if (!error) {
+            if ([jsonObject isKindOfClass:[NSArray class]]) {
+                NSArray *jsonArray = (NSArray *)jsonObject;
+                for(id elemet in jsonArray){
+                    if([elemet isKindOfClass:[NSDictionary class]]){
+                        NSDictionary* jsonElemet = (NSDictionary*) elemet;
+                        NSString* type = jsonElemet[@"type"];
+                        NSString* kind = jsonElemet[@"kind"];
+                        if([type isEqual: @"inbound-rtp"] && [kind isEqual:@"video"]){
+                            NSNumber* fps = jsonElemet[@"framesPerSecond"];
+                            NSNumber* bw = jsonElemet[@"bytesReceived"];
+                            inboundStats = [NSString stringWithFormat:@"fps: %@ bytes: %.3f MB",fps, bw.doubleValue / 1048576];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    stats = [NSString stringWithFormat:@"Subscriber: %@\n", [inboundStats length] > 0 ? inboundStats : @"NA"];
+
+    [_subscriberStatsLabel removeFromSuperview];
+    [_subscriberStatsLabel setText:stats];
+    [_subscriberStatsLabel setNumberOfLines:0];
+    [_remoteVideoView addSubview:_subscriberStatsLabel];
 }
 
 @end
