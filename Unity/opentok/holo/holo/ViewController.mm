@@ -13,6 +13,8 @@
 
 #import "Logger.h"
 
+#define SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+
 typedef struct {
     NSString* apiKey;
     NSString* sessionId;
@@ -51,6 +53,7 @@ static double widgetWidth = 320;
 @implementation ViewController {
     UIView *_view;
     HoloCredentials credentials;
+    BOOL sender;
 }
 
 #pragma mark - View lifecycle
@@ -93,7 +96,34 @@ static double widgetWidth = 320;
 {
     [super viewDidLoad];
 
-//    [[OpenTokLogger alloc] init];
+    sender = YES;
+    UIAlertController *alert = [UIAlertController
+                                alertControllerWithTitle:@"Role"
+                                message:@"Select one rol please"
+                                preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* yesButton = [UIAlertAction
+                                actionWithTitle:@"Sender"
+                                style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction * action) {
+        self->sender = YES;
+        [self doInit];
+    }];
+    UIAlertAction* noButton = [UIAlertAction
+                               actionWithTitle:@"Receiver"
+                               style:UIAlertActionStyleDefault
+                               handler:^(UIAlertAction * action) {
+        self->sender = FALSE;
+        [self doInit];
+    }];
+    [alert addAction:yesButton];
+    [alert addAction:noButton];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self presentViewController:alert animated:YES completion:nil];
+    });
+}
+
+- (void)doInit {
+    //    [[OpenTokLogger alloc] init];
 
     if (![kApiKey isEqualToString:@""] && ![kSessionId isEqualToString:@""]) {
         // Step 1: As the view comes into the foreground, initialize a new instance
@@ -105,7 +135,7 @@ static double widgetWidth = 320;
         return;
     }
     // TODO: Revert this when AMR is disabled for the application ID used by the room service.
-//    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, kHoloRoomName]];
+    //    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, kHoloRoomName]];
     NSURL *url = [NSURL URLWithString:@"http://3.19.223.109:8080"];
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
@@ -221,13 +251,17 @@ static double widgetWidth = 320;
 - (void)doSubscribe:(OTStream*)stream
 {
 #if !(TARGET_IPHONE_SIMULATOR)
+#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
     _renderer = [[Renderer alloc] init];
     [_renderer updateView:_remoteVideoView];
+#endif
 #endif
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
     _subscriber.rtcStatsReportDelegate = self;
 #if !(TARGET_IPHONE_SIMULATOR)
+#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
     [_subscriber setVideoRender:_renderer];
+#endif
 #endif
 
     OTError *error = nil;
@@ -262,7 +296,9 @@ static double widgetWidth = 320;
 
     // Step 2: We have successfully connected, now instantiate a publisher and
     // begin pushing A/V streams into OpenTok.
-    [self doPublish];
+    if (sender) {
+        [self doPublish];
+    }
 }
 
 - (void)sessionDidDisconnect:(OTSession*)session
@@ -279,8 +315,7 @@ static double widgetWidth = 320;
 {
     NSLog(@"session streamCreated (%@)", stream.streamId);
 
-    if (nil == _subscriber)
-    {
+    if ((nil == _subscriber) && (sender == NO)) {
         [self doSubscribe:stream];
     }
 }
@@ -333,8 +368,14 @@ didFailWithError:(OTError*)error
     });
 #if (TARGET_IPHONE_SIMULATOR)
     [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
-                                         widgetHeight)];
+                                          widgetHeight)];
     [self.view addSubview:_subscriber.view];
+#else
+#ifdef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+    [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
+                                          widgetHeight)];
+    [self.view addSubview:_subscriber.view];
+#endif
 #endif
 }
 
@@ -479,7 +520,11 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     [_subscriberStatsLabel removeFromSuperview];
     [_subscriberStatsLabel setText:stats];
     [_subscriberStatsLabel setNumberOfLines:0];
+#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
     [_remoteVideoView addSubview:_subscriberStatsLabel];
+#else
+    [_subscriber.view addSubview:_subscriberStatsLabel];
+#endif
 }
 
 @end
