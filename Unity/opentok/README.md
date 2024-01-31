@@ -33,8 +33,6 @@ $ pod install --verbose --repo-update --clean-install
 
 That will install the OpenTok SDK for iOS. The SDK is installed as framework bundle file under [Unity/opentok/Pods/OTXCFramework/](https://github.com/Vonage/vonage-media-transformers-samples/tree/main/Unity/opentok/Pods/OTXCFramework).
 
-You might need to override that framework bundle file with a custom one shared manually.
-
 Given the OpenTok iOS SDK is used for video communication any holo app user
 should be familar with the OpenTok video platform a bit. In order to run the app,
 the user has to set up authentication so the app can connect to an OpenTok
@@ -50,10 +48,18 @@ with the session ID and token you generated.
 Note it is important that when [creating the session](https://tokbox.com/developer/guides/create-session/)
 you create a **relayed** one.
 
+There is also support for a room service that creates these for you based on a
+room name. Please continue reading so you find how to use it instead of creating
+the authentication credentials on your own.
+
 ## Build the app
 
 Before building the app make sure you hardcode the API key, session ID, and token
 we mentioned before in file at [Unity/opentok/holo/holo/ViewController.mm](https://github.com/Vonage/vonage-media-transformers-samples/tree/main/Unity/opentok/holo/holo/ViewController.mm).
+
+As we mentioned before there is also support for room names so you can skip
+setting the API key, session ID, and token. You can override the default name by
+changing the value of constant `kHoloRoomName` at [Unity/opentok/holo/holo/ViewController.mm](https://github.com/Vonage/vonage-media-transformers-samples/tree/main/Unity/opentok/holo/holo/ViewController.mm).
 
 Within Xcode go to Product then Build and let it build.
 

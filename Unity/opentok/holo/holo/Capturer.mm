@@ -8,6 +8,8 @@
 
 #import <AugmentedCompression.h>
 
+//#define SKIP_UNITY_INTEGRATION
+
 typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
 
     OTCapturerSuccess = 0,
@@ -226,10 +228,12 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
                 break;
         }
         NSData *data = nil;
+#ifndef SKIP_UNITY_INTEGRATION
         if ([videoFrame isAugmented]) {
             data = [NSData dataWithBytes:[videoFrame augmentingData] length:[videoFrame augmentingDataSize]];
 //            NSLog(@"[holo]: Capturer %p capturer augmented data size is %lu", self, static_cast<size_t>(data.length));
         }
+#endif
         // TODO: Review the way we build the timestamp we provide through CMTimeMake (not sure is correct).
         [_videoCaptureConsumer consumeImageBuffer:buffer
                                       orientation:orientation
