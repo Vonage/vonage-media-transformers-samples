@@ -1,6 +1,7 @@
 #import "AppDelegate.h"
 
 #import <TargetConditionals.h>
+#import <AVFoundation/AVCaptureSession.h>
 
 int gArgc = 0;
 char** gArgv = nullptr;
@@ -33,8 +34,15 @@ UnityFramework* UnityFrameworkLoad()
 
 @implementation AppDelegate
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    if (([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio] == AVAuthorizationStatusAuthorized) &&
+        ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo] == AVAuthorizationStatusAuthorized)) {
+    } else {
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
+        }];
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        }];
+    }
     // Override point for customization after application launch.
     appLaunchOpts = launchOptions;
 #if !(TARGET_IPHONE_SIMULATOR)
@@ -42,7 +50,6 @@ UnityFramework* UnityFrameworkLoad()
 #endif
     return YES;
 }
-
 
 #pragma mark - UISceneSession lifecycle
 
