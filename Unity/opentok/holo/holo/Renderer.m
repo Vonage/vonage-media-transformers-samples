@@ -58,6 +58,7 @@ namespace vonage {
 
 @implementation Renderer {
     BOOL _renderingEnabled;
+    int64_t _current_timestamp;
 }
 
 @synthesize delegate = _delegate;
@@ -82,6 +83,14 @@ namespace vonage {
 }
 
 #pragma mark - OTVideoRender
+
+-(instancetype)init{
+    self = [super init];
+    if(self){
+        _current_timestamp = 0;
+    }
+    return self;
+}
 
 - (void)renderVideoFrame:(OTVideoFrame*)frame {
     if ([_delegate respondsToSelector:@selector(renderer:didReceiveFrame:)]) {
@@ -190,6 +199,7 @@ namespace vonage {
     }
 #endif
 
+    _current_timestamp += 1;
     webrtc::VideoFrame outputWebrtcVideoFrame = webrtc::VideoFrame::Builder()
 #ifndef SKIP_UNITY_INTEGRATION
         .set_rotation(vonage::GetRotation(outputRotation))
@@ -198,7 +208,7 @@ namespace vonage {
         .set_rotation(vonage::GetRotation(vonage::GetRotation([frame orientation])))
         .set_video_frame_buffer(inputWebrtcVideoFrameBuffer)
 #endif
-        .set_timestamp_ms(CMTimeGetSeconds([frame timestamp]) * 1000)
+        .set_timestamp_ms(_current_timestamp)
         .build();
     if (_videoView) {
         [_videoView renderFrame:webrtc::NativeToObjCVideoFrame(outputWebrtcVideoFrame)];
