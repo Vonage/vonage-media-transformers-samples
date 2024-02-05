@@ -13,7 +13,10 @@
 
 #import "Logger.h"
 
+// Note: Define SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER macro whenever
+//       you want to use the OpenTok default video render.
 //#define SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+
 #define MAX_PARTICIPANTS_PER_ROOM 2
 
 typedef struct {
@@ -254,7 +257,7 @@ static double widgetWidth = 320;
 {
 #if !(TARGET_IPHONE_SIMULATOR)
 #ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
-    _renderer = [[Renderer alloc] init];
+    _renderer = [[Renderer alloc] initWithUnityRenderingEnabled:YES];
     [_renderer updateView:_remoteVideoView];
 #endif
 #endif
