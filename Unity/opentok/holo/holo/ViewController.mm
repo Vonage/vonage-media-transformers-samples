@@ -14,6 +14,7 @@
 #import "Logger.h"
 
 //#define SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+#define MAX_PARTICIPANTS_PER_ROOM 2
 
 typedef struct {
     NSString* apiKey;
@@ -54,6 +55,7 @@ static double widgetWidth = 320;
     UIView *_view;
     HoloCredentials credentials;
     BOOL sender;
+    uint8_t _participantsNumber;
 }
 
 #pragma mark - View lifecycle
@@ -157,7 +159,6 @@ static double widgetWidth = 320;
                     self->credentials.apiKey = [dict objectForKey:@"applicationId"];
                     self->credentials.sessionId = [dict objectForKey:@"sessionId"];
                     self->credentials.token = [dict objectForKey:@"token"];
-
                     self->_session = [[OTSession alloc] initWithApiKey:self->credentials.apiKey
                                                              sessionId:self->credentials.sessionId
                                                               delegate:self];
@@ -191,6 +192,7 @@ static double widgetWidth = 320;
  */
 - (void)doConnect
 {
+    _participantsNumber = 0;
     OTError *error = nil;
     if ([kToken isEqualToString:@""]) {
         [_session connectWithToken:credentials.token error:&error];
@@ -293,12 +295,22 @@ static double widgetWidth = 320;
 - (void)sessionDidConnect:(OTSession*)session
 {
     NSLog(@"sessionDidConnect (%@)", session.sessionId);
+    ++_participantsNumber;
 
-    // Step 2: We have successfully connected, now instantiate a publisher and
-    // begin pushing A/V streams into OpenTok.
-    if (sender) {
-        [self doPublish];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:NO block:^(NSTimer * _Nonnull timer) {
+            if (self->_participantsNumber > MAX_PARTICIPANTS_PER_ROOM) {
+                [session disconnect:nil];
+                NSLog(@"sessionDidConnect (%d participants)", self->_participantsNumber);
+                [self showAlert:@"Room is full. Disconnecting."];
+                return;
+            }
+
+            if (self->sender) {
+                [self doPublish];
+            }
+        }];
+    });
 }
 
 - (void)sessionDidDisconnect:(OTSession*)session
@@ -335,12 +347,18 @@ streamDestroyed:(OTStream *)stream
 connectionCreated:(OTConnection *)connection
 {
     NSLog(@"session connectionCreated (%@)", connection.connectionId);
+    // Sent when another client connects to the session.
+    // This message is not sent when your own client connects to the session.
+    ++_participantsNumber;
 }
 
 - (void)    session:(OTSession *)session
 connectionDestroyed:(OTConnection *)connection
 {
     NSLog(@"session connectionDestroyed (%@)", connection.connectionId);
+    // Sent when another client disconnects from the session.
+    // This message is not sent when your own client disconnects from the session.
+    --_participantsNumber;
     if ([_subscriber.stream.connection.connectionId
          isEqualToString:connection.connectionId])
     {
