@@ -234,6 +234,13 @@ public:
     void OnError(webrtc::MediaProcessorErrorCode code, const std::string& message) override{
         RTC_LOG_T_F(LS_ERROR) << "TransformerObserver code: " << code << " message: " << message;
     }
+    void OnWarning(uint8_t code, const std::string& message) override {
+        RTC_LOG_T_F(LS_WARNING) << "TransformerObserver code: " << code << " message: " << message;
+    }
+    void OnError(uint8_t code, const std::string& message) override {
+        RTC_LOG_T_F(LS_ERROR) << "TransformerObserver code: " << code << " message: " << message;
+
+    }
     void OnStats(const std::string& stats) override{
         NSString* res;
         if(!stats.empty()){
