@@ -13,7 +13,7 @@
 
 #import "Logger.h"
 
-#define SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+//#define SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
 
 typedef struct {
     NSString* apiKey;
