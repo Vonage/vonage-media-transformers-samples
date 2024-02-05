@@ -17,7 +17,13 @@
 
 #include "AppDelegate.h"
 
-#define SKIP_UNITY_INTEGRATION
+// Note: Define SKIP_UNITY_INTEGRATION macro whenever
+//       you want this custom video renderer to skip
+//       using the Unity integration completely.
+//       Note this macro is different to the unityRenderingEnabled
+//       render flag that tells the instance to let
+//       Unity do the rendering instead of WebRTC.
+//#define SKIP_UNITY_INTEGRATION
 
 namespace vonage {
     int GetRotation(OTVideoOrientation rotation){
@@ -57,7 +63,7 @@ namespace vonage {
 @end
 
 @implementation Renderer {
-    BOOL _renderingEnabled;
+    BOOL _unityRenderingEnabled;
     int64_t _current_timestamp;
 }
 
@@ -85,9 +91,14 @@ namespace vonage {
 #pragma mark - OTVideoRender
 
 -(instancetype)init{
+    return [self initWithUnityRenderingEnabled:NO];
+}
+
+-(instancetype)initWithUnityRenderingEnabled:(BOOL)unityRenderingEnabled {
     self = [super init];
     if(self){
         _current_timestamp = 0;
+        _unityRenderingEnabled = unityRenderingEnabled;
     }
     return self;
 }
@@ -161,6 +172,10 @@ namespace vonage {
                          augmentedSize:depthDataSize
                               rotation:static_cast<uint32_t>(vonage::GetRotation([frame orientation]))];
     [gUfw sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
+    if (_unityRenderingEnabled) {
+        // If Unity is in charge of rendering the app won't doit by using the WebRTC renderer so we bail out here.
+        return;
+    }
     std::unique_ptr<uint8_t[]> argbOutputData;
     uint32_t argbOutputDataSize = 0;
     [FrameworkLibAPI getOutputBufferCpp:argbOutputData size:argbOutputDataSize];
