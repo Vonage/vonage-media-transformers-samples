@@ -180,7 +180,7 @@
 				FFD5ADFB2B508A290022E578 /* Frameworks */,
 				FFD5ADFC2B508A290022E578 /* Resources */,
 				FFD5AE1D2B5091A60022E578 /* Embed Frameworks */,
-				0CEA65285D81D3ABDC30976F /* [CP] Copy Pods Resources */,
+				394D47169E864BB5C1077467 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -199,7 +199,7 @@
 				FFFFC1D32B57D5FE00BEB84E /* Sources */,
 				FFFFC1DA2B57D5FE00BEB84E /* Frameworks */,
 				FFFFC1DD2B57D5FE00BEB84E /* Resources */,
-				45D866280ABCB5C5ECC3C86A /* [CP] Copy Pods Resources */,
+				44E7D7D20319F162409391E7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -267,7 +267,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0CEA65285D81D3ABDC30976F /* [CP] Copy Pods Resources */ = {
+		394D47169E864BB5C1077467 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -284,7 +284,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-holo/Pods-holo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		45D866280ABCB5C5ECC3C86A /* [CP] Copy Pods Resources */ = {
+		44E7D7D20319F162409391E7 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (

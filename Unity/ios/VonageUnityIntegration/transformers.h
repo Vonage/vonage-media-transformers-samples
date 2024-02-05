@@ -18,16 +18,6 @@ public:
                             uint32_t& outputSize) = 0;
 };
 
-class TransformerObserver : public webrtc::BaseFrameTransformerObserver {
-public:
-    TransformerObserver();
-    virtual ~TransformerObserver();
-    
-    // BaseFrameTransformerObsever implementation.
-    void OnWarning(webrtc::MediaProcessorWarningCode code, const std::string& message) override;
-    void OnError(webrtc::MediaProcessorErrorCode code, const std::string& message) override;
-};
-
 class VonageUnityVideoTransformer : public webrtc::BaseFrameTransformer<webrtc::VideoFrame> {
 public:
     VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor);
@@ -35,7 +25,6 @@ public:
     
     // webrtc::BaseFrameTransformer
     void Transform(webrtc::VideoFrame* target_frame) override;
-    bool SetTransformerConfig(const vonage::MLTransformerBaseConfig* config) override;
     
 private:
     std::shared_ptr<DecompressAugmentedData> decompressor_;

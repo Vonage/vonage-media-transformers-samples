@@ -49,10 +49,6 @@ namespace vonage {
     VonageUnityVideoTransformer::~VonageUnityVideoTransformer() {
     }
 
-    bool VonageUnityVideoTransformer::SetTransformerConfig(const vonage::MLTransformerBaseConfig *config){
-        return true;
-    }
-
 /*
     -----------------------------------------------------------------------------------------------------------------------------------------------------
     |   In this function we send the video frame to be rendered by Unity through the following steps:                                                   |
