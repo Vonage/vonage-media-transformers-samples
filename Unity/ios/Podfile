@@ -7,7 +7,7 @@ target 'VonageUnityIntegration' do
     platform :ios, '13.0'
     project 'VonageUnityIntegration.xcodeproj'
     use_frameworks! :linkage => :static
-    pod 'VonageWebRTC', '= 99.13.0-dev.362'
+    pod 'VonageWebRTC', '= 99.13.0-dev.363'
 
 
 end

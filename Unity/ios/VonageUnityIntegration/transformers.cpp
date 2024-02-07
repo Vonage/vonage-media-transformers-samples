@@ -43,7 +43,7 @@ namespace vonage {
     }
 
     // VonageUnityVideoTransformer
-    VonageUnityVideoTransformer::VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor) : webrtc::BaseFrameTransformer<webrtc::VideoFrame>(observer), decompressor_(decompressor){
+    VonageUnityVideoTransformer::VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor, bool unity_rendering_enabled) : webrtc::BaseFrameTransformer<webrtc::VideoFrame>(observer), decompressor_(decompressor), unity_rendering_enabled_(unity_rendering_enabled){
     }
 
     VonageUnityVideoTransformer::~VonageUnityVideoTransformer() {
@@ -107,6 +107,10 @@ namespace vonage {
         // Tell Unity to update texture rendering using the updated input buffer
         [gUfw sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
          
+        if(unity_rendering_enabled_){
+            return;
+        }
+        
         //Get Unity 3D scene rendering as ARGB buffer
         std::unique_ptr<uint8_t[]> out_argb_data;
         uint32_t out_size = 0;

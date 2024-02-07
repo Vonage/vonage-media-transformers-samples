@@ -20,7 +20,7 @@ public:
 
 class VonageUnityVideoTransformer : public webrtc::BaseFrameTransformer<webrtc::VideoFrame> {
 public:
-    VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor);
+    VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor, bool unity_rendering_enabled);
     virtual ~VonageUnityVideoTransformer();
     
     // webrtc::BaseFrameTransformer
@@ -28,6 +28,7 @@ public:
     
 private:
     std::shared_ptr<DecompressAugmentedData> decompressor_;
+    bool unity_rendering_enabled_;
 };
 }
 
