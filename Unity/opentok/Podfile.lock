@@ -1,10 +1,10 @@
 PODS:
   - OTXCFramework (2.27.0-custom.0)
-  - VonageWebRTC (99.13.0-dev.362)
+  - VonageWebRTC (99.13.0-dev.363)
 
 DEPENDENCIES:
   - OTXCFramework (from `OTXCFramework.podspec`)
-  - VonageWebRTC (= 99.13.0-dev.362)
+  - VonageWebRTC (= 99.13.0-dev.363)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -15,9 +15,9 @@ EXTERNAL SOURCES:
     :podspec: OTXCFramework.podspec
 
 SPEC CHECKSUMS:
-  OTXCFramework: b483c4299e2803ae1a14abb60bd9ec8495d82171
-  VonageWebRTC: f37d8cfbcc8fa37266b227a062835407503d21da
+  OTXCFramework: e4a764c6baf2b217152915aaa1dc7ee2d71ddcb4
+  VonageWebRTC: 98eb353768476c6beef2ea92b576085b4fce027e
 
-PODFILE CHECKSUM: 8fd77467bac3a8651caec21c2d4b739d22577827
+PODFILE CHECKSUM: 9db23579cb27efacf4dfd9805ba7b5a780d66519
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.11.3

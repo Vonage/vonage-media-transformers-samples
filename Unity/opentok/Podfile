@@ -6,7 +6,7 @@ target 'holo' do
   platform :ios, '13.0'
   project 'holo/holo.xcodeproj'
   use_frameworks! :linkage => :static
-  pod 'VonageWebRTC', '= 99.13.0-dev.362'
+  pod 'VonageWebRTC', '= 99.13.0-dev.363'
   pod 'OTXCFramework', :podspec => 'OTXCFramework.podspec'
 end
 
@@ -14,6 +14,6 @@ target 'holosim' do
   platform :ios, '13.0'
   project 'holo/holo.xcodeproj'
   use_frameworks! :linkage => :static
-  pod 'VonageWebRTC', '= 99.13.0-dev.362'
+  pod 'VonageWebRTC', '= 99.13.0-dev.363'
   pod 'OTXCFramework', :podspec => 'OTXCFramework.podspec'
 end

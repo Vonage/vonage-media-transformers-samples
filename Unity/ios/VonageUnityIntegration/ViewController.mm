@@ -20,6 +20,22 @@
 
 #import "transformers.h"
 
+static const bool unity_rendering_enabled = false;
+
+@interface DummyVideoView : UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>
+- (void)renderFrame:(nullable RTC_OBJC_TYPE(RTCVideoFrame) *)frame;
+@end
+
+@implementation DummyVideoView
+
+- (void)renderFrame:(nullable RTC_OBJC_TYPE(RTCVideoFrame) *)frame {
+}
+
+- (void)setSize:(CGSize)size {
+}
+
+@end
+
 
 class GeneralObserver;
 
@@ -92,7 +108,12 @@ public:
     [super viewDidLoad];
     _view = [[UIView alloc] initWithFrame:CGRectZero];
     
-    _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
+    if(unity_rendering_enabled){
+        _remoteVideoView = [[DummyVideoView alloc] initWithFrame:CGRectZero];
+    }else{
+        _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
+    }
+    
     _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
     [_view addSubview:_remoteVideoView];
     
@@ -138,7 +159,7 @@ public:
         self->_local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
         self->_remote_sink = webrtc::ObjCToNativeVideoRenderer(self->_remoteVideoView);
         
-        self->transformer_ = std::make_shared<vonage::VonageUnityVideoTransformer>(self->_observer.get(), self->augmented_compress_);
+        self->transformer_ = std::make_shared<vonage::VonageUnityVideoTransformer>(self->_observer.get(), self->augmented_compress_, unity_rendering_enabled);
         
         if([self->_capturer isKindOfClass:[RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) class]]){
             RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)*)self->_capturer;
@@ -189,7 +210,7 @@ public:
                 depthFormat = filtered[0];
             }
             AVCaptureDeviceInput* device_input = [AVCaptureDeviceInput deviceInputWithDevice:selectedDevice error:&error];
-            [local_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:AVCaptureSessionPreset640x480 videoDeviceInput:device_input videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_32BGRA depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
+            [local_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:AVCaptureSessionPreset640x480 videoDeviceInput:device_input videoMirrored:YES pixelFormat:kCVPixelFormatType_32BGRA depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
                 if(!error){
                     rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
                     self->_webrtcHelper->init(video_track_source.get(), std::move(self->_local_sink), std::move(self->_remote_sink), self->transformer_, true);
