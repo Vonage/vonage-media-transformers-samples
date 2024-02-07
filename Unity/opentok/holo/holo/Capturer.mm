@@ -158,7 +158,7 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
             [self showCapturerError:err];
             return;
         }
-        [self->_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:self->_capturePreset videoDeviceInput:videoDeviceInput videoMirrored:YES orientation:AVCaptureVideoOrientationPortrait pixelFormat:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
+        [self->_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:self->_capturePreset videoDeviceInput:videoDeviceInput videoMirrored:YES  pixelFormat:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
             if(error){
                 OTError *err = [OTError errorWithDomain:OT_PUBLISHER_ERROR_DOMAIN
                                                    code:OTCapturerError
