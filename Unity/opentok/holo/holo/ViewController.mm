@@ -36,7 +36,7 @@ static NSString* const kToken = @"";
 
 static NSString* const kHoloRoomServiceServerIP = @"3.19.223.109";
 static NSString* const kHoloRoomServiceURI = @"https://3.19.223.109:8080/room/%@/info";
-static NSString* const kHoloRoomName = @"holo";
+static NSString* const kHoloRoomName = @"holoE";
 
 static double widgetHeight = 240;
 static double widgetWidth = 320;
@@ -139,9 +139,7 @@ static double widgetWidth = 320;
         [self doConnect];
         return;
     }
-    // TODO: Revert this when AMR is disabled for the application ID used by the room service.
-    //    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, kHoloRoomName]];
-    NSURL *url = [NSURL URLWithString:@"http://3.19.223.109:8080"];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, kHoloRoomName]];
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
@@ -156,10 +154,10 @@ static double widgetWidth = 320;
             NSError *parseError = nil;
             if (httpResponse.statusCode == 200) {
                 NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&parseError];
-                if ([dict objectForKey:@"applicationId"] &&
+                if ([dict objectForKey:@"apiKey"] &&
                     [dict objectForKey:@"sessionId"] &&
                     [dict objectForKey:@"token"]) {
-                    self->credentials.apiKey = [dict objectForKey:@"applicationId"];
+                    self->credentials.apiKey = [dict objectForKey:@"apiKey"];
                     self->credentials.sessionId = [dict objectForKey:@"sessionId"];
                     self->credentials.token = [dict objectForKey:@"token"];
                     self->_session = [[OTSession alloc] initWithApiKey:self->credentials.apiKey
