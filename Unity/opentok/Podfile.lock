@@ -1,5 +1,5 @@
 PODS:
-  - OTXCFramework (2.27.0-custom.0)
+  - OTXCFramework (2.27.0-custom.3)
   - VonageWebRTC (99.13.0-dev.363)
 
 DEPENDENCIES:
@@ -15,9 +15,9 @@ EXTERNAL SOURCES:
     :podspec: OTXCFramework.podspec
 
 SPEC CHECKSUMS:
-  OTXCFramework: e4a764c6baf2b217152915aaa1dc7ee2d71ddcb4
+  OTXCFramework: 76eb52f6afaf289d083719f32f57815a5c331b16
   VonageWebRTC: 98eb353768476c6beef2ea92b576085b4fce027e
 
 PODFILE CHECKSUM: 9db23579cb27efacf4dfd9805ba7b5a780d66519
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.14.3
