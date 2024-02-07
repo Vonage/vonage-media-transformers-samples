@@ -235,11 +235,12 @@ typedef NS_ENUM(int32_t, OTCapturerErrorCode) {
         }
 #endif
         // TODO: Review the way we build the timestamp we provide through CMTimeMake (not sure is correct).
-        [_videoCaptureConsumer consumeImageBuffer:buffer
-                                      orientation:orientation
-                                        timestamp: CMTimeMake([videoFrame timeStampNs], CMTimeScale(NSEC_PER_SEC))
-                                         metadata:data];
-
+        if (![_videoCaptureConsumer consumeImageBuffer:buffer
+                                           orientation:orientation
+                                             timestamp: CMTimeMake([videoFrame timeStampNs], CMTimeScale(NSEC_PER_SEC))
+                                              metadata:data]) {
+            NSLog(@"[holo]: Capturer %p Failed to provide frame %p", self, videoFrame);
+        }
     }
 }
 
