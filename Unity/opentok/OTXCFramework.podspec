@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "OTXCFramework"
-  s.version      = "2.27.0-custom.0"
+  s.version      = "2.27.0-custom.3"
   s.summary      = "OpenTok lets you weave interactive live WebRTC video streaming right into your application"
   s.description  = <<-DESC
                    The OpenTok iOS SDK lets you use WebRTC video sessions in apps you build for iPad,
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
 
   s.platform     = :ios
   s.ios.deployment_target = '13.0'
-  s.source       = { :http => 'file:' + __dir__ + '/OpenTok-4af7028dc.xcframework.zip' }
+  s.source       = { :http => 'file:' + __dir__ + '/OpenTok-436d504.xcframework.zip' }
   s.resources = 'OpenTok.xcframework/ios-arm64/**/*.tflite'
   s.vendored_frameworks = "OpenTok.xcframework"
   s.frameworks   = "Foundation", "AVFoundation", "AudioToolbox", "CoreFoundation", "CoreGraphics",
