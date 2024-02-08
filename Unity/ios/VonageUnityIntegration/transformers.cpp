@@ -5,10 +5,12 @@
 #include <api/video/i420_buffer.h>
 #include <api/video/video_frame.h>
 #include <rtc_base/logging.h>
+#include <rtc_base/time_utils.h>
 #include <modules/video_coding/codecs/multiplex/include/augmented_video_frame_buffer.h>
 
 #include <third_party/libyuv/include/libyuv.h>
 #include <UnityFramework/NativeCallProxy.h>
+#include <numeric>
 
 namespace vonage {
 
@@ -43,7 +45,7 @@ namespace vonage {
     }
 
     // VonageUnityVideoTransformer
-    VonageUnityVideoTransformer::VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor, bool unity_rendering_enabled) : webrtc::BaseFrameTransformer<webrtc::VideoFrame>(observer), decompressor_(decompressor), unity_rendering_enabled_(unity_rendering_enabled){
+    VonageUnityVideoTransformer::VonageUnityVideoTransformer(webrtc::BaseFrameTransformerObserver* observer, std::shared_ptr<DecompressAugmentedData> decompressor, bool unity_rendering_enabled, UnityFramework* unity_framework) : webrtc::BaseFrameTransformer<webrtc::VideoFrame>(observer), decompressor_(decompressor), unity_rendering_enabled_(unity_rendering_enabled), unity_framework_(unity_framework){
     }
 
     VonageUnityVideoTransformer::~VonageUnityVideoTransformer() {
@@ -102,10 +104,11 @@ namespace vonage {
                            input_width,
                            input_heigth);
         
+        int64_t start = rtc::TimeNanos();
         // Send converted ARGB video frame buffer to Unity
         [FrameworkLibAPI setInputBufferCpp:in_argb_data.get() rgbSize:(input_num_bytes) augmentedBuffer:augmented_data.get() augmentedSize:augmented_size rotation:GetRotation(target_frame->rotation())];
         // Tell Unity to update texture rendering using the updated input buffer
-        [gUfw sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
+        [unity_framework_ sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
          
         if(unity_rendering_enabled_){
             return;
@@ -116,6 +119,12 @@ namespace vonage {
         uint32_t out_size = 0;
         [FrameworkLibAPI getOutputBufferCpp:out_argb_data size:out_size];
       
+        time_gap_.emplace_back(rtc::TimeNanos() - start);
+        
+        if(time_gap_.size() % 300 == 0){
+            int64_t sum = std::accumulate(time_gap_.begin(), time_gap_.end(), 0);
+            printf("mini123 avg: %.5f size: %zu\r\n", (double)sum / time_gap_.size(), time_gap_.size());
+        }
         if(out_argb_data && out_size > 0)
         {
             uint32_t output_width = 0;
