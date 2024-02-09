@@ -18,9 +18,7 @@
 
 #import <AugmentedCompression.h>
 #import "transformers.h"
-#import <UnityFramework/UnityForwardDecls.h>
 #import <UnityFramework/DisplayManager.h>
-#import <UnityFramework/UnityView.h>
 
 int gArgc = 0;
 char** gArgv = nullptr;
@@ -72,7 +70,7 @@ public:
                   uint32_t& outputSize){
         return Holographic::Compression::compress(depthDataMap, outputArray, outputSize);
     }
-    
+
     bool decompress(const uint8_t* inputArray,
                     uint32_t inputSize,
                     std::unique_ptr<uint8_t[]>& outputArray,
@@ -104,7 +102,7 @@ public:
 
 @end
 
-@interface ViewController ()
+@interface ViewController () 
 @property(nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>* localVideoView;
 @property(nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>* remoteVideoView;
 @property(nonatomic) RTC_OBJC_TYPE(RTCVideoCapturer) * capturer;
@@ -171,137 +169,107 @@ public:
     self.view = _view;
 }
 
-- (void)viewWillLayoutSubviews{
-    [super viewWillLayoutSubviews];
-    
-}
-
-- (void)viewDidLayoutSubviews{
-    [super viewDidLayoutSubviews];
-    
-}
-
--(void)startWebrtc{
-#if TARGET_OS_SIMULATOR
-    self.capturer = [[RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer) alloc] init];
-#else
-    self.capturer = [[RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) alloc] init];
-    self->augmented_compress_ = std::make_shared<AugmentedCompress>();
-    self.depthDataCompress = [[DepthDataCompress alloc] initCompressor:self->augmented_compress_.get()];
-    RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)* local_capturer = static_cast<RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer*)>(self->_capturer);
-    [local_capturer updateDepthDelegate:self->_depthDataCompress];
-#endif
-    self->_local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
-    self->_remote_sink = webrtc::ObjCToNativeVideoRenderer(self->_remoteVideoView);
-    
-    self->transformer_ = std::make_shared<vonage::VonageUnityVideoTransformer>(self->_observer.get(), self->augmented_compress_, unity_rendering_enabled, self->_unityFramework);
-    
-    if([self->_capturer isKindOfClass:[RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) class]]){
-        RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)*)self->_capturer;
-        AVCaptureDeviceType deviceType = AVCaptureDeviceTypeBuiltInTrueDepthCamera;
-        AVCaptureDeviceDiscoverySession* deviceDiscoverySession = [AVCaptureDeviceDiscoverySession
-                                                                   discoverySessionWithDeviceTypes:@[ deviceType ]
-                                                                   mediaType:AVMediaTypeVideo
-                                                                   position:AVCaptureDevicePositionFront];
-        AVCaptureDevice* selectedDevice =
-        [deviceDiscoverySession devices]
-        ? [deviceDiscoverySession devices].firstObject
-        : [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-        
-        AVCaptureDeviceFormat *selectedFormat = nil;
-        int targetWidth = 640;
-        int targetHeight = 480;
-        int currentDiff = INT_MAX;
-        NSArray<AVCaptureDeviceFormat *> *formats = [RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) supportedFormatsForDevice:selectedDevice];
-        for (AVCaptureDeviceFormat *format in formats) {
-            if([format.supportedDepthDataFormats count] == 0){
-                continue;
-            }
-            CMVideoDimensions dimension = CMVideoFormatDescriptionGetDimensions(format.formatDescription);
-            bool isCorrectFps = false;
-            for(AVFrameRateRange* frameRate in format.videoSupportedFrameRateRanges){
-                if(frameRate.maxFrameRate <= 60){
-                    isCorrectFps = true;
-                    break;
-                }
-            }
-            if(isCorrectFps){
-                int diff = abs(targetWidth - dimension.width) + abs(targetHeight - dimension.height);
-                if (diff < currentDiff) {
-                    selectedFormat = format;
-                    currentDiff = diff;
-                }
-            }
-        }
-        NSError* error;
-        
-        NSArray<AVCaptureDeviceFormat *> *depthFormats = selectedFormat.supportedDepthDataFormats;
-        NSArray<AVCaptureDeviceFormat *> *filtered = [depthFormats filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(AVCaptureDeviceFormat *evaluatedObject, NSDictionary<NSString *, id> *bindings) {
-            return CMFormatDescriptionGetMediaSubType(evaluatedObject.formatDescription) == kCVPixelFormatType_DepthFloat32 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).width == 640 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).height == 480;
-        }]];
-        
-        AVCaptureDeviceFormat* depthFormat = nil;
-        if([filtered count] == 1){
-            depthFormat = filtered[0];
-        }
-        AVCaptureDeviceInput* device_input = [AVCaptureDeviceInput deviceInputWithDevice:selectedDevice error:&error];
-        [local_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:AVCaptureSessionPreset640x480 videoDeviceInput:device_input videoMirrored:YES pixelFormat:kCVPixelFormatType_32BGRA depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
-            if(!error){
-                rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
-                self->_webrtcHelper->init(video_track_source.get(), std::move(self->_local_sink), std::move(self->_remote_sink), self->transformer_, true);
-                self->_webrtcHelper->requestStats();
-            }
-        }];
-    } else {
-        RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer)*)self->_capturer;
-        [local_capturer stopCapture];
-        rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
-        self->_webrtcHelper->init(video_track_source.get(), std::move(self->_local_sink), std::move(self->_remote_sink), self->transformer_, false);
-        self->_webrtcHelper->requestStats();
-    }
-}
-
 -(void)viewDidLoad {
     [super viewDidLoad];
     
     self->_unityQuit = NO;
     [self initUnity];
     [self updateViews];
-    [self startWebrtc];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
+    [[[[self unityFramework] appController] rootViewController] viewDidAppear:animated];
+//    [super viewDidAppear:animated];
     
-    [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self->_localVideoView removeFromSuperview];
-            [[[[self unityFramework] appController] unityView]addSubview:self->_localVideoView];
-        });
-    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)) , dispatch_get_main_queue(), ^() {
+#if TARGET_OS_SIMULATOR
+        self.capturer = [[RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer) alloc] init];
+#else
+        self.capturer = [[RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) alloc] init];
+        self->augmented_compress_ = std::make_shared<AugmentedCompress>();
+        self.depthDataCompress = [[DepthDataCompress alloc] initCompressor:self->augmented_compress_.get()];
+        RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)* local_capturer = static_cast<RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer*)>(self->_capturer);
+        [local_capturer updateDepthDelegate:self->_depthDataCompress];
+#endif
+        self->_local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
+        self->_remote_sink = webrtc::ObjCToNativeVideoRenderer(self->_remoteVideoView);
+        
+        self->transformer_ = std::make_shared<vonage::VonageUnityVideoTransformer>(self->_observer.get(), self->augmented_compress_, unity_rendering_enabled, self->_unityFramework);
+        
+        if([self->_capturer isKindOfClass:[RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) class]]){
+            RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)*)self->_capturer;
+            AVCaptureDeviceType deviceType = AVCaptureDeviceTypeBuiltInTrueDepthCamera;
+            AVCaptureDeviceDiscoverySession* deviceDiscoverySession = [AVCaptureDeviceDiscoverySession
+                                                                       discoverySessionWithDeviceTypes:@[ deviceType ]
+                                                                       mediaType:AVMediaTypeVideo
+                                                                       position:AVCaptureDevicePositionFront];
+            AVCaptureDevice* selectedDevice =
+            [deviceDiscoverySession devices]
+            ? [deviceDiscoverySession devices].firstObject
+            : [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+            
+            AVCaptureDeviceFormat *selectedFormat = nil;
+            int targetWidth = 640;
+            int targetHeight = 480;
+            int currentDiff = INT_MAX;
+            NSArray<AVCaptureDeviceFormat *> *formats = [RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) supportedFormatsForDevice:selectedDevice];
+            for (AVCaptureDeviceFormat *format in formats) {
+                if([format.supportedDepthDataFormats count] == 0){
+                    continue;
+                }
+                CMVideoDimensions dimension = CMVideoFormatDescriptionGetDimensions(format.formatDescription);
+                bool isCorrectFps = false;
+                for(AVFrameRateRange* frameRate in format.videoSupportedFrameRateRanges){
+                    if(frameRate.maxFrameRate <= 60){
+                        isCorrectFps = true;
+                        break;
+                    }
+                }
+                if(isCorrectFps){
+                    int diff = abs(targetWidth - dimension.width) + abs(targetHeight - dimension.height);
+                    if (diff < currentDiff) {
+                        selectedFormat = format;
+                        currentDiff = diff;
+                    }
+                }
+            }
+            NSError* error;
+            
+            NSArray<AVCaptureDeviceFormat *> *depthFormats = selectedFormat.supportedDepthDataFormats;
+            NSArray<AVCaptureDeviceFormat *> *filtered = [depthFormats filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(AVCaptureDeviceFormat *evaluatedObject, NSDictionary<NSString *, id> *bindings) {
+                return CMFormatDescriptionGetMediaSubType(evaluatedObject.formatDescription) == kCVPixelFormatType_DepthFloat32 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).width == 640 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).height == 480;
+            }]];
+
+            AVCaptureDeviceFormat* depthFormat = nil;
+            if([filtered count] == 1){
+                depthFormat = filtered[0];
+            }
+            AVCaptureDeviceInput* device_input = [AVCaptureDeviceInput deviceInputWithDevice:selectedDevice error:&error];
+            [local_capturer startWithDevice:selectedDevice format:selectedFormat sessionPreset:AVCaptureSessionPreset640x480 videoDeviceInput:device_input videoMirrored:YES pixelFormat:kCVPixelFormatType_32BGRA depthFormat:depthFormat CompletionHandler:^(NSError * _Nullable error) {
+                if(!error){
+                    rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
+                    self->_webrtcHelper->init(video_track_source.get(), std::move(self->_local_sink), std::move(self->_remote_sink), self->transformer_, true);
+                    self->_webrtcHelper->requestStats();
+                }
+            }];
+        } else {
+            RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer)*)self->_capturer;
+            [local_capturer stopCapture];
+            rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_track_source = webrtc::ObjCToNativeVideoCapturer(self->_capturer, self->_webrtcHelper->getSignalingThread(), self->_webrtcHelper->getWorkerThread());
+            self->_webrtcHelper->init(video_track_source.get(), std::move(self->_local_sink), std::move(self->_remote_sink), self->transformer_, false);
+            self->_webrtcHelper->requestStats();
+        }
+    });
+    [[[[self unityFramework] appController] rootViewController] viewDidAppear:animated];
 }
 
--(void)dealloc{
+-(void) viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
     if(![self unityIsInitialized]) {
         NSLog(@"Unity is not initialized. Initialize Unity first");
     } else {
         [UnityFrameworkLoad() unloadApplication];
     }
-}
-
--(void) viewDidDisappear:(BOOL)animated{
-    [super viewDidDisappear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear: animated];
-    
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear: animated];
-    
 }
 
 - (void)onStats:(NSString*)stats {
@@ -315,11 +283,7 @@ public:
         [_statsLabel removeFromSuperview];
         [_statsLabel setText:stats];
         [_statsLabel setNumberOfLines:0];
-        if(unity_rendering_enabled){
-            [[[[self unityFramework] appController] unityView]addSubview:_statsLabel];
-        }else{
-            [self.view addSubview:_statsLabel];
-        }
+        [self.view addSubview:_statsLabel];
     });
 }
 
@@ -388,7 +352,7 @@ public:
     }
     void OnError(uint8_t code, const std::string& message) override {
         RTC_LOG_T_F(LS_ERROR) << "TransformerObserver code: " << code << " message: " << message;
-        
+
     }
     void OnStats(const std::string& stats) override{
         NSString* res;
