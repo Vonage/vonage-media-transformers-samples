@@ -64,6 +64,7 @@ namespace vonage {
 
 @implementation Renderer {
     BOOL _unityRenderingEnabled;
+    UnityFramework* _unity;
     int64_t _current_timestamp;
 }
 
@@ -90,15 +91,12 @@ namespace vonage {
 
 #pragma mark - OTVideoRender
 
--(instancetype)init{
-    return [self initWithUnityRenderingEnabled:NO];
-}
-
--(instancetype)initWithUnityRenderingEnabled:(BOOL)unityRenderingEnabled {
+- (instancetype)initWithUnityRenderingEnabled:(BOOL)unityRenderingEnabled unity:(nonnull UnityFramework *)unity {
     self = [super init];
     if(self){
         _current_timestamp = 0;
         _unityRenderingEnabled = unityRenderingEnabled;
+        _unity = unity;
     }
     return self;
 }
@@ -171,7 +169,7 @@ namespace vonage {
                        augmentedBuffer:depthData.get()
                          augmentedSize:depthDataSize
                               rotation:static_cast<uint32_t>(vonage::GetRotation([frame orientation]))];
-    [gUfw sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
+    [_unity sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
     if (_unityRenderingEnabled) {
         // If Unity is in charge of rendering the app won't doit by using the WebRTC renderer so we bail out here.
         return;

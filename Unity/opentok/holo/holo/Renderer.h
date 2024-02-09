@@ -3,6 +3,8 @@
 #import <sdk/objc/components/renderer/metal/RTCMTLRenderer.h>
 #import <sdk/objc/components/renderer/metal/RTCMTLVideoView.h>
 
+#include <UnityFramework/UnityFramework.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol RendererDelegate;
@@ -12,8 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL mirroring;
 @property (nonatomic, assign) BOOL renderingEnabled;
 
--(instancetype)init;
--(instancetype)initWithUnityRenderingEnabled:(BOOL)unityRenderingEnabled;
+-(instancetype)initWithUnityRenderingEnabled:(BOOL)unityRenderingEnabled unity:(UnityFramework*)unity;
 
 -(void)updateView:(nullable RTC_OBJC_TYPE(RTCMTLVideoView)*)videoView;
 -(void)updateDelegate:(nullable id<RendererDelegate>)delegate;

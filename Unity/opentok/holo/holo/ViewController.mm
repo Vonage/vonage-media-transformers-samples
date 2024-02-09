@@ -1,12 +1,14 @@
 #import "ViewController.h"
 
-#import <TargetConditionals.h>
-
 #import <OpenTok/OpenTok.h>
 
 #import <sdk/objc/components/renderer/metal/RTCMTLVideoView.h>
 
 #if !(TARGET_IPHONE_SIMULATOR)
+#import <UnityFramework/UnityForwardDecls.h>
+#import <UnityFramework/DisplayManager.h>
+#import <UnityFramework/UnityView.h>
+
 #import "Capturer.h"
 #import "Renderer.h"
 #endif
@@ -25,6 +27,9 @@ typedef struct {
     NSString* token;
 } HoloCredentials;
 
+int gArgc = 0;
+char** gArgv = nullptr;
+
 // *** Fill the following variables using your own Project info  ***
 // ***          https://dashboard.tokbox.com/projects            ***
 // Replace with your OpenTok API key
@@ -41,13 +46,40 @@ static NSString* const kHoloRoomName = @"holoE";
 static double widgetHeight = 240;
 static double widgetWidth = 320;
 
+static Boolean const kUnityRenderingEnabled = YES;
+
+#if !(TARGET_IPHONE_SIMULATOR)
+#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+UnityFramework* UnityFrameworkLoad() {
+    NSString* bundlePath = nil;
+    bundlePath = [[NSBundle mainBundle] bundlePath];
+    bundlePath = [bundlePath stringByAppendingString: @"/Frameworks/UnityFramework.framework"];
+
+    NSBundle* bundle = [NSBundle bundleWithPath: bundlePath];
+    if ([bundle isLoaded] == false) [bundle load];
+
+    UnityFramework* ufw = [bundle.principalClass getInstance];
+    if (![ufw appController])
+    {
+        // unity is not initialized
+        [ufw setExecuteHeader: &_mh_execute_header];
+    }
+    return ufw;
+}
+#endif
+#endif
+
 @interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate, OTPublisherKitRtcStatsReportDelegate, OTSubscriberKitRtcStatsReportDelegate>
 @property (nonatomic) OTSession *session;
 @property (nonatomic) OTPublisher *publisher;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *remoteVideoView;
 #if !(TARGET_IPHONE_SIMULATOR)
+#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+@property(nonatomic) UnityFramework* unityFramework;
+@property(nonatomic) BOOL unityQuit;
 @property (nonatomic) Renderer *renderer;
+#endif
 #endif
 @property (nonatomic) OTSubscriber *subscriber;
 @property (nonatomic) UILabel* publisherStatsLabel;
@@ -56,6 +88,11 @@ static double widgetWidth = 320;
 
 @implementation ViewController {
     UIView *_view;
+#if !(TARGET_IPHONE_SIMULATOR)
+#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+    UIView *_unityView;
+#endif
+#endif
     HoloCredentials credentials;
     BOOL sender;
     uint8_t _participantsNumber;
@@ -63,24 +100,81 @@ static double widgetWidth = 320;
 
 #pragma mark - View lifecycle
 
-- (void)loadView {
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    sender = YES;
+    UIAlertController *alert = [UIAlertController
+                                alertControllerWithTitle:@"Role"
+                                message:@"Select one rol please"
+                                preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* senderButton = [UIAlertAction
+                                   actionWithTitle:@"Sender"
+                                   style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction * action) {
+        [self updateViews];
+        self->sender = YES;
+        [self doInit];
+    }];
+    UIAlertAction* receiverButton = [UIAlertAction
+                                     actionWithTitle:@"Receiver"
+                                     style:UIAlertActionStyleDefault
+                                     handler:^(UIAlertAction * action) {
+#if !(TARGET_IPHONE_SIMULATOR)
+#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+        self->_unityQuit = NO;
+        [self initUnity];
+#endif
+#endif
+        [self updateViews];
+        self->sender = FALSE;
+        [self doInit];
+    }];
+    [alert addAction:senderButton];
+    [alert addAction:receiverButton];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self presentViewController:alert animated:YES completion:nil];
+    });
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear: animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+}
+
+- (void)updateViews {
     _view = [[UIView alloc] initWithFrame:CGRectZero];
-    _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
-    _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_view addSubview:_remoteVideoView];
+
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+    if ((sender == NO) && kUnityRenderingEnabled) {
+        _unityView = [[[[self unityFramework] appController] mainDisplay] view];
+        [_view addSubview:_unityView];
+        [[[[self unityFramework] appController] mainDisplay] shouldShowWindow:YES];
+    } else {
+#endif
+        _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
+        _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_view addSubview:_remoteVideoView];
+
+        UILayoutGuide *remoteMargin = _view.layoutMarginsGuide;
+        [_remoteVideoView.leadingAnchor constraintEqualToAnchor:remoteMargin.leadingAnchor].active = YES;
+        [_remoteVideoView.topAnchor constraintEqualToAnchor:remoteMargin.topAnchor].active = YES;
+        [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remoteMargin.trailingAnchor].active = YES;
+        [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remoteMargin.bottomAnchor].active = YES;
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+    }
+#endif
 
     _localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
     _localVideoView.translatesAutoresizingMaskIntoConstraints = NO;
     [_view addSubview:_localVideoView];
 
-    UILayoutGuide *margin = _view.layoutMarginsGuide;
-    [_remoteVideoView.leadingAnchor constraintEqualToAnchor:margin.leadingAnchor].active = YES;
-    [_remoteVideoView.topAnchor constraintEqualToAnchor:margin.topAnchor].active = YES;
-    [_remoteVideoView.trailingAnchor constraintEqualToAnchor:margin.trailingAnchor].active = YES;
-    [_remoteVideoView.bottomAnchor constraintEqualToAnchor:margin.bottomAnchor].active = YES;
-
-    [_localVideoView.leadingAnchor constraintEqualToAnchor:margin.leadingAnchor constant:8.0].active = YES;
-    [_localVideoView.topAnchor constraintEqualToAnchor:margin.topAnchor constant:8.0].active = YES;
+    UILayoutGuide *localMargin = _view.layoutMarginsGuide;
+    [_localVideoView.leadingAnchor constraintEqualToAnchor:localMargin.leadingAnchor constant:8.0].active = YES;
+    [_localVideoView.topAnchor constraintEqualToAnchor:localMargin.topAnchor constant:8.0].active = YES;
     [_localVideoView.widthAnchor constraintEqualToConstant:120].active = YES;
     [_localVideoView.heightAnchor constraintEqualToConstant:120].active = YES;
 
@@ -97,35 +191,72 @@ static double widgetWidth = 320;
     self.view = _view;
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-
-    sender = YES;
-    UIAlertController *alert = [UIAlertController
-                                alertControllerWithTitle:@"Role"
-                                message:@"Select one rol please"
-                                preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction* yesButton = [UIAlertAction
-                                actionWithTitle:@"Sender"
-                                style:UIAlertActionStyleDefault
-                                handler:^(UIAlertAction * action) {
-        self->sender = YES;
-        [self doInit];
-    }];
-    UIAlertAction* noButton = [UIAlertAction
-                               actionWithTitle:@"Receiver"
-                               style:UIAlertActionStyleDefault
-                               handler:^(UIAlertAction * action) {
-        self->sender = FALSE;
-        [self doInit];
-    }];
-    [alert addAction:yesButton];
-    [alert addAction:noButton];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self presentViewController:alert animated:YES completion:nil];
-    });
+-(void) viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
 }
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear: animated];
+    [_session unsubscribe:_subscriber error:nil];
+    _subscriber = nil;
+    [_session unpublish:_publisher error:nil];
+    _publisher = nil;
+    [_session disconnect:nil];
+    _session = nil;
+}
+
+-(void)dealloc {
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+    if (![self unityIsInitialized]) {
+        NSLog(@"Unity is not initialized. Initialize Unity first.");
+    } else {
+        [UnityFrameworkLoad() unloadApplication];
+    }
+#endif
+}
+
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+
+- (bool)unityIsInitialized {
+    return [self unityFramework] && [[self unityFramework] appController];
+}
+
+- (void)initUnity {
+    if ([self unityIsInitialized]) {
+        NSLog(@"Unity already initialized. Unload Unity first");
+        return;
+    }
+
+    if (self->_unityQuit) {
+        NSLog(@"Unity cannot be initialized after quit. Use unload instead");
+        return;
+    }
+
+    self->_unityFramework = UnityFrameworkLoad();
+
+    // Set UnityFramework target for Unity-iPhone/Data folder to make Data part of a UnityFramework.framework and uncomment call to setDataBundleId
+    // ODR is not supported in this case, ( if you need embedded and ODR you need to copy data )
+    [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
+    [[self unityFramework] registerFrameworkListener: self];
+
+    NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
+    [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
+}
+
+- (void)unityDidUnload:(NSNotification*)notification {
+    NSLog(@"unityDidUnload called");
+    [[self unityFramework] unregisterFrameworkListener: self];
+    self->_unityFramework = nil;
+}
+
+- (void)unityDidQuit:(NSNotification*)notification {
+    NSLog(@"unityDidQuit called");
+    [[self unityFramework] unregisterFrameworkListener: self];
+    self->_unityFramework = nil;
+    self->_unityQuit = YES;
+}
+
+#endif
 
 - (void)doInit {
     //    [[OpenTokLogger alloc] init];
@@ -185,6 +316,7 @@ static double widgetWidth = 320;
 - (BOOL)shouldAutorotate {
     return UIUserInterfaceIdiomPhone != [[UIDevice currentDevice] userInterfaceIdiom];
 }
+
 #pragma mark - OpenTok methods
 
 /**
@@ -253,18 +385,16 @@ static double widgetWidth = 320;
  */
 - (void)doSubscribe:(OTStream*)stream
 {
-#if !(TARGET_IPHONE_SIMULATOR)
-#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
-    _renderer = [[Renderer alloc] initWithUnityRenderingEnabled:YES];
-    [_renderer updateView:_remoteVideoView];
-#endif
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+    _renderer = [[Renderer alloc] initWithUnityRenderingEnabled:kUnityRenderingEnabled unity:_unityFramework];
+    if (!kUnityRenderingEnabled) {
+        [_renderer updateView:_remoteVideoView];
+    }
 #endif
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
     _subscriber.rtcStatsReportDelegate = self;
-#if !(TARGET_IPHONE_SIMULATOR)
-#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
     [_subscriber setVideoRender:_renderer];
-#endif
 #endif
 
     OTError *error = nil;
@@ -448,16 +578,6 @@ didFailWithError:(OTError*)error
     });
 }
 
--(void) viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    [_session unsubscribe:_subscriber error:nil];
-    _subscriber = nil;
-    [_session unpublish:_publisher error:nil];
-    _publisher = nil;
-    [_session disconnect:nil];
-    _session = nil;
-}
-
 - (void) URLSession:(NSURLSession *)session
 didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
   completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
@@ -539,10 +659,19 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     [_subscriberStatsLabel removeFromSuperview];
     [_subscriberStatsLabel setText:stats];
     [_subscriberStatsLabel setNumberOfLines:0];
-#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
-    [_remoteVideoView addSubview:_subscriberStatsLabel];
-#else
+
+#if (TARGET_IPHONE_SIMULATOR)
     [_subscriber.view addSubview:_subscriberStatsLabel];
+#else
+#ifdef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+    [_subscriber.view addSubview:_subscriberStatsLabel];
+#else
+    if (kUnityRenderingEnabled) {
+        [_unityView addSubview:_subscriberStatsLabel];
+    } else {
+        [_subscriber.view addSubview:_subscriberStatsLabel];
+    }
+#endif
 #endif
 }
 
