@@ -6,9 +6,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <UnityFramework/UnityFramework.h>
 
-@interface ViewController : UIViewController<UnityFrameworkListener>
+@interface ViewController : UIViewController
+
 
 @end
 

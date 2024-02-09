@@ -17,31 +17,10 @@
 #import <sdk/objc/base/RTCMacros.h>
 
 #import <AugmentedCompression.h>
+
 #import "transformers.h"
-#import <UnityFramework/DisplayManager.h>
 
-int gArgc = 0;
-char** gArgv = nullptr;
-
-static const bool unity_rendering_enabled = true;
-
-UnityFramework* UnityFrameworkLoad()
-{
-    NSString* bundlePath = nil;
-    bundlePath = [[NSBundle mainBundle] bundlePath];
-    bundlePath = [bundlePath stringByAppendingString: @"/Frameworks/UnityFramework.framework"];
-    
-    NSBundle* bundle = [NSBundle bundleWithPath: bundlePath];
-    if ([bundle isLoaded] == false) [bundle load];
-    
-    UnityFramework* ufw = [bundle.principalClass getInstance];
-    if (![ufw appController])
-    {
-        // unity is not initialized
-        [ufw setExecuteHeader: &_mh_execute_header];
-    }
-    return ufw;
-}
+static const bool unity_rendering_enabled = false;
 
 @interface DummyVideoView : UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>
 - (void)renderFrame:(nullable RTC_OBJC_TYPE(RTCVideoFrame) *)frame;
@@ -102,16 +81,13 @@ public:
 
 @end
 
-@interface ViewController () 
+@interface ViewController ()
 @property(nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>* localVideoView;
 @property(nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>* remoteVideoView;
 @property(nonatomic) RTC_OBJC_TYPE(RTCVideoCapturer) * capturer;
 @property(nonatomic) DepthDataCompress* depthDataCompress;
-@property(nonatomic) UILabel* statsLabel;
-@property(nonatomic) UnityFramework* unityFramework;
-@property(nonatomic) BOOL unityQuit;
+@property (nonatomic) UILabel* statsLabel;
 
-+(UnityAppController*) getUnityAppController;
 - (void) onStats:(NSString*)stats;
 @end
 
@@ -127,27 +103,25 @@ public:
 
 @synthesize capturer = _capturer;
 @synthesize localVideoView = _localVideoView;
-@synthesize unityFramework = _unityFramework;
-@synthesize unityQuit = _unityQuit;
 
--(void)updateViews {
+- (void)viewDidLoad {
+    [super viewDidLoad];
     _view = [[UIView alloc] initWithFrame:CGRectZero];
     
     if(unity_rendering_enabled){
         _remoteVideoView = [[DummyVideoView alloc] initWithFrame:CGRectZero];
-        UIView* unity_view = [[[[self unityFramework] appController] mainDisplay] view];
-        [_view addSubview:unity_view];
-        [[[[self unityFramework] appController] mainDisplay] shouldShowWindow:YES];
     }else{
         _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
-        _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_view addSubview:_remoteVideoView];
-        UILayoutGuide *remote_margin = _view.layoutMarginsGuide;
-        [_remoteVideoView.leadingAnchor constraintEqualToAnchor:remote_margin.leadingAnchor].active = YES;
-        [_remoteVideoView.topAnchor constraintEqualToAnchor:remote_margin.topAnchor].active = YES;
-        [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remote_margin.trailingAnchor].active = YES;
-        [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remote_margin.bottomAnchor].active = YES;
     }
+    
+    _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_view addSubview:_remoteVideoView];
+    
+    UILayoutGuide *remote_margin = _view.layoutMarginsGuide;
+    [_remoteVideoView.leadingAnchor constraintEqualToAnchor:remote_margin.leadingAnchor].active = YES;
+    [_remoteVideoView.topAnchor constraintEqualToAnchor:remote_margin.topAnchor].active = YES;
+    [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remote_margin.trailingAnchor].active = YES;
+    [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remote_margin.bottomAnchor].active = YES;
     
     _localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectMake(5, 5, 100, 200)];
     _localVideoView.translatesAutoresizingMaskIntoConstraints = YES;
@@ -169,17 +143,8 @@ public:
     self.view = _view;
 }
 
--(void)viewDidLoad {
-    [super viewDidLoad];
-    
-    self->_unityQuit = NO;
-    [self initUnity];
-    [self updateViews];
-}
-
 - (void)viewDidAppear:(BOOL)animated {
-    [[[[self unityFramework] appController] rootViewController] viewDidAppear:animated];
-//    [super viewDidAppear:animated];
+    [super viewDidAppear:animated];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)) , dispatch_get_main_queue(), ^() {
 #if TARGET_OS_SIMULATOR
@@ -194,7 +159,7 @@ public:
         self->_local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
         self->_remote_sink = webrtc::ObjCToNativeVideoRenderer(self->_remoteVideoView);
         
-        self->transformer_ = std::make_shared<vonage::VonageUnityVideoTransformer>(self->_observer.get(), self->augmented_compress_, unity_rendering_enabled, self->_unityFramework);
+        self->transformer_ = std::make_shared<vonage::VonageUnityVideoTransformer>(self->_observer.get(), self->augmented_compress_, unity_rendering_enabled);
         
         if([self->_capturer isKindOfClass:[RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) class]]){
             RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)*)self->_capturer;
@@ -260,18 +225,7 @@ public:
             self->_webrtcHelper->requestStats();
         }
     });
-    [[[[self unityFramework] appController] rootViewController] viewDidAppear:animated];
 }
-
--(void) viewDidDisappear:(BOOL)animated{
-    [super viewDidDisappear:animated];
-    if(![self unityIsInitialized]) {
-        NSLog(@"Unity is not initialized. Initialize Unity first");
-    } else {
-        [UnityFrameworkLoad() unloadApplication];
-    }
-}
-
 - (void)onStats:(NSString*)stats {
     dispatch_sync(dispatch_get_main_queue(), ^{
         [NSTimer scheduledTimerWithTimeInterval:3 repeats:NO block:^(NSTimer * _Nonnull timer) {
@@ -285,52 +239,6 @@ public:
         [_statsLabel setNumberOfLines:0];
         [self.view addSubview:_statsLabel];
     });
-}
-
-- (bool)unityIsInitialized {
-    return [self unityFramework] && [[self unityFramework] appController];
-}
-
-- (void)initUnity
-{
-    if([self unityIsInitialized]) {
-        NSLog(@"Unity already initialized. Unload Unity first");
-        return;
-    }
-    
-    if(self->_unityQuit) {
-        NSLog(@"Unity cannot be initialized after quit. Use unload instead");
-        return;
-    }
-    
-    self->_unityFramework = UnityFrameworkLoad();
-    
-    // Set UnityFramework target for Unity-iPhone/Data folder to make Data part of a UnityFramework.framework and uncomment call to setDataBundleId
-    // ODR is not supported in this case, ( if you need embedded and ODR you need to copy data )
-    [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
-    [[self unityFramework] registerFrameworkListener: self];
-    
-    NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
-    [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
-}
-
-- (void)unityDidUnload:(NSNotification*)notification
-{
-    NSLog(@"unityDidUnload called");
-    [[self unityFramework] unregisterFrameworkListener: self];
-    self->_unityFramework = nil;
-}
-
-- (void)unityDidQuit:(NSNotification*)notification
-{
-    NSLog(@"unityDidQuit called");
-    [[self unityFramework] unregisterFrameworkListener: self];
-    self->_unityFramework = nil;
-    self->_unityQuit = YES;
-}
-
-+ (UnityAppController *)getUnityAppController {
-    return nil;
 }
 
 @end
