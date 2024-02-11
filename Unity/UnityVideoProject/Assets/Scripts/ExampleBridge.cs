@@ -67,7 +67,7 @@ public class ExampleBridge : MonoBehaviour
     byte[] inputAugmentedArray = new byte[inputNumAugmentedBytes];
     byte[] outputArray;
 
-    private Texture2D texture, texture2;
+    private Texture2D inputTexture, outputTexture;
     private RawImage img;
     Rect rect;
 
@@ -83,7 +83,7 @@ public class ExampleBridge : MonoBehaviour
         
 #endif
         img = myPlane.GetComponent<RawImage>();
-        texture = new Texture2D(inputWidth, inputHeight, TextureFormat.BGRA32, false)
+        inputTexture = new Texture2D(inputWidth, inputHeight, TextureFormat.BGRA32, false)
         {
             wrapMode = TextureWrapMode.Clamp,
             filterMode = FilterMode.Point,
@@ -106,10 +106,10 @@ public class ExampleBridge : MonoBehaviour
 #if !UNITY_WEBGL
             int rotation = getInputRotationCS();
 #endif
-            texture.LoadRawTextureData(inputArray);
+            inputTexture.LoadRawTextureData(inputArray);
 
-            texture.Apply(false);
-            img.texture = texture;
+            inputTexture.Apply(false);
+            img.texture = inputTexture;
             if(getUnityRendererCS() == false){
                 StartCoroutine(WaitAndCopyOutputArray());
             }
@@ -126,7 +126,7 @@ public class ExampleBridge : MonoBehaviour
             outputWidth = src_render_texture.width;
             outputHeight = src_render_texture.height;
             outputNumTexturePixels = outputWidth * outputHeight * 4;
-            texture2 = new Texture2D(outputWidth, outputHeight, TextureFormat.BGRA32, false);
+            outputTexture = new Texture2D(outputWidth, outputHeight, TextureFormat.BGRA32, false);
             rect = new Rect(0, 0, outputWidth, outputHeight);
             setOutputWidthCS((uint)outputWidth);
             setOutputHeightCS((uint)outputHeight);
@@ -135,10 +135,10 @@ public class ExampleBridge : MonoBehaviour
         }
 
         RenderTexture.active = src_render_texture;
-        texture2.ReadPixels(rect, 0, 0);
-        texture2.Apply();
+        outputTexture.ReadPixels(rect, 0, 0);
+        outputTexture.Apply(false);
         RenderTexture.active = null;
-        outputArray = texture2.GetRawTextureData();
+        outputArray = outputTexture.GetRawTextureData();
 
 #if !UNITY_WEBGL
         setOutputRotationCS(outputRotation);
