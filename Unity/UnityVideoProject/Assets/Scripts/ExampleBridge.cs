@@ -21,13 +21,10 @@ public class ExampleBridge : MonoBehaviour
 #else
 
     [DllImport("__Internal")]
-    private static extern void initInputBuffersCS(UInt32 rgb_size, UInt32 augmented_size);
+    private static extern void initInputBuffersCS(byte[] rgb_buffer, UInt32 rgb_size, byte[] augmented_buffer, UInt32 augmented_size);
 
     [DllImport("__Internal")]
-    private static extern void initOutputBufferCS(UInt32 size);
-
-    [DllImport("__Internal")]
-    private static extern void getInputBufferCS(byte[] outBuffer, byte[] outAugmentedBuffer);
+    private static extern void initOutputBufferCS(byte[] output_buffer, UInt32 size);
 
     [DllImport("__Internal")]
     private static extern int getInputRotationCS();
@@ -48,10 +45,10 @@ public class ExampleBridge : MonoBehaviour
     private static extern void setOutputHeightCS(UInt32 height);
 
     [DllImport("__Internal")]
-    private static extern void setOutputBufferDataCS(byte[] bufferData);
+    private static extern void setRoomNameAndRoleCS(byte[] roomName, bool isSender);
 
     [DllImport("__Internal")]
-    private static extern void setRoomNameAndRoleCS(byte[] roomName, bool isSender);
+    private static extern bool getUnityRendererCS();
 
 #endif
 
@@ -63,7 +60,7 @@ public class ExampleBridge : MonoBehaviour
     const int outputRotation = 90;
 
     private const int inputNumTexturePixels = inputWidth * inputHeight * 4;
-    private const int inputNumAugmentedBytes = inputWidth * inputHeight * 2;
+    private const int inputNumAugmentedBytes = inputWidth * inputHeight * 4;
     private int outputNumTexturePixels = 0;
 
     byte[] inputArray = new byte[inputNumTexturePixels];
@@ -82,7 +79,7 @@ public class ExampleBridge : MonoBehaviour
         setInputWidthCS(inputWidth);
         setInputHeightCS(inputHeight);
         
-        initInputBuffersCS(inputNumTexturePixels, inputNumAugmentedBytes);
+        initInputBuffersCS(inputArray, inputNumTexturePixels, inputAugmentedArray, inputNumAugmentedBytes);
         
 #endif
         img = myPlane.GetComponent<RawImage>();
@@ -108,14 +105,14 @@ public class ExampleBridge : MonoBehaviour
         {
 #if !UNITY_WEBGL
             int rotation = getInputRotationCS();
-            getInputBufferCS(inputArray, inputAugmentedArray);
 #endif
             texture.LoadRawTextureData(inputArray);
 
             texture.Apply(false);
             img.texture = texture;
-
-            StartCoroutine(WaitAndCopyOutputArray());
+            if(getUnityRendererCS() == false){
+                StartCoroutine(WaitAndCopyOutputArray());
+            }
         }
         catch (Exception ex)
         {
@@ -133,8 +130,8 @@ public class ExampleBridge : MonoBehaviour
             rect = new Rect(0, 0, outputWidth, outputHeight);
             setOutputWidthCS((uint)outputWidth);
             setOutputHeightCS((uint)outputHeight);
-            initOutputBufferCS((uint)outputNumTexturePixels);
             outputArray = new byte[outputNumTexturePixels];
+            initOutputBufferCS(outputArray, (uint)outputNumTexturePixels);
         }
 
         RenderTexture.active = src_render_texture;
@@ -145,7 +142,6 @@ public class ExampleBridge : MonoBehaviour
 
 #if !UNITY_WEBGL
         setOutputRotationCS(outputRotation);
-        setOutputBufferDataCS(outputArray);
 #endif
     }
 

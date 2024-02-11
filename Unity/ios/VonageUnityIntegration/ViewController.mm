@@ -352,6 +352,7 @@ static UnityAppController* unityAppController = nullptr;
     // ODR is not supported in this case, ( if you need embedded and ODR you need to copy data )
     [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
     [[self unityFramework] registerFrameworkListener: self];
+    [FrameworkLibAPI setUnityRenderer:unity_rendering_enabled];
     
     NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
     [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
