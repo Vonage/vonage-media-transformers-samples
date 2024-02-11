@@ -15,8 +15,6 @@ This sample application shows how to use insertable streams (video) in ios app t
 - Open the generated project `Unity-iPhone.xcodeproj`.
 - In file inspector select Data folder and set target membership to `UnityFramework`.
 - In file inspector select `Libraries/Plugins/iOS/NativeCallProxy.h` and set target membership to `UnityFramework` and `Public`.
-- In file inspector select `DisplayManager.h` and set target membership to `UnityFramework` and `Public`.
-- In file inspector select `UnityRendering.h` and set target membership to `UnityFramework` and `Public`.
 - In file inspector select `LifeCycleListener.h` change this code:
 ```
 void UnityRegisterLifeCycleListener(id<LifeCycleListener> obj);

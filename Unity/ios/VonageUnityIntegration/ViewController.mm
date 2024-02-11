@@ -18,7 +18,6 @@
 
 #import <AugmentedCompression.h>
 #import "transformers.h"
-#import <UnityFramework/DisplayManager.h>
 #include <UnityFramework/NativeCallProxy.h>
 
 int gArgc = 0;
@@ -137,10 +136,10 @@ static UnityAppController* unityAppController = nullptr;
 -(void)updateViews {
     _modifiedView = [[UIView alloc] initWithFrame:CGRectZero];
     
+    _localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectMake(5, 5, 100, 200)];
     if(unity_rendering_enabled){
         _remoteVideoView = [[DummyVideoView alloc] initWithFrame:CGRectZero];
         unityAppController = [[self unityFramework] appController];
-        [[[[self unityFramework] appController] mainDisplay] shouldShowWindow:YES];
     }else{
         _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
         _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -150,25 +149,21 @@ static UnityAppController* unityAppController = nullptr;
         [_remoteVideoView.topAnchor constraintEqualToAnchor:remote_margin.topAnchor].active = YES;
         [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remote_margin.trailingAnchor].active = YES;
         [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remote_margin.bottomAnchor].active = YES;
+        _localVideoView.translatesAutoresizingMaskIntoConstraints = YES;
+        [_modifiedView addSubview:_localVideoView];
+        
+        UILayoutGuide *local_margin = _modifiedView.layoutMarginsGuide;
+        [_localVideoView.leadingAnchor constraintEqualToAnchor:local_margin.leadingAnchor].active = YES;
+        [_localVideoView.topAnchor constraintEqualToAnchor:local_margin.topAnchor].active = YES;
+        [_localVideoView.trailingAnchor constraintEqualToAnchor:local_margin.trailingAnchor].active = YES;
+        [_localVideoView.bottomAnchor constraintEqualToAnchor:local_margin.bottomAnchor].active = YES;
     }
-    
-    _localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectMake(5, 5, 100, 200)];
-    _localVideoView.translatesAutoresizingMaskIntoConstraints = YES;
-    [_modifiedView addSubview:_localVideoView];
-    
-    UILayoutGuide *local_margin = _modifiedView.layoutMarginsGuide;
-    [_localVideoView.leadingAnchor constraintEqualToAnchor:local_margin.leadingAnchor].active = YES;
-    [_localVideoView.topAnchor constraintEqualToAnchor:local_margin.topAnchor].active = YES;
-    [_localVideoView.trailingAnchor constraintEqualToAnchor:local_margin.trailingAnchor].active = YES;
-    [_localVideoView.bottomAnchor constraintEqualToAnchor:local_margin.bottomAnchor].active = YES;
     
     _statsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
     [_statsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
     [_statsLabel setTextColor:[UIColor whiteColor]];
     [_statsLabel setBackgroundColor:[UIColor clearColor]];
     
-    self->_observer = std::make_unique<GeneralObserver>(self);
-    self->_webrtcHelper = new rtc::RefCountedObject<WebRTCHelper>(self->_observer.get());
     self.view = _modifiedView;
 }
 
@@ -182,6 +177,8 @@ static UnityAppController* unityAppController = nullptr;
 
 -(void)startWebrtc{
     dispatch_async(dispatch_get_main_queue(), ^{
+        self->_observer = std::make_unique<GeneralObserver>(self);
+        self->_webrtcHelper = new rtc::RefCountedObject<WebRTCHelper>(self->_observer.get());
 #if TARGET_OS_SIMULATOR
         self.capturer = [[RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer) alloc] init];
 #else
