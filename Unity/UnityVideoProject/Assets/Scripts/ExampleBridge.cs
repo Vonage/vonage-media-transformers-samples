@@ -51,9 +51,6 @@ public class ExampleBridge : MonoBehaviour
     private static extern void setOutputBufferDataCS(byte[] bufferData);
 
     [DllImport("__Internal")]
-    private static extern bool isNewBufferDataAvailable();
-
-    [DllImport("__Internal")]
     private static extern void setRoomNameAndRoleCS(byte[] roomName, bool isSender);
 
 #endif

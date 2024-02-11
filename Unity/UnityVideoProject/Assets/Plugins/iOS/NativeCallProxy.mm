@@ -23,7 +23,6 @@ public:
         outputArraySize_ = 0;
         inputRotation_ = outputRotation_ = 0;
         inputWidth_ = inputHeight_ = outputWidth_ = outputHeight_ = 0;
-        newBufferDataAvailable_ = false;
     }
     
     void getOutput(std::unique_ptr<uint8_t[]>& buffer, uint32_t& size){
@@ -34,16 +33,6 @@ public:
             buffer = std::make_unique<uint8_t[]>(outputArraySize_);
             memcpy(buffer.get(), outputArray_.get(), outputArraySize_ * sizeof(uint8_t));
         }
-    }
-
-    bool isNewBufferDataAvailable()
-    {
-        return newBufferDataAvailable_;
-    }
-
-    void setNewBufferDataAvailable(bool value)
-    {
-        newBufferDataAvailable_ = value;
     }
     
     void initInputBuffer(uint32_t rgb_size, uint32_t augmented_size){
@@ -170,8 +159,6 @@ private:
     uint32_t inputHeight_;
     uint32_t outputWidth_;
     uint32_t outputHeight_;
-    
-    bool newBufferDataAvailable_;  
 };
 
 unityBridgePtr unityBridge::instance_ = std::make_shared<unityBridge>();
@@ -188,7 +175,6 @@ extern "C"{
 
     void __stdcall getInputBufferCS(uint8_t* outBuffer, uint8_t* outAugmentedBuffer){
         unityBridge::getBridge()->copyInputArray(outBuffer, outAugmentedBuffer);
-        unityBridge::getBridge()->setNewBufferDataAvailable(false);
     }
 
     int __stdcall getInputRotationCS(){
@@ -217,11 +203,6 @@ extern "C"{
 
     void __stdcall setOutputBufferDataCS(uint8_t* bufferData){
         unityBridge::getBridge()->setOutputBufferData(bufferData);
-    }
-
-    bool __stdcall isNewBufferDataAvailable()
-    {
-        return unityBridge::getBridge()->isNewBufferDataAvailable();
     }
 
     void __stdcall setRoomNameAndRoleCS(uint8_t* roomName, bool isSender){
@@ -258,7 +239,6 @@ extern "C"{
     bridge->setInputBufferData(buffer, rgb_size);
     bridge->setInputAugmentedBufferData(augmentedBuffer, augmented_size);
     bridge->setInputRotation(rotation);
-    bridge->setNewBufferDataAvailable(true);
 }
 
 + (void)getInputWidth:(uint32_t &)width height:(uint32_t &)height {
