@@ -223,6 +223,17 @@ extern "C"{
     {
         return unityBridge::getBridge()->isNewBufferDataAvailable();
     }
+
+    void __stdcall setRoomNameAndRoleCS(uint8_t* roomName, bool isSender){
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        if(roomName != nullptr){
+            NSString* nsRoomName = [NSString stringWithUTF8String:(char*)roomName];
+            NSDictionary *roomInfo = @{@"roomName": nsRoomName, @"isSender": @(isSender)};
+            [notificationCenter postNotificationName:kRoomNameAndRoleNotification
+                                                      object:nil
+                                                    userInfo:roomInfo];
+        }
+    }
 }
 
 @implementation FrameworkLibAPI

@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using UnityEngine.UI;
 using System;
+using System.Text;
+using System.Threading.Tasks;
 
 public class ExampleBridge : MonoBehaviour
 {
@@ -51,6 +53,9 @@ public class ExampleBridge : MonoBehaviour
     [DllImport("__Internal")]
     private static extern bool isNewBufferDataAvailable();
 
+    [DllImport("__Internal")]
+    private static extern void setRoomNameAndRoleCS(byte[] roomName, bool isSender);
+
 #endif
 
     const int inputWidth = 640;
@@ -90,6 +95,14 @@ public class ExampleBridge : MonoBehaviour
             filterMode = FilterMode.Point,
             anisoLevel = 1
         };
+
+// add/remove this line back if need to simulate notifcation for room name and role.
+        Task.Delay(3000).ContinueWith(t=>setRoomNameAndRole("test", false));
+    }
+
+    public void setRoomNameAndRole(string roomName, bool isSender)
+    {
+        setRoomNameAndRoleCS(Encoding.UTF8.GetBytes(roomName), isSender);
     }
 
     public void SetTexture()
@@ -102,7 +115,7 @@ public class ExampleBridge : MonoBehaviour
 #endif
             texture.LoadRawTextureData(inputArray);
 
-            texture.Apply();
+            texture.Apply(false);
             img.texture = texture;
 
             StartCoroutine(WaitAndCopyOutputArray());
@@ -126,7 +139,7 @@ public class ExampleBridge : MonoBehaviour
             initOutputBufferCS((uint)outputNumTexturePixels);
             outputArray = new byte[outputNumTexturePixels];
         }
-        
+
         RenderTexture.active = src_render_texture;
         texture2.ReadPixels(rect, 0, 0);
         texture2.Apply();

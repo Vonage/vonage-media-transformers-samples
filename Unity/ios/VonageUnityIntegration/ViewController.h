@@ -7,8 +7,9 @@
 
 #import <UIKit/UIKit.h>
 #import <UnityFramework/UnityFramework.h>
+#import <UnityFramework/LifeCycleListener.h>
 
-@interface ViewController : UIViewController<UnityFrameworkListener>
+@interface ViewController : UIViewController<UnityFrameworkListener, LifeCycleListener>
 
 @end
 
