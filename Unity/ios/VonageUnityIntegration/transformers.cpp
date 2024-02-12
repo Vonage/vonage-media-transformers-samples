@@ -98,8 +98,8 @@ namespace vonage {
                            input_heigth);
         
         int64_t start = rtc::TimeNanos();
-        webrtc::AugmentedVideoFrameBuffer* augemnted_video_frame = static_cast<webrtc::AugmentedVideoFrameBuffer*>(target_frame->video_frame_buffer().get());
-        [FrameworkLibAPI setInputBufferCpp:in_argb_data.get() rgbSize:(input_num_bytes) augmentedBuffer:augemnted_video_frame->GetAugmentingData() augmentedSize:augemnted_video_frame->GetAugmentingDataSize() rotation:GetRotation(target_frame->rotation())];
+        webrtc::AugmentedVideoFrameBuffer* augmented_video_frame = static_cast<webrtc::AugmentedVideoFrameBuffer*>(target_frame->video_frame_buffer().get());
+        [FrameworkLibAPI setInputBufferCpp:in_argb_data.get() rgbSize:(input_num_bytes) augmentedBuffer:augmented_video_frame->GetAugmentingData() augmentedSize:augmented_video_frame->GetAugmentingDataSize() rotation:GetRotation(target_frame->rotation())];
         // Tell Unity to update texture rendering using the updated input buffer
         [unity_framework_ sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
          
