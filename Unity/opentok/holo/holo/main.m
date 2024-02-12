@@ -1,6 +1,9 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
 
+extern int gArgc;
+extern char** gArgv;
+
 int main(int argc, char * argv[]) {
     gArgc = argc;
     gArgv = argv;
