@@ -7,6 +7,8 @@
 #import <Foundation/Foundation.h>
 #import <memory>
 
+__attribute__((visibility("default"))) NSString *const kRoomNameAndRoleNotification = @"RoomNameAndRoleNotification";
+
 __attribute__ ((visibility("default")))
 @interface FrameworkLibAPI : NSObject
 // call it any time after UnityFrameworkLoad to set object implementing NativeCallsProtocol methods
@@ -14,8 +16,7 @@ __attribute__ ((visibility("default")))
 + (void) getOutputBufferCpp:(std::unique_ptr<uint8_t[]>&)buffer size:(uint32_t&)size;
 + (void) getInputWidth:(uint32_t&)width height:(uint32_t&)height;
 + (void) getOutputWidth:(uint32_t&)width height:(uint32_t&)height rotation:(uint8_t&)rotation;
++ (void) setUnityRenderer:(bool)unityRenderer;
 @end
 
 #endif //NATIVECALLPROXY_H_
-
-

@@ -17,10 +17,31 @@
 #import <sdk/objc/base/RTCMacros.h>
 
 #import <AugmentedCompression.h>
-
 #import "transformers.h"
+#include <UnityFramework/NativeCallProxy.h>
 
-static const bool unity_rendering_enabled = false;
+int gArgc = 0;
+char** gArgv = nullptr;
+
+static const bool unity_rendering_enabled = true;
+
+UnityFramework* UnityFrameworkLoad()
+{
+    NSString* bundlePath = nil;
+    bundlePath = [[NSBundle mainBundle] bundlePath];
+    bundlePath = [bundlePath stringByAppendingString: @"/Frameworks/UnityFramework.framework"];
+    
+    NSBundle* bundle = [NSBundle bundleWithPath: bundlePath];
+    if ([bundle isLoaded] == false) [bundle load];
+    
+    UnityFramework* ufw = [bundle.principalClass getInstance];
+    if (![ufw appController])
+    {
+        // unity is not initialized
+        [ufw setExecuteHeader: &_mh_execute_header];
+    }
+    return ufw;
+}
 
 @interface DummyVideoView : UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>
 - (void)renderFrame:(nullable RTC_OBJC_TYPE(RTCVideoFrame) *)frame;
@@ -49,7 +70,7 @@ public:
                   uint32_t& outputSize){
         return Holographic::Compression::compress(depthDataMap, outputArray, outputSize);
     }
-
+    
     bool decompress(const uint8_t* inputArray,
                     uint32_t inputSize,
                     std::unique_ptr<uint8_t[]>& outputArray,
@@ -86,13 +107,16 @@ public:
 @property(nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)>* remoteVideoView;
 @property(nonatomic) RTC_OBJC_TYPE(RTCVideoCapturer) * capturer;
 @property(nonatomic) DepthDataCompress* depthDataCompress;
-@property (nonatomic) UILabel* statsLabel;
+@property(nonatomic) UILabel* statsLabel;
+@property(nonatomic) UnityFramework* unityFramework;
+@property(nonatomic) BOOL unityQuit;
+@property(nonatomic) UIView * modifiedView;
 
++(UnityAppController*) getUnityAppController;
 - (void) onStats:(NSString*)stats;
 @end
 
 @implementation ViewController {
-    UIView *_view;
     rtc::scoped_refptr<WebRTCHelper> _webrtcHelper;
     std::unique_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> _local_sink;
     std::unique_ptr<rtc::VideoSinkInterface<webrtc::VideoFrame>> _remote_sink;
@@ -101,52 +125,60 @@ public:
     std::shared_ptr<AugmentedCompress> augmented_compress_;
 }
 
+static UnityAppController* unityAppController = nullptr;
+
 @synthesize capturer = _capturer;
 @synthesize localVideoView = _localVideoView;
+@synthesize unityFramework = _unityFramework;
+@synthesize unityQuit = _unityQuit;
+@synthesize modifiedView = _modifiedView;
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    _view = [[UIView alloc] initWithFrame:CGRectZero];
-    
-    if(unity_rendering_enabled){
-        _remoteVideoView = [[DummyVideoView alloc] initWithFrame:CGRectZero];
-    }else{
-        _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
-    }
-    
-    _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_view addSubview:_remoteVideoView];
-    
-    UILayoutGuide *remote_margin = _view.layoutMarginsGuide;
-    [_remoteVideoView.leadingAnchor constraintEqualToAnchor:remote_margin.leadingAnchor].active = YES;
-    [_remoteVideoView.topAnchor constraintEqualToAnchor:remote_margin.topAnchor].active = YES;
-    [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remote_margin.trailingAnchor].active = YES;
-    [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remote_margin.bottomAnchor].active = YES;
+-(void)updateViews {
+    _modifiedView = [[UIView alloc] initWithFrame:CGRectZero];
     
     _localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectMake(5, 5, 100, 200)];
-    _localVideoView.translatesAutoresizingMaskIntoConstraints = YES;
-    [_view addSubview:_localVideoView];
-    
-    UILayoutGuide *local_margin = _view.layoutMarginsGuide;
-    [_localVideoView.leadingAnchor constraintEqualToAnchor:local_margin.leadingAnchor].active = YES;
-    [_localVideoView.topAnchor constraintEqualToAnchor:local_margin.topAnchor].active = YES;
-    [_localVideoView.trailingAnchor constraintEqualToAnchor:local_margin.trailingAnchor].active = YES;
-    [_localVideoView.bottomAnchor constraintEqualToAnchor:local_margin.bottomAnchor].active = YES;
+    if(unity_rendering_enabled){
+        _remoteVideoView = [[DummyVideoView alloc] initWithFrame:CGRectZero];
+        unityAppController = [[self unityFramework] appController];
+    }else{
+        _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
+        _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_modifiedView addSubview:_remoteVideoView];
+        UILayoutGuide *remote_margin = _modifiedView.layoutMarginsGuide;
+        [_remoteVideoView.leadingAnchor constraintEqualToAnchor:remote_margin.leadingAnchor].active = YES;
+        [_remoteVideoView.topAnchor constraintEqualToAnchor:remote_margin.topAnchor].active = YES;
+        [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remote_margin.trailingAnchor].active = YES;
+        [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remote_margin.bottomAnchor].active = YES;
+        _localVideoView.translatesAutoresizingMaskIntoConstraints = YES;
+        [_modifiedView addSubview:_localVideoView];
+        
+        UILayoutGuide *local_margin = _modifiedView.layoutMarginsGuide;
+        [_localVideoView.leadingAnchor constraintEqualToAnchor:local_margin.leadingAnchor].active = YES;
+        [_localVideoView.topAnchor constraintEqualToAnchor:local_margin.topAnchor].active = YES;
+        [_localVideoView.trailingAnchor constraintEqualToAnchor:local_margin.trailingAnchor].active = YES;
+        [_localVideoView.bottomAnchor constraintEqualToAnchor:local_margin.bottomAnchor].active = YES;
+    }
     
     _statsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
     [_statsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
     [_statsLabel setTextColor:[UIColor whiteColor]];
     [_statsLabel setBackgroundColor:[UIColor clearColor]];
     
-    self->_observer = std::make_unique<GeneralObserver>(self);
-    self->_webrtcHelper = new rtc::RefCountedObject<WebRTCHelper>(self->_observer.get());
-    self.view = _view;
+    self.view = _modifiedView;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)) , dispatch_get_main_queue(), ^() {
+- (void)viewWillLayoutSubviews{
+    [super viewWillLayoutSubviews];
+}
+
+- (void)viewDidLayoutSubviews{
+    [super viewDidLayoutSubviews];
+}
+
+-(void)startWebrtc{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self->_observer = std::make_unique<GeneralObserver>(self);
+        self->_webrtcHelper = new rtc::RefCountedObject<WebRTCHelper>(self->_observer.get());
 #if TARGET_OS_SIMULATOR
         self.capturer = [[RTC_OBJC_TYPE(RTCFakeCameraVideoCapturer) alloc] init];
 #else
@@ -159,7 +191,7 @@ public:
         self->_local_sink = webrtc::ObjCToNativeVideoRenderer(self->_localVideoView);
         self->_remote_sink = webrtc::ObjCToNativeVideoRenderer(self->_remoteVideoView);
         
-        self->transformer_ = std::make_shared<vonage::VonageUnityVideoTransformer>(self->_observer.get(), self->augmented_compress_, unity_rendering_enabled);
+        self->transformer_ = std::make_shared<vonage::VonageUnityVideoTransformer>(self->_observer.get(), self->augmented_compress_, unity_rendering_enabled, self->_unityFramework);
         
         if([self->_capturer isKindOfClass:[RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer) class]]){
             RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)* local_capturer = (RTC_OBJC_TYPE(VonageRTCCameraVideoCapturer)*)self->_capturer;
@@ -204,7 +236,7 @@ public:
             NSArray<AVCaptureDeviceFormat *> *filtered = [depthFormats filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(AVCaptureDeviceFormat *evaluatedObject, NSDictionary<NSString *, id> *bindings) {
                 return CMFormatDescriptionGetMediaSubType(evaluatedObject.formatDescription) == kCVPixelFormatType_DepthFloat32 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).width == 640 && CMVideoFormatDescriptionGetDimensions(evaluatedObject.formatDescription).height == 480;
             }]];
-
+            
             AVCaptureDeviceFormat* depthFormat = nil;
             if([filtered count] == 1){
                 depthFormat = filtered[0];
@@ -226,6 +258,52 @@ public:
         }
     });
 }
+
+-(void)viewDidLoad {
+    [super viewDidLoad];
+    self->_unityQuit = NO;
+    [self updateViews];
+    [self initUnity];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if(unity_rendering_enabled){
+        [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                UnityRegisterLifeCycleListener(self);
+                [self->_localVideoView removeFromSuperview];
+                [[[[self unityFramework] appController] rootView]addSubview:self->_localVideoView];
+            });
+        }];
+    }else{
+        [self startWebrtc];
+    }
+    
+}
+
+-(void)dealloc{
+    if(![self unityIsInitialized]) {
+        NSLog(@"Unity is not initialized. Initialize Unity first");
+    } else {
+        [UnityFrameworkLoad() unloadApplication];
+    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+-(void) viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear: animated];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear: animated];
+}
+
 - (void)onStats:(NSString*)stats {
     dispatch_sync(dispatch_get_main_queue(), ^{
         [NSTimer scheduledTimerWithTimeInterval:3 repeats:NO block:^(NSTimer * _Nonnull timer) {
@@ -237,8 +315,101 @@ public:
         [_statsLabel removeFromSuperview];
         [_statsLabel setText:stats];
         [_statsLabel setNumberOfLines:0];
-        [self.view addSubview:_statsLabel];
+        if(unity_rendering_enabled){
+            [[[[self unityFramework] appController] rootView]addSubview:_statsLabel];
+        }else{
+            [self.view addSubview:_statsLabel];
+        }
     });
+}
+
+- (bool)unityIsInitialized {
+    return [self unityFramework] && [[self unityFramework] appController];
+}
+
+- (void)initUnity
+{
+    if([self unityIsInitialized]) {
+        NSLog(@"Unity already initialized. Unload Unity first");
+        return;
+    }
+    
+    if(self->_unityQuit) {
+        NSLog(@"Unity cannot be initialized after quit. Use unload instead");
+        return;
+    }
+    
+    if(unity_rendering_enabled){
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(roomNameAndRoleNotification:)
+                                                     name:kRoomNameAndRoleNotification
+                                                   object:nil];
+    }
+    
+    self->_unityFramework = UnityFrameworkLoad();
+    
+    // Set UnityFramework target for Unity-iPhone/Data folder to make Data part of a UnityFramework.framework and uncomment call to setDataBundleId
+    // ODR is not supported in this case, ( if you need embedded and ODR you need to copy data )
+    [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
+    [[self unityFramework] registerFrameworkListener: self];
+    [FrameworkLibAPI setUnityRenderer:unity_rendering_enabled];
+    
+    NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
+    [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
+}
+
+- (void)unityDidUnload:(NSNotification*)notification
+{
+    NSLog(@"unityDidUnload called");
+    [[self unityFramework] unregisterFrameworkListener: self];
+    self->_unityFramework = nil;
+}
+
+- (void)unityDidQuit:(NSNotification*)notification
+{
+    NSLog(@"unityDidQuit called");
+    [[self unityFramework] unregisterFrameworkListener: self];
+    self->_unityFramework = nil;
+    self->_unityQuit = YES;
+}
+
++ (UnityAppController *)getUnityAppController {
+    return unityAppController;
+}
+
+- (void)didBecomeActive:(NSNotification *)notification {
+    NSLog(@"unity didBecomeActive called");
+}
+
+
+- (void)didEnterBackground:(NSNotification *)notification {
+    NSLog(@"unity didEnterBackground called");
+}
+
+
+- (void)didFinishLaunching:(NSNotification *)notification {
+    NSLog(@"unity didFinishLaunching called");
+}
+
+
+- (void)willEnterForeground:(NSNotification *)notification {
+    NSLog(@"unity willEnterForeground called");
+}
+
+
+- (void)willResignActive:(NSNotification *)notification {
+    NSLog(@"unity willResignActive called");
+}
+
+
+- (void)willTerminate:(NSNotification *)notification {
+    NSLog(@"unity willTerminate called");
+}
+
+- (void)roomNameAndRoleNotification:(NSNotification *)notification {
+    NSDictionary *userInfo = notification.userInfo;
+    NSLog(@"Notification received with userInfo: %@", userInfo);
+    [self startWebrtc];
 }
 
 @end
@@ -260,7 +431,7 @@ public:
     }
     void OnError(uint8_t code, const std::string& message) override {
         RTC_LOG_T_F(LS_ERROR) << "TransformerObserver code: " << code << " message: " << message;
-
+        
     }
     void OnStats(const std::string& stats) override{
         NSString* res;
