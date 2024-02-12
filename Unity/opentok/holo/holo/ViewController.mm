@@ -4,20 +4,14 @@
 
 #import <sdk/objc/components/renderer/metal/RTCMTLVideoView.h>
 
-#if !(TARGET_IPHONE_SIMULATOR)
-#import <UnityFramework/UnityForwardDecls.h>
-#import <UnityFramework/DisplayManager.h>
-#import <UnityFramework/UnityView.h>
+#include <UnityFramework/NativeCallProxy.h>
 
+#if !(TARGET_IPHONE_SIMULATOR)
 #import "Capturer.h"
 #import "Renderer.h"
 #endif
 
 #import "Logger.h"
-
-// Note: Define SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER macro whenever
-//       you want to use the OpenTok default video render.
-//#define SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
 
 #define MAX_PARTICIPANTS_PER_ROOM 2
 
@@ -48,7 +42,7 @@ static double widgetWidth = 320;
 
 static BOOL const kUnityRenderingEnabled = YES;
 
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+#if !(TARGET_IPHONE_SIMULATOR)
 UnityFramework* UnityFrameworkLoad() {
     NSString* bundlePath = nil;
     bundlePath = [[NSBundle mainBundle] bundlePath];
@@ -72,9 +66,8 @@ UnityFramework* UnityFrameworkLoad() {
 @property (nonatomic) OTPublisher *publisher;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *remoteVideoView;
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+#if !(TARGET_IPHONE_SIMULATOR)
 @property(nonatomic) UnityFramework* unityFramework;
-@property(nonatomic) UIView *unityView;
 @property(nonatomic) BOOL unityQuit;
 @property (nonatomic) Renderer *renderer;
 #endif
@@ -104,7 +97,7 @@ UnityFramework* UnityFrameworkLoad() {
                                    actionWithTitle:@"Sender"
                                    style:UIAlertActionStyleDefault
                                    handler:^(UIAlertAction * action) {
-        [self updateViews];
+        [self updateSenderViews];
         self->sender = YES;
         [self doInit];
     }];
@@ -112,12 +105,17 @@ UnityFramework* UnityFrameworkLoad() {
                                      actionWithTitle:@"Receiver"
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+#if !(TARGET_IPHONE_SIMULATOR)
         self->_unityQuit = NO;
         [self initUnity];
+        [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
+            self->_subscriberStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
+            [self->_subscriberStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
+            [self->_subscriberStatsLabel setTextColor:[UIColor whiteColor]];
+            [self->_subscriberStatsLabel setBackgroundColor:[UIColor clearColor]];
+        }];
 #endif
-        [self updateViews];
-        self->sender = FALSE;
+        self->sender = NO;
         [self doInit];
     }];
     [alert addAction:senderButton];
@@ -135,28 +133,19 @@ UnityFramework* UnityFrameworkLoad() {
     [super viewDidAppear:animated];
 }
 
-- (void)updateViews {
+- (void)updateSenderViews {
     _view = [[UIView alloc] initWithFrame:CGRectZero];
 
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
-    if ((sender == NO) && kUnityRenderingEnabled) {
-        _unityView = [[[[self unityFramework] appController] mainDisplay] view];
-        [_view addSubview:_unityView];
-        [[[[self unityFramework] appController] mainDisplay] shouldShowWindow:YES];
-    } else {
-#endif
-        _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
-        _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
-        [_view addSubview:_remoteVideoView];
+    // TODO: We need the remote view in case unity rendering is disabled.
+//    _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
+//    _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
+//    [_view addSubview:_remoteVideoView];
 
-        UILayoutGuide *remoteMargin = _view.layoutMarginsGuide;
-        [_remoteVideoView.leadingAnchor constraintEqualToAnchor:remoteMargin.leadingAnchor].active = YES;
-        [_remoteVideoView.topAnchor constraintEqualToAnchor:remoteMargin.topAnchor].active = YES;
-        [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remoteMargin.trailingAnchor].active = YES;
-        [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remoteMargin.bottomAnchor].active = YES;
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
-    }
-#endif
+//    UILayoutGuide *remoteMargin = _view.layoutMarginsGuide;
+//    [_remoteVideoView.leadingAnchor constraintEqualToAnchor:remoteMargin.leadingAnchor].active = YES;
+//    [_remoteVideoView.topAnchor constraintEqualToAnchor:remoteMargin.topAnchor].active = YES;
+//    [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remoteMargin.trailingAnchor].active = YES;
+//    [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remoteMargin.bottomAnchor].active = YES;
 
     _localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
     _localVideoView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -172,11 +161,6 @@ UnityFramework* UnityFrameworkLoad() {
     [_publisherStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
     [_publisherStatsLabel setTextColor:[UIColor whiteColor]];
     [_publisherStatsLabel setBackgroundColor:[UIColor clearColor]];
-
-    _subscriberStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
-    [_subscriberStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
-    [_subscriberStatsLabel setTextColor:[UIColor whiteColor]];
-    [_subscriberStatsLabel setBackgroundColor:[UIColor clearColor]];
 
     self.view = _view;
 }
@@ -196,16 +180,17 @@ UnityFramework* UnityFrameworkLoad() {
 }
 
 -(void)dealloc {
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+#if !(TARGET_IPHONE_SIMULATOR)
     if (![self unityIsInitialized]) {
         NSLog(@"Unity is not initialized. Initialize Unity first.");
     } else {
         [UnityFrameworkLoad() unloadApplication];
     }
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 #endif
 }
 
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+#if !(TARGET_IPHONE_SIMULATOR)
 
 - (bool)unityIsInitialized {
     return [self unityFramework] && [[self unityFramework] appController];
@@ -224,6 +209,13 @@ UnityFramework* UnityFrameworkLoad() {
 
     self->_unityFramework = UnityFrameworkLoad();
 
+    if (kUnityRenderingEnabled) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(roomNameAndRoleNotification:)
+                                                     name:kRoomNameAndRoleNotification
+                                                   object:nil];
+    }
+
     // Set UnityFramework target for Unity-iPhone/Data folder to make Data part of a UnityFramework.framework and uncomment call to setDataBundleId
     // ODR is not supported in this case, ( if you need embedded and ODR you need to copy data )
     [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
@@ -231,6 +223,7 @@ UnityFramework* UnityFrameworkLoad() {
 
     NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
     [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
+    [FrameworkLibAPI setUnityRenderer:kUnityRenderingEnabled];
 }
 
 - (void)unityDidUnload:(NSNotification*)notification {
@@ -375,7 +368,7 @@ UnityFramework* UnityFrameworkLoad() {
  */
 - (void)doSubscribe:(OTStream*)stream
 {
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+#if !(TARGET_IPHONE_SIMULATOR)
     _renderer = [[Renderer alloc] initWithUnityRenderingEnabled:kUnityRenderingEnabled unity:_unityFramework];
     if (!kUnityRenderingEnabled) {
         [_renderer updateView:_remoteVideoView];
@@ -383,7 +376,7 @@ UnityFramework* UnityFrameworkLoad() {
 #endif
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
     _subscriber.rtcStatsReportDelegate = self;
-#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
+#if !(TARGET_IPHONE_SIMULATOR)
     [_subscriber setVideoRender:_renderer];
 #endif
 
@@ -509,12 +502,6 @@ didFailWithError:(OTError*)error
     [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
                                           widgetHeight)];
     [self.view addSubview:_subscriber.view];
-#else
-#ifdef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
-    [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
-                                          widgetHeight)];
-    [self.view addSubview:_subscriber.view];
-#endif
 #endif
 }
 
@@ -653,16 +640,17 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
 #if (TARGET_IPHONE_SIMULATOR)
     [_subscriber.view addSubview:_subscriberStatsLabel];
 #else
-#ifdef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
-    [_subscriber.view addSubview:_subscriberStatsLabel];
-#else
     if (kUnityRenderingEnabled) {
-        [_unityView addSubview:_subscriberStatsLabel];
+        [[[[self unityFramework] appController] rootView]addSubview:_subscriberStatsLabel];
     } else {
         [_subscriber.view addSubview:_subscriberStatsLabel];
     }
 #endif
-#endif
+}
+
+- (void)roomNameAndRoleNotification:(NSNotification *)notification {
+    NSDictionary *userInfo = notification.userInfo;
+    NSLog(@"Notification received with userInfo: %@", userInfo);
 }
 
 @end
