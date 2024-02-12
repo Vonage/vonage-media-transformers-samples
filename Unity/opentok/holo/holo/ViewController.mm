@@ -46,10 +46,9 @@ static NSString* const kHoloRoomName = @"holoE";
 static double widgetHeight = 240;
 static double widgetWidth = 320;
 
-static Boolean const kUnityRenderingEnabled = YES;
+static BOOL const kUnityRenderingEnabled = YES;
 
-#if !(TARGET_IPHONE_SIMULATOR)
-#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
 UnityFramework* UnityFrameworkLoad() {
     NSString* bundlePath = nil;
     bundlePath = [[NSBundle mainBundle] bundlePath];
@@ -67,19 +66,17 @@ UnityFramework* UnityFrameworkLoad() {
     return ufw;
 }
 #endif
-#endif
 
 @interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate, OTPublisherKitRtcStatsReportDelegate, OTSubscriberKitRtcStatsReportDelegate>
 @property (nonatomic) OTSession *session;
 @property (nonatomic) OTPublisher *publisher;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *remoteVideoView;
-#if !(TARGET_IPHONE_SIMULATOR)
-#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
 @property(nonatomic) UnityFramework* unityFramework;
+@property(nonatomic) UIView *unityView;
 @property(nonatomic) BOOL unityQuit;
 @property (nonatomic) Renderer *renderer;
-#endif
 #endif
 @property (nonatomic) OTSubscriber *subscriber;
 @property (nonatomic) UILabel* publisherStatsLabel;
@@ -88,11 +85,6 @@ UnityFramework* UnityFrameworkLoad() {
 
 @implementation ViewController {
     UIView *_view;
-#if !(TARGET_IPHONE_SIMULATOR)
-#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
-    UIView *_unityView;
-#endif
-#endif
     HoloCredentials credentials;
     BOOL sender;
     uint8_t _participantsNumber;
@@ -120,11 +112,9 @@ UnityFramework* UnityFrameworkLoad() {
                                      actionWithTitle:@"Receiver"
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
-#if !(TARGET_IPHONE_SIMULATOR)
-#ifndef SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER
+#if !(TARGET_IPHONE_SIMULATOR) && !defined(SKIP_USING_VONAGE_EHC_SUBSCRIBER_RENDERER)
         self->_unityQuit = NO;
         [self initUnity];
-#endif
 #endif
         [self updateViews];
         self->sender = FALSE;
