@@ -2,6 +2,7 @@
 
 #import <sdk/objc/base/RTCMacros.h>
 #import <sdk/objc/base/RTCVideoCapturer.h>
+#import <sdk/objc/base/RTCVideoRenderer.h>
 
 @protocol OTVideoCapture;
 
@@ -11,7 +12,6 @@
 @protected
     dispatch_queue_t _capture_queue;
 }
-
--(id)initWithCapturePreset: (NSString*)preset;
-
+-(instancetype)initWithCapturePreset: (NSString*)preset andDelegate:(id<RTC_OBJC_TYPE(RTCVideoRenderer)>) dlegate;
+-(void)startCaptureCompletionHandler:(void(^)(NSError *))completionHandler;
 @end

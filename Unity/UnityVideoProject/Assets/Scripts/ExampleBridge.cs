@@ -48,6 +48,12 @@ public class ExampleBridge : MonoBehaviour
     private static extern void setRoomNameAndRoleCS(byte[] roomName, bool isSender);
 
     [DllImport("__Internal")]
+    private static extern void hangupCS();
+
+    [DllImport("__Internal")]
+    private static extern bool getIsSenderCS();
+
+    [DllImport("__Internal")]
     private static extern bool getUnityRendererCS();
 
 #endif
@@ -91,12 +97,18 @@ public class ExampleBridge : MonoBehaviour
         };
 
 // add/remove this line back if need to simulate notifcation for room name and role.
-        Task.Delay(3000).ContinueWith(t=>setRoomNameAndRole("test", false));
+        Task.Delay(3000).ContinueWith(t=>setRoomNameAndRole("test", getIsSenderCS()));
     }
 
     public void setRoomNameAndRole(string roomName, bool isSender)
     {
         setRoomNameAndRoleCS(Encoding.UTF8.GetBytes(roomName), isSender);
+
+        Task.Delay(10000).ContinueWith(t=>hangup());
+    }
+
+    public void hangup(){
+        hangupCS()
     }
 
     public void SetTexture()

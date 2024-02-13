@@ -6,10 +6,8 @@
 
 #include <UnityFramework/NativeCallProxy.h>
 
-#if !(TARGET_IPHONE_SIMULATOR)
 #import "Capturer.h"
 #import "Renderer.h"
-#endif
 
 #import "Logger.h"
 
@@ -35,14 +33,12 @@ static NSString* const kToken = @"";
 
 static NSString* const kHoloRoomServiceServerIP = @"3.19.223.109";
 static NSString* const kHoloRoomServiceURI = @"https://3.19.223.109:8080/room/%@/info";
-static NSString* const kHoloRoomName = @"holoE";
 
 static double widgetHeight = 240;
 static double widgetWidth = 320;
 
 static BOOL const kUnityRenderingEnabled = YES;
 
-#if !(TARGET_IPHONE_SIMULATOR)
 UnityFramework* UnityFrameworkLoad() {
     NSString* bundlePath = nil;
     bundlePath = [[NSBundle mainBundle] bundlePath];
@@ -59,110 +55,66 @@ UnityFramework* UnityFrameworkLoad() {
     }
     return ufw;
 }
-#endif
 
 @interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate, OTPublisherKitRtcStatsReportDelegate, OTSubscriberKitRtcStatsReportDelegate>
 @property (nonatomic) OTSession *session;
 @property (nonatomic) OTPublisher *publisher;
-@property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
-@property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *remoteVideoView;
-#if !(TARGET_IPHONE_SIMULATOR)
 @property(nonatomic) UnityFramework* unityFramework;
 @property(nonatomic) BOOL unityQuit;
 @property (nonatomic) Renderer *renderer;
-#endif
 @property (nonatomic) OTSubscriber *subscriber;
 @property (nonatomic) UILabel* publisherStatsLabel;
 @property (nonatomic) UILabel* subscriberStatsLabel;
+@property (nonatomic) BOOL sender;
+@property (nonatomic) NSString* roomName;
+@property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
+@property (nonatomic) Capturer* capturer;
+@property (nonatomic) BOOL wasUnityPresented;
 @end
 
 @implementation ViewController {
-    UIView *_view;
+    
     HoloCredentials credentials;
-    BOOL sender;
     uint8_t _participantsNumber;
 }
 
-#pragma mark - View lifecycle
+@synthesize session = _session;
+@synthesize publisher = _publisher;
+@synthesize subscriber = _subscriber;
+@synthesize unityFramework = _unityFramework;
+@synthesize roomName = _roomName;
+@synthesize sender = _sender;
+@synthesize wasUnityPresented = _wasUnityPresented;
+@synthesize localVideoView = _localVideoView;
+@synthesize capturer = _capturer;
+@synthesize renderer = _renderer;
 
+#pragma mark - View lifecycle
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    sender = YES;
-    UIAlertController *alert = [UIAlertController
-                                alertControllerWithTitle:@"Role"
-                                message:@"Select one rol please"
-                                preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction* senderButton = [UIAlertAction
-                                   actionWithTitle:@"Sender"
-                                   style:UIAlertActionStyleDefault
-                                   handler:^(UIAlertAction * action) {
-        [self updateSenderViews];
-        self->sender = YES;
-        [self doInit];
-    }];
-    UIAlertAction* receiverButton = [UIAlertAction
-                                     actionWithTitle:@"Receiver"
-                                     style:UIAlertActionStyleDefault
-                                     handler:^(UIAlertAction * action) {
-#if !(TARGET_IPHONE_SIMULATOR)
-        self->_unityQuit = NO;
-        [self initUnity];
-        [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
-            self->_subscriberStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
-            [self->_subscriberStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
-            [self->_subscriberStatsLabel setTextColor:[UIColor whiteColor]];
-            [self->_subscriberStatsLabel setBackgroundColor:[UIColor clearColor]];
-        }];
-#endif
-        self->sender = NO;
-        [self doInit];
-    }];
-    [alert addAction:senderButton];
-    [alert addAction:receiverButton];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self presentViewController:alert animated:YES completion:nil];
-    });
+    self->_sender = NO;
+    self->_unityQuit = NO;
+    self->_wasUnityPresented = NO;
+    [self initUnity:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear: animated];
+    if(self->_sender){
+        self->_publisherStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
+        [self->_publisherStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
+        [self->_publisherStatsLabel setTextColor:[UIColor whiteColor]];
+        [self->_publisherStatsLabel setBackgroundColor:[UIColor clearColor]];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-}
-
-- (void)updateSenderViews {
-    _view = [[UIView alloc] initWithFrame:CGRectZero];
-
-    // TODO: We need the remote view in case unity rendering is disabled.
-//    _remoteVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
-//    _remoteVideoView.translatesAutoresizingMaskIntoConstraints = NO;
-//    [_view addSubview:_remoteVideoView];
-
-//    UILayoutGuide *remoteMargin = _view.layoutMarginsGuide;
-//    [_remoteVideoView.leadingAnchor constraintEqualToAnchor:remoteMargin.leadingAnchor].active = YES;
-//    [_remoteVideoView.topAnchor constraintEqualToAnchor:remoteMargin.topAnchor].active = YES;
-//    [_remoteVideoView.trailingAnchor constraintEqualToAnchor:remoteMargin.trailingAnchor].active = YES;
-//    [_remoteVideoView.bottomAnchor constraintEqualToAnchor:remoteMargin.bottomAnchor].active = YES;
-
-    _localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectZero];
-    _localVideoView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_view addSubview:_localVideoView];
-
-    UILayoutGuide *localMargin = _view.layoutMarginsGuide;
-    [_localVideoView.leadingAnchor constraintEqualToAnchor:localMargin.leadingAnchor constant:8.0].active = YES;
-    [_localVideoView.topAnchor constraintEqualToAnchor:localMargin.topAnchor constant:8.0].active = YES;
-    [_localVideoView.widthAnchor constraintEqualToConstant:120].active = YES;
-    [_localVideoView.heightAnchor constraintEqualToConstant:120].active = YES;
-
-    _publisherStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
-    [_publisherStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
-    [_publisherStatsLabel setTextColor:[UIColor whiteColor]];
-    [_publisherStatsLabel setBackgroundColor:[UIColor clearColor]];
-
-    self.view = _view;
+    if(_wasUnityPresented == NO){
+        [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
+            self->_wasUnityPresented = YES;
+        }];
+    }
 }
 
 -(void) viewDidDisappear:(BOOL)animated {
@@ -171,32 +123,23 @@ UnityFramework* UnityFrameworkLoad() {
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear: animated];
-    [_session unsubscribe:_subscriber error:nil];
-    _subscriber = nil;
-    [_session unpublish:_publisher error:nil];
-    _publisher = nil;
-    [_session disconnect:nil];
-    _session = nil;
+;
 }
 
 -(void)dealloc {
-#if !(TARGET_IPHONE_SIMULATOR)
     if (![self unityIsInitialized]) {
         NSLog(@"Unity is not initialized. Initialize Unity first.");
     } else {
         [UnityFrameworkLoad() unloadApplication];
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-#endif
 }
-
-#if !(TARGET_IPHONE_SIMULATOR)
 
 - (bool)unityIsInitialized {
     return [self unityFramework] && [[self unityFramework] appController];
 }
 
-- (void)initUnity {
+- (void)initUnity:(BOOL)isSender {
     if ([self unityIsInitialized]) {
         NSLog(@"Unity already initialized. Unload Unity first");
         return;
@@ -215,15 +158,13 @@ UnityFramework* UnityFrameworkLoad() {
                                                      name:kRoomNameAndRoleNotification
                                                    object:nil];
     }
-
-    // Set UnityFramework target for Unity-iPhone/Data folder to make Data part of a UnityFramework.framework and uncomment call to setDataBundleId
-    // ODR is not supported in this case, ( if you need embedded and ODR you need to copy data )
     [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
     [[self unityFramework] registerFrameworkListener: self];
 
     NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
     [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
     [FrameworkLibAPI setUnityRenderer:kUnityRenderingEnabled];
+    [FrameworkLibAPI setRole:isSender];
 }
 
 - (void)unityDidUnload:(NSNotification*)notification {
@@ -239,21 +180,15 @@ UnityFramework* UnityFrameworkLoad() {
     self->_unityQuit = YES;
 }
 
-#endif
-
 - (void)doInit {
-    //    [[OpenTokLogger alloc] init];
-
     if (![kApiKey isEqualToString:@""] && ![kSessionId isEqualToString:@""]) {
-        // Step 1: As the view comes into the foreground, initialize a new instance
-        // of OTSession and begin the connection process.
         _session = [[OTSession alloc] initWithApiKey:kApiKey
                                            sessionId:kSessionId
                                             delegate:self];
         [self doConnect];
         return;
     }
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, kHoloRoomName]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, _roomName]];
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
@@ -301,11 +236,6 @@ UnityFramework* UnityFrameworkLoad() {
 }
 
 #pragma mark - OpenTok methods
-
-/**
- * Asynchronously begins the session connect process. Some time later, we will
- * expect a delegate method to call us back with the results of this action.
- */
 - (void)doConnect
 {
     _participantsNumber = 0;
@@ -320,35 +250,19 @@ UnityFramework* UnityFrameworkLoad() {
     }
 }
 
-/**
- * Sets up an instance of OTPublisher to use with this session. OTPubilsher
- * binds to the device camera and microphone, and will provide A/V streams
- * to the OpenTok session.
- */
 - (void)doPublish
 {
     OTPublisherSettings *settings = [[OTPublisherSettings alloc] init];
     settings.name = [UIDevice currentDevice].name;
-#if !(TARGET_IPHONE_SIMULATOR)
-    Capturer* capturer = [[Capturer alloc] initWithCapturePreset:AVCaptureSessionPreset640x480];
-    settings.videoCapture = capturer;
-#endif
+    settings.videoCapture = _capturer;
     _publisher = [[OTPublisher alloc] initWithDelegate:self settings:settings];
     _publisher.rtcStatsReportDelegate = self;
-
     OTError *error = nil;
     [_session publish:_publisher error:&error];
     if (error)
     {
         [self showAlert:[error localizedDescription]];
     }
-
-#if !(TARGET_IPHONE_SIMULATOR)
-    [_localVideoView addSubview:_publisher.view];
-#else
-    [self.view addSubview:_publisher.view];
-#endif
-    [_publisher.view setFrame:CGRectMake(0, 0, widgetWidth, widgetHeight)];
 }
 
 /**
@@ -360,26 +274,12 @@ UnityFramework* UnityFrameworkLoad() {
     _publisher = nil;
 }
 
-/**
- * Instantiates a subscriber for the given stream and asynchronously begins the
- * process to begin receiving A/V content for this stream. Unlike doPublish,
- * this method does not add the subscriber to the view hierarchy. Instead, we
- * add the subscriber only after it has connected and begins receiving data.
- */
 - (void)doSubscribe:(OTStream*)stream
 {
-#if !(TARGET_IPHONE_SIMULATOR)
     _renderer = [[Renderer alloc] initWithUnityRenderingEnabled:kUnityRenderingEnabled unity:_unityFramework];
-    if (!kUnityRenderingEnabled) {
-        [_renderer updateView:_remoteVideoView];
-    }
-#endif
     _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
     _subscriber.rtcStatsReportDelegate = self;
-#if !(TARGET_IPHONE_SIMULATOR)
     [_subscriber setVideoRender:_renderer];
-#endif
-
     OTError *error = nil;
     [_session subscribe:_subscriber error:&error];
     if (error)
@@ -388,19 +288,9 @@ UnityFramework* UnityFrameworkLoad() {
     }
 }
 
-/**
- * Cleans the subscriber from the view hierarchy, if any.
- * NB: You do *not* have to call unsubscribe in your controller in response to
- * a streamDestroyed event. Any subscribers (or the publisher) for a stream will
- * be automatically removed from the session during cleanup of the stream.
- */
 - (void)cleanupSubscriber
 {
-#if !(TARGET_IPHONE_SIMULATOR)
     [_renderer clearRenderBuffer];
-#else
-    [_subscriber.view removeFromSuperview];
-#endif
     _subscriber = nil;
 }
 
@@ -420,7 +310,7 @@ UnityFramework* UnityFrameworkLoad() {
                 return;
             }
 
-            if (self->sender) {
+            if (self->_sender) {
                 [self doPublish];
             }
         }];
@@ -441,7 +331,7 @@ UnityFramework* UnityFrameworkLoad() {
 {
     NSLog(@"session streamCreated (%@)", stream.streamId);
 
-    if ((nil == _subscriber) && (sender == NO)) {
+    if ((nil == _subscriber) && (_sender == NO)) {
         [self doSubscribe:stream];
     }
 }
@@ -457,7 +347,7 @@ streamDestroyed:(OTStream *)stream
     }
 }
 
-- (void)  session:(OTSession *)session
+- (void) session:(OTSession *)session
 connectionCreated:(OTConnection *)connection
 {
     NSLog(@"session connectionCreated (%@)", connection.connectionId);
@@ -466,7 +356,7 @@ connectionCreated:(OTConnection *)connection
     ++_participantsNumber;
 }
 
-- (void)    session:(OTSession *)session
+- (void) session:(OTSession *)session
 connectionDestroyed:(OTConnection *)connection
 {
     NSLog(@"session connectionDestroyed (%@)", connection.connectionId);
@@ -487,7 +377,6 @@ didFailWithError:(OTError*)error
 }
 
 # pragma mark - OTSubscriber delegate callbacks
-
 - (void)subscriberDidConnectToStream:(OTSubscriberKit*)subscriber
 {
     NSLog(@"subscriberDidConnectToStream (%@)",
@@ -498,11 +387,6 @@ didFailWithError:(OTError*)error
             [self->_subscriber getRtcStatsReport];
         }];
     });
-#if (TARGET_IPHONE_SIMULATOR)
-    [_subscriber.view setFrame:CGRectMake(0, widgetHeight, widgetWidth,
-                                          widgetHeight)];
-    [self.view addSubview:_subscriber.view];
-#endif
 }
 
 - (void)subscriber:(OTSubscriberKit*)subscriber
@@ -514,7 +398,6 @@ didFailWithError:(OTError*)error
 }
 
 # pragma mark - OTPublisher delegate callbacks
-
 - (void)publisher:(OTPublisherKit *)publisher
     streamCreated:(OTStream *)stream
 {
@@ -636,21 +519,45 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     [_subscriberStatsLabel removeFromSuperview];
     [_subscriberStatsLabel setText:stats];
     [_subscriberStatsLabel setNumberOfLines:0];
-
-#if (TARGET_IPHONE_SIMULATOR)
-    [_subscriber.view addSubview:_subscriberStatsLabel];
-#else
     if (kUnityRenderingEnabled) {
         [[[[self unityFramework] appController] rootView]addSubview:_subscriberStatsLabel];
     } else {
         [_subscriber.view addSubview:_subscriberStatsLabel];
     }
-#endif
 }
 
 - (void)roomNameAndRoleNotification:(NSNotification *)notification {
     NSDictionary *userInfo = notification.userInfo;
     NSLog(@"Notification received with userInfo: %@", userInfo);
+    _sender = false;
+    if([userInfo objectForKey:@"isSender"]){
+        _sender = [userInfo valueForKey:@"isSender"];
+    }
+    
+    if([userInfo objectForKey:@"roomName"]){
+        _roomName = [userInfo valueForKey:@"roomName"];
+    }
+    
+    if(_sender){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self->_localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+            self->_capturer = [[Capturer alloc] initWithCapturePreset:AVCaptureSessionPreset640x480 andDelegate:self->_localVideoView];
+            [self->_capturer startCaptureCompletionHandler:^(NSError * error) {
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    if(!error){
+                        [self.view addSubview:self->_localVideoView];
+                        [self dismissViewControllerAnimated:YES completion:nil];
+                    }
+                });
+            }];
+        });
+    }else{
+        self->_subscriberStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
+        [self->_subscriberStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
+        [self->_subscriberStatsLabel setTextColor:[UIColor whiteColor]];
+        [self->_subscriberStatsLabel setBackgroundColor:[UIColor clearColor]];
+    }
+    [self doInit];
 }
 
 @end
