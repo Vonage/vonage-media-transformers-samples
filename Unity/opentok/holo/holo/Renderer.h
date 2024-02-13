@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL mirroring;
 @property (nonatomic, assign) BOOL renderingEnabled;
 
--(instancetype)initWithUnityRenderingEnabled:(BOOL)unityRenderingEnabled unity:(UnityFramework*)unity;
+-(instancetype)initWithUnity:(UnityFramework*)unity;
 
 -(void)updateView:(nullable RTC_OBJC_TYPE(RTCMTLVideoView)*)videoView;
 -(void)updateDelegate:(nullable id<RendererDelegate>)delegate;

@@ -34,10 +34,7 @@ static NSString* const kToken = @"";
 static NSString* const kHoloRoomServiceServerIP = @"3.19.223.109";
 static NSString* const kHoloRoomServiceURI = @"https://3.19.223.109:8080/room/%@/info";
 
-static double widgetHeight = 240;
-static double widgetWidth = 320;
-
-static BOOL const kUnityRenderingEnabled = YES;
+static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
 
 UnityFramework* UnityFrameworkLoad() {
     NSString* bundlePath = nil;
@@ -70,11 +67,10 @@ UnityFramework* UnityFrameworkLoad() {
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
 @property (nonatomic) Capturer* capturer;
 @property (nonatomic) BOOL wasUnityPresented;
+@property(nonatomic) dispatch_queue_t opentokQueue;
 @end
 
 @implementation ViewController {
-    
-    HoloCredentials credentials;
     uint8_t _participantsNumber;
 }
 
@@ -95,7 +91,20 @@ UnityFramework* UnityFrameworkLoad() {
     self->_sender = NO;
     self->_unityQuit = NO;
     self->_wasUnityPresented = NO;
-    [self initUnity:YES];
+    
+    dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, /*relative_priority=*/0);
+    self.opentokQueue = dispatch_queue_create(kOpenTokQueueLabel, qosAttribute);
+    
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].isiOSAppOnMac){
+            [self initUnity:NO];
+        }else{
+            [self initUnity:YES];
+        }
+    } else {
+    
+    }
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -135,6 +144,8 @@ UnityFramework* UnityFrameworkLoad() {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+#pragma mark - Unity methods
+
 - (bool)unityIsInitialized {
     return [self unityFramework] && [[self unityFramework] appController];
 }
@@ -151,19 +162,18 @@ UnityFramework* UnityFrameworkLoad() {
     }
 
     self->_unityFramework = UnityFrameworkLoad();
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(roomNameAndRoleNotification:)
+                                                 name:kRoomNameAndRoleNotification
+                                               object:nil];
 
-    if (kUnityRenderingEnabled) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(roomNameAndRoleNotification:)
-                                                     name:kRoomNameAndRoleNotification
-                                                   object:nil];
-    }
     [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
     [[self unityFramework] registerFrameworkListener: self];
 
     NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
     [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
-    [FrameworkLibAPI setUnityRenderer:kUnityRenderingEnabled];
+    [FrameworkLibAPI setUnityRenderer:YES];
     [FrameworkLibAPI setRole:isSender];
 }
 
@@ -180,12 +190,15 @@ UnityFramework* UnityFrameworkLoad() {
     self->_unityQuit = YES;
 }
 
+#pragma mark - OpenTok local methods
+
 - (void)doInit {
     if (![kApiKey isEqualToString:@""] && ![kSessionId isEqualToString:@""]) {
-        _session = [[OTSession alloc] initWithApiKey:kApiKey
-                                           sessionId:kSessionId
-                                            delegate:self];
-        [self doConnect];
+        HoloCredentials credentials;
+        credentials.apiKey = kApiKey;
+        credentials.sessionId = kSessionId;
+        credentials.token = kToken;
+        [self doConnectHoloCredentials:credentials];
         return;
     }
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:kHoloRoomServiceURI, _roomName]];
@@ -206,13 +219,11 @@ UnityFramework* UnityFrameworkLoad() {
                 if ([dict objectForKey:@"apiKey"] &&
                     [dict objectForKey:@"sessionId"] &&
                     [dict objectForKey:@"token"]) {
-                    self->credentials.apiKey = [dict objectForKey:@"apiKey"];
-                    self->credentials.sessionId = [dict objectForKey:@"sessionId"];
-                    self->credentials.token = [dict objectForKey:@"token"];
-                    self->_session = [[OTSession alloc] initWithApiKey:self->credentials.apiKey
-                                                             sessionId:self->credentials.sessionId
-                                                              delegate:self];
-                    [self doConnect];
+                    HoloCredentials credentials;
+                    credentials.apiKey = [dict objectForKey:@"apiKey"];
+                    credentials.sessionId = [dict objectForKey:@"sessionId"];
+                    credentials.token = [dict objectForKey:@"token"];
+                    [self doConnectHoloCredentials:credentials];
                 } else {
                     [self showAlert:@"Failed to receive Video API credentials"];
                 }
@@ -235,143 +246,152 @@ UnityFramework* UnityFrameworkLoad() {
     return UIUserInterfaceIdiomPhone != [[UIDevice currentDevice] userInterfaceIdiom];
 }
 
-#pragma mark - OpenTok methods
-- (void)doConnect
+- (void)doConnectHoloCredentials:(const HoloCredentials&)credentials
 {
-    _participantsNumber = 0;
-    OTError *error = nil;
-    if ([kToken isEqualToString:@""]) {
-        [_session connectWithToken:credentials.token error:&error];
-    } else {
-        [_session connectWithToken:kToken error:&error];
-    }
-    if (error) {
-        [self showAlert:[error localizedDescription]];
-    }
+    dispatch_sync(self->_opentokQueue, ^{
+        self->_participantsNumber = 0;
+        self->_session = [[OTSession alloc] initWithApiKey:credentials.apiKey
+                                                 sessionId:credentials.sessionId
+                                                  delegate:self];
+        OTError *error = nil;
+        [self->_session connectWithToken:credentials.token error:&error];
+        if (error) {
+            [self showAlert:[error localizedDescription]];
+        }
+    });
 }
 
-- (void)doPublish
+-(void)doPublish
 {
-    OTPublisherSettings *settings = [[OTPublisherSettings alloc] init];
-    settings.name = [UIDevice currentDevice].name;
-    settings.videoCapture = _capturer;
-    _publisher = [[OTPublisher alloc] initWithDelegate:self settings:settings];
-    _publisher.rtcStatsReportDelegate = self;
-    OTError *error = nil;
-    [_session publish:_publisher error:&error];
-    if (error)
-    {
-        [self showAlert:[error localizedDescription]];
-    }
+    dispatch_async(self->_opentokQueue, ^{
+        OTPublisherSettings *settings = [[OTPublisherSettings alloc] init];
+        settings.name = [UIDevice currentDevice].name;
+        settings.videoCapture = self->_capturer;
+        self->_publisher = [[OTPublisher alloc] initWithDelegate:self settings:settings];
+        self->_publisher.rtcStatsReportDelegate = self;
+        OTError *error = nil;
+        [self->_session publish:self->_publisher error:&error];
+        if (error)
+        {
+            [self showAlert:[error localizedDescription]];
+        }
+    });
+
 }
 
-/**
- * Cleans up the publisher and its view. At this point, the publisher should not
- * be attached to the session any more.
- */
 - (void)cleanupPublisher {
-    [_publisher.view removeFromSuperview];
-    _publisher = nil;
+    dispatch_async(self->_opentokQueue, ^{
+        [self->_publisher.view removeFromSuperview];
+        self->_publisher = nil;
+    });
 }
 
 - (void)doSubscribe:(OTStream*)stream
 {
-    _renderer = [[Renderer alloc] initWithUnityRenderingEnabled:kUnityRenderingEnabled unity:_unityFramework];
-    _subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
-    _subscriber.rtcStatsReportDelegate = self;
-    [_subscriber setVideoRender:_renderer];
-    OTError *error = nil;
-    [_session subscribe:_subscriber error:&error];
-    if (error)
-    {
-        [self showAlert:[error localizedDescription]];
-    }
+    dispatch_async(self->_opentokQueue, ^{
+        self->_renderer = [[Renderer alloc] initWithUnity:self->_unityFramework];
+        self->_subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
+        self->_subscriber.rtcStatsReportDelegate = self;
+        [self->_subscriber setVideoRender:self->_renderer];
+        OTError *error = nil;
+        [self->_session subscribe:self->_subscriber error:&error];
+        if (error)
+        {
+            [self showAlert:[error localizedDescription]];
+        }
+    });
 }
 
 - (void)cleanupSubscriber
 {
-    [_renderer clearRenderBuffer];
-    _subscriber = nil;
+    dispatch_async(self->_opentokQueue, ^{
+        [self->_renderer clearRenderBuffer];
+        self->_subscriber = nil;
+    });
 }
 
 # pragma mark - OTSession delegate callbacks
 
 - (void)sessionDidConnect:(OTSession*)session
 {
-    NSLog(@"sessionDidConnect (%@)", session.sessionId);
-    ++_participantsNumber;
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:NO block:^(NSTimer * _Nonnull timer) {
-            if (self->_participantsNumber > MAX_PARTICIPANTS_PER_ROOM) {
-                [session disconnect:nil];
-                NSLog(@"sessionDidConnect (%d participants)", self->_participantsNumber);
-                [self showAlert:@"Room is full. Disconnecting."];
-                return;
-            }
-
-            if (self->_sender) {
-                [self doPublish];
-            }
-        }];
+    dispatch_async(self->_opentokQueue, ^{
+        NSLog(@"sessionDidConnect (%@)", session.sessionId);
+        ++self->_participantsNumber;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:NO block:^(NSTimer * _Nonnull timer) {
+                if (self->_participantsNumber > MAX_PARTICIPANTS_PER_ROOM) {
+                    [session disconnect:nil];
+                    NSLog(@"sessionDidConnect (%d participants)", self->_participantsNumber);
+                    [self showAlert:@"Room is full. Disconnecting."];
+                    return;
+                }
+                
+                if (self->_sender) {
+                    dispatch_async(self->_opentokQueue, ^{
+                        [self doPublish];
+                    });
+                }
+            }];
+        });
     });
 }
 
 - (void)sessionDidDisconnect:(OTSession*)session
 {
-    NSString* alertMessage =
-    [NSString stringWithFormat:@"Session disconnected: (%@)",
-     session.sessionId];
-    NSLog(@"sessionDidDisconnect (%@)", alertMessage);
+    dispatch_async(self->_opentokQueue, ^{
+        NSString* alertMessage = [NSString stringWithFormat:@"Session disconnected: (%@)", session.sessionId];
+        NSLog(@"sessionDidDisconnect (%@)", alertMessage);
+    });
 }
 
 
-- (void)session:(OTSession*)mySession
-  streamCreated:(OTStream *)stream
+- (void)session:(OTSession*)mySession streamCreated:(OTStream *)stream
 {
-    NSLog(@"session streamCreated (%@)", stream.streamId);
-
-    if ((nil == _subscriber) && (_sender == NO)) {
-        [self doSubscribe:stream];
-    }
+    dispatch_async(self->_opentokQueue, ^{
+        NSLog(@"session streamCreated (%@)", stream.streamId);
+        if ((nil == self->_subscriber) && (self->_sender == NO)) {
+            [self doSubscribe:stream];
+        }
+    });
 }
 
-- (void)session:(OTSession*)session
-streamDestroyed:(OTStream *)stream
+- (void)session:(OTSession*)session streamDestroyed:(OTStream *)stream
 {
-    NSLog(@"session streamDestroyed (%@)", stream.streamId);
-
-    if ([_subscriber.stream.streamId isEqualToString:stream.streamId])
-    {
-        [self cleanupSubscriber];
-    }
+    dispatch_async(self->_opentokQueue, ^{
+        NSLog(@"session streamDestroyed (%@)", stream.streamId);
+        if ([self->_subscriber.stream.streamId isEqualToString:stream.streamId])
+        {
+            [self cleanupSubscriber];
+        }
+    });
 }
 
-- (void) session:(OTSession *)session
-connectionCreated:(OTConnection *)connection
+- (void) session:(OTSession *)session connectionCreated:(OTConnection *)connection
 {
-    NSLog(@"session connectionCreated (%@)", connection.connectionId);
-    // Sent when another client connects to the session.
-    // This message is not sent when your own client connects to the session.
-    ++_participantsNumber;
+    dispatch_async(self->_opentokQueue, ^{
+        NSLog(@"session connectionCreated (%@)", connection.connectionId);
+        // Sent when another client connects to the session.
+        // This message is not sent when your own client connects to the session.
+        ++self->_participantsNumber;
+    });
 }
 
-- (void) session:(OTSession *)session
-connectionDestroyed:(OTConnection *)connection
+- (void) session:(OTSession *)session connectionDestroyed:(OTConnection *)connection
 {
-    NSLog(@"session connectionDestroyed (%@)", connection.connectionId);
-    // Sent when another client disconnects from the session.
-    // This message is not sent when your own client disconnects from the session.
-    --_participantsNumber;
-    if ([_subscriber.stream.connection.connectionId
-         isEqualToString:connection.connectionId])
-    {
-        [self cleanupSubscriber];
-    }
+    dispatch_async(self->_opentokQueue, ^{
+        NSLog(@"session connectionDestroyed (%@)", connection.connectionId);
+        // Sent when another client disconnects from the session.
+        // This message is not sent when your own client disconnects from the session.
+        --self->_participantsNumber;
+        if ([self->_subscriber.stream.connection.connectionId
+             isEqualToString:connection.connectionId])
+        {
+            [self cleanupSubscriber];
+        }
+    });
 }
 
-- (void) session:(OTSession*)session
-didFailWithError:(OTError*)error
+- (void) session:(OTSession*)session didFailWithError:(OTError*)error
 {
     NSLog(@"didFailWithError: (%@)", error);
 }
@@ -379,57 +399,56 @@ didFailWithError:(OTError*)error
 # pragma mark - OTSubscriber delegate callbacks
 - (void)subscriberDidConnectToStream:(OTSubscriberKit*)subscriber
 {
-    NSLog(@"subscriberDidConnectToStream (%@)",
-          subscriber.stream.connection.connectionId);
-    assert(_subscriber == subscriber);
     dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"subscriberDidConnectToStream (%@)", subscriber.stream.connection.connectionId);
+        assert(self->_subscriber == subscriber);
         [NSTimer scheduledTimerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            [self->_subscriber getRtcStatsReport];
+            dispatch_async(self->_opentokQueue, ^{
+                [self->_subscriber getRtcStatsReport];
+            });
         }];
     });
 }
 
-- (void)subscriber:(OTSubscriberKit*)subscriber
-  didFailWithError:(OTError*)error
+- (void)subscriber:(OTSubscriberKit*)subscriber didFailWithError:(OTError*)error
 {
-    NSLog(@"subscriber %@ didFailWithError %@",
-          subscriber.stream.streamId,
-          error);
+    NSLog(@"subscriber %@ didFailWithError %@", subscriber.stream.streamId, error);
 }
 
 # pragma mark - OTPublisher delegate callbacks
-- (void)publisher:(OTPublisherKit *)publisher
-    streamCreated:(OTStream *)stream
+- (void)publisher:(OTPublisherKit *)publisher streamCreated:(OTStream *)stream
 {
-    NSLog(@"Publishing");
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSTimer scheduledTimerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            [self->_publisher getRtcStatsReport];
+            dispatch_async(self->_opentokQueue, ^{
+                [self->_publisher getRtcStatsReport];
+            });
         }];
     });
 }
 
-- (void)publisher:(OTPublisherKit*)publisher
-  streamDestroyed:(OTStream *)stream
+- (void)publisher:(OTPublisherKit*)publisher streamDestroyed:(OTStream *)stream
 {
-    if ([_subscriber.stream.streamId isEqualToString:stream.streamId])
-    {
-        [self cleanupSubscriber];
-    }
-
-    [self cleanupPublisher];
+    dispatch_async(self->_opentokQueue, ^{
+        if ([self->_subscriber.stream.streamId isEqualToString:stream.streamId])
+        {
+            [self cleanupSubscriber];
+        }
+        [self cleanupPublisher];
+    });
+    
 }
 
-- (void)publisher:(OTPublisherKit*)publisher
- didFailWithError:(OTError*) error
+- (void)publisher:(OTPublisherKit*)publisher didFailWithError:(OTError*) error
 {
-    NSLog(@"publisher didFailWithError %@", error);
-    [self cleanupPublisher];
+    dispatch_async(self->_opentokQueue, ^{
+        NSLog(@"publisher didFailWithError %@", error);
+        [self cleanupPublisher];
+    });
 }
 
 - (void)showAlert:(NSString *)string
 {
-    // show alertview on main UI
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:@"OTError"
                                                                          message:string
@@ -441,6 +460,7 @@ didFailWithError:(OTError*)error
 - (void) URLSession:(NSURLSession *)session
 didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
   completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
+    
     if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
         if ([challenge.protectionSpace.host isEqualToString:kHoloRoomServiceServerIP]) {
             NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
@@ -480,11 +500,12 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
             }
         }
         stats = [NSString stringWithFormat:@"Publisher: %@", [outboundStats length] > 0 ? outboundStats : @"NA"];
-
-        [_publisherStatsLabel removeFromSuperview];
-        [_publisherStatsLabel setText:stats];
-        [_publisherStatsLabel setNumberOfLines:0];
-        [_localVideoView addSubview:_publisherStatsLabel];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [_publisherStatsLabel removeFromSuperview];
+            [_publisherStatsLabel setText:stats];
+            [_publisherStatsLabel setNumberOfLines:0];
+            [_localVideoView addSubview:_publisherStatsLabel];
+        });
     }
 }
 
@@ -515,15 +536,12 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         }
     }
     stats = [NSString stringWithFormat:@"Subscriber: %@\n", [inboundStats length] > 0 ? inboundStats : @"NA"];
-
-    [_subscriberStatsLabel removeFromSuperview];
-    [_subscriberStatsLabel setText:stats];
-    [_subscriberStatsLabel setNumberOfLines:0];
-    if (kUnityRenderingEnabled) {
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [_subscriberStatsLabel removeFromSuperview];
+        [_subscriberStatsLabel setText:stats];
+        [_subscriberStatsLabel setNumberOfLines:0];
         [[[[self unityFramework] appController] rootView]addSubview:_subscriberStatsLabel];
-    } else {
-        [_subscriber.view addSubview:_subscriberStatsLabel];
-    }
+    });
 }
 
 - (void)roomNameAndRoleNotification:(NSNotification *)notification {
@@ -531,11 +549,11 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     NSLog(@"Notification received with userInfo: %@", userInfo);
     _sender = false;
     if([userInfo objectForKey:@"isSender"]){
-        _sender = [userInfo valueForKey:@"isSender"];
+        _sender = [[userInfo valueForKey:@"isSender"] boolValue];
     }
     
     if([userInfo objectForKey:@"roomName"]){
-        _roomName = [userInfo valueForKey:@"roomName"];
+        _roomName = [userInfo valueForKey:@"roomName"] ;
     }
     
     if(_sender){
