@@ -500,11 +500,11 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
             }
         }
         stats = [NSString stringWithFormat:@"Publisher: %@", [outboundStats length] > 0 ? outboundStats : @"NA"];
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [_publisherStatsLabel removeFromSuperview];
-            [_publisherStatsLabel setText:stats];
-            [_publisherStatsLabel setNumberOfLines:0];
-            [_localVideoView addSubview:_publisherStatsLabel];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self->_publisherStatsLabel removeFromSuperview];
+            [self->_publisherStatsLabel setText:stats];
+            [self->_publisherStatsLabel setNumberOfLines:0];
+            [self->_localVideoView addSubview:self->_publisherStatsLabel];
         });
     }
 }
@@ -536,11 +536,11 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         }
     }
     stats = [NSString stringWithFormat:@"Subscriber: %@\n", [inboundStats length] > 0 ? inboundStats : @"NA"];
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [_subscriberStatsLabel removeFromSuperview];
-        [_subscriberStatsLabel setText:stats];
-        [_subscriberStatsLabel setNumberOfLines:0];
-        [[[[self unityFramework] appController] rootView]addSubview:_subscriberStatsLabel];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self->_subscriberStatsLabel removeFromSuperview];
+        [self->_subscriberStatsLabel setText:stats];
+        [self->_subscriberStatsLabel setNumberOfLines:0];
+        [[[[self unityFramework] appController] rootView]addSubview:self->_subscriberStatsLabel];
     });
 }
 

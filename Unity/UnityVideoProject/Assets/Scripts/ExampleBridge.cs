@@ -103,12 +103,13 @@ public class ExampleBridge : MonoBehaviour
     public void setRoomNameAndRole(string roomName, bool isSender)
     {
         setRoomNameAndRoleCS(Encoding.UTF8.GetBytes(roomName), isSender);
-
-        Task.Delay(10000).ContinueWith(t=>hangup());
+        if(isSender == false){
+            Task.Delay(10000).ContinueWith(t=>hangup());
+        }
     }
 
     public void hangup(){
-        hangupCS()
+        hangupCS();
     }
 
     public void SetTexture()
