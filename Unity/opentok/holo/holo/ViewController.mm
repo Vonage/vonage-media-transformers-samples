@@ -36,23 +36,6 @@ static NSString* const kHoloRoomServiceURI = @"https://3.19.223.109:8080/room/%@
 
 static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
 
-UnityFramework* UnityFrameworkLoad() {
-    NSString* bundlePath = nil;
-    bundlePath = [[NSBundle mainBundle] bundlePath];
-    bundlePath = [bundlePath stringByAppendingString: @"/Frameworks/UnityFramework.framework"];
-
-    NSBundle* bundle = [NSBundle bundleWithPath: bundlePath];
-    if ([bundle isLoaded] == false) [bundle load];
-
-    UnityFramework* ufw = [bundle.principalClass getInstance];
-    if (![ufw appController])
-    {
-        // unity is not initialized
-        [ufw setExecuteHeader: &_mh_execute_header];
-    }
-    return ufw;
-}
-
 @interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate, OTPublisherKitRtcStatsReportDelegate, OTSubscriberKitRtcStatsReportDelegate>
 @property (nonatomic) OTSession *session;
 @property (nonatomic) OTPublisher *publisher;
@@ -85,26 +68,68 @@ UnityFramework* UnityFrameworkLoad() {
 @synthesize capturer = _capturer;
 @synthesize renderer = _renderer;
 
-#pragma mark - View lifecycle
-- (void)viewDidLoad {
-    [super viewDidLoad];
++(NSBundle*) getUnityBundle {
+    NSString* bundlePath = nil;
+    bundlePath = [[NSBundle mainBundle] bundlePath];
+    bundlePath = [bundlePath stringByAppendingString: @"/Frameworks/UnityFramework.framework"];
+
+    NSBundle* bundle = [NSBundle bundleWithPath: bundlePath];
+    return bundle;
+}
+
++(UnityFramework*) unityFrameworkLoad {
+    NSBundle* bundle = [ViewController getUnityBundle];
+    if(bundle == nil){
+        return nil;
+    }
+    if ([bundle isLoaded] == false){
+        [bundle load];
+    }
+
+    UnityFramework* ufw = [bundle.principalClass getInstance];
+    if (![ufw appController])
+    {
+        // unity is not initialized
+        [ufw setExecuteHeader: &_mh_execute_header];
+    }
+    return ufw;
+}
+
++(void) unityFrameworkUnload {
+    NSBundle* bundle = [ViewController getUnityBundle];
+    if(bundle == nil){
+        return;
+    }
+    
+    if ([bundle isLoaded]){
+        [bundle unload];
+    }
+}
+
+-(void)initApp {
     self->_sender = NO;
     self->_unityQuit = NO;
     self->_wasUnityPresented = NO;
-    
-    dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, /*relative_priority=*/0);
-    self.opentokQueue = dispatch_queue_create(kOpenTokQueueLabel, qosAttribute);
-    
     if (@available(iOS 14.0, *)) {
         if([NSProcessInfo processInfo].isiOSAppOnMac){
             [self initUnity:NO];
         }else{
             [self initUnity:YES];
         }
-    } else {
-    
     }
-    
+}
+
+-(void)hangup{
+    [self doOpentokUninit];
+    [self uninitUnity];
+}
+
+#pragma mark - View lifecycle
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, /*relative_priority=*/0);
+    self.opentokQueue = dispatch_queue_create(kOpenTokQueueLabel, qosAttribute);
+    [self initApp];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -132,18 +157,13 @@ UnityFramework* UnityFrameworkLoad() {
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear: animated];
-;
 }
 
 -(void)dealloc {
-    if (![self unityIsInitialized]) {
-        NSLog(@"Unity is not initialized. Initialize Unity first.");
-    } else {
-        [UnityFrameworkLoad() unloadApplication];
-    }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self doOpentokUninit];
+    [self uninitUnity];
 }
-
 #pragma mark - Unity methods
 
 - (bool)unityIsInitialized {
@@ -155,22 +175,27 @@ UnityFramework* UnityFrameworkLoad() {
         NSLog(@"Unity already initialized. Unload Unity first");
         return;
     }
-
+    
     if (self->_unityQuit) {
         NSLog(@"Unity cannot be initialized after quit. Use unload instead");
         return;
     }
-
-    self->_unityFramework = UnityFrameworkLoad();
+    
+    self->_unityFramework = [ViewController unityFrameworkLoad];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(roomNameAndRoleNotification:)
                                                  name:kRoomNameAndRoleNotification
                                                object:nil];
-
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(hangupNotification:)
+                                                 name:kHangupNotification
+                                               object:nil];
+    
     [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
     [[self unityFramework] registerFrameworkListener: self];
-
+    
     NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
     [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
     [FrameworkLibAPI setUnityRenderer:YES];
@@ -181,6 +206,9 @@ UnityFramework* UnityFrameworkLoad() {
     NSLog(@"unityDidUnload called");
     [[self unityFramework] unregisterFrameworkListener: self];
     self->_unityFramework = nil;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self initApp];
+    });
 }
 
 - (void)unityDidQuit:(NSNotification*)notification {
@@ -190,9 +218,18 @@ UnityFramework* UnityFrameworkLoad() {
     self->_unityQuit = YES;
 }
 
+-(void) uninitUnity{
+    if (![self unityIsInitialized]) {
+        NSLog(@"Unity is not initialized. Initialize Unity first.");
+    } else {
+        [self->_unityFramework unloadApplication];
+        [ViewController unityFrameworkUnload];
+    }
+}
+
 #pragma mark - OpenTok local methods
 
-- (void)doInit {
+- (void)doOpentokInit {
     if (![kApiKey isEqualToString:@""] && ![kSessionId isEqualToString:@""]) {
         HoloCredentials credentials;
         credentials.apiKey = kApiKey;
@@ -208,7 +245,7 @@ UnityFramework* UnityFrameworkLoad() {
     NSMutableURLRequest *mutableRequest = [urlRequest mutableCopy];
     [mutableRequest setHTTPMethod: @"GET"];
     [mutableRequest addValue:@"application/json, text/plain, */*" forHTTPHeaderField:@"Accept"];
-
+    
     [[session dataTaskWithRequest:mutableRequest
                 completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (!error) {
@@ -237,13 +274,16 @@ UnityFramework* UnityFrameworkLoad() {
     }] resume];
 }
 
-- (BOOL)prefersStatusBarHidden
-{
-    return YES;
-}
-
-- (BOOL)shouldAutorotate {
-    return UIUserInterfaceIdiomPhone != [[UIDevice currentDevice] userInterfaceIdiom];
+- (void)doOpentokUninit {
+    dispatch_sync(self->_opentokQueue, ^{
+        OTError* error;
+        if(self->_session){
+            [self->_session disconnect:&error];
+            if(error){
+                NSLog(@"erro disconnect from session");
+            }
+        }
+    });
 }
 
 - (void)doConnectHoloCredentials:(const HoloCredentials&)credentials
@@ -276,7 +316,6 @@ UnityFramework* UnityFrameworkLoad() {
             [self showAlert:[error localizedDescription]];
         }
     });
-
 }
 
 - (void)cleanupPublisher {
@@ -563,6 +602,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
             [self->_capturer startCaptureCompletionHandler:^(NSError * error) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     if(!error){
+                        [[NSNotificationCenter defaultCenter] removeObserver:self];
                         [self.view addSubview:self->_localVideoView];
                         [self dismissViewControllerAnimated:YES completion:nil];
                     }
@@ -575,7 +615,11 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         [self->_subscriberStatsLabel setTextColor:[UIColor whiteColor]];
         [self->_subscriberStatsLabel setBackgroundColor:[UIColor clearColor]];
     }
-    [self doInit];
+    [self doOpentokInit];
+}
+
+-(void)hangupNotification: (NSNotification *)notification {
+    [self hangup];
 }
 
 @end
