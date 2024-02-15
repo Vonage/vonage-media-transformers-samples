@@ -150,13 +150,7 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
     self->_unityQuit = NO;
     self->_wasUnityPresented = NO;
     self->_unityEventListner = [[UnityEventListner alloc] initWithDelegate:self];
-    if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].isiOSAppOnMac){
-            [self initUnity:NO];
-        }else{
-            [self initUnity:YES];
-        }
-    }
+    [self initUnity];
 }
 
 -(void)hangup{
@@ -223,7 +217,7 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
     return [self unityFramework] && [[self unityFramework] appController];
 }
 
-- (void)initUnity:(BOOL)isSender {
+- (void)initUnity {
     if ([self unityIsInitialized]) {
         NSLog(@"Unity already initialized. Unload Unity first");
         return;
@@ -252,7 +246,6 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
     NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
     [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
     [FrameworkLibAPI setUnityRenderer:YES];
-    [FrameworkLibAPI setRole:isSender];
 }
 
 - (void)unityDidUnload:(BOOL)sender {

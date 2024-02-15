@@ -18,7 +18,6 @@ __attribute__ ((visibility("default")))
 + (void) getInputWidth:(uint32_t&)width height:(uint32_t&)height;
 + (void) getOutputWidth:(uint32_t&)width height:(uint32_t&)height rotation:(uint8_t&)rotation;
 + (void) setUnityRenderer:(bool)unityRenderer;
-+ (void) setRole:(bool)isSender;
 @end
 
 #endif //NATIVECALLPROXY_H_

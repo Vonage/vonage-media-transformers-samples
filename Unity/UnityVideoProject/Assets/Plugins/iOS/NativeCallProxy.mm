@@ -24,8 +24,6 @@ public:
         inputRotation_ = outputRotation_ = 0;
         unityRenderer_ = false;
         inputWidth_ = inputHeight_ = outputWidth_ = outputHeight_ = 0;
-
-        isSender_ = false;
     }
     
     void getOutput(std::unique_ptr<uint8_t[]>& buffer, uint32_t& size){
@@ -133,14 +131,6 @@ public:
         return unityRenderer_;
     }
 
-    void setIsSender(bool isSender){
-        isSender_ = isSender;
-    }
-
-    bool getIsSender() const {
-        return isSender_;
-    }
-
 private:
     uint8_t* inputArray_;
     uint8_t* inputAugmentedArray_;
@@ -158,8 +148,6 @@ private:
     uint32_t outputHeight_;
 
     bool unityRenderer_;
-
-    bool isSender_;
 };
 
 unityBridgePtr unityBridge::instance_ = std::make_shared<unityBridge>();
@@ -219,10 +207,6 @@ extern "C"{
     bool __stdcall getUnityRendererCS(){
         return unityBridge::getBridge()->getUnityRenderer();
     }
-
-    bool __stdcall getIsSenderCS(){
-        return unityBridge::getBridge()->getIsSender();
-    }
 }
 
 @implementation FrameworkLibAPI
@@ -270,12 +254,6 @@ extern "C"{
     auto bridge = unityBridge::getBridge();
     if(bridge == nullptr) return;
     bridge->setUnityRenderer(unityRenderer);
-}
-
-+ (void) setRole:(bool)isSender{
-    auto bridge = unityBridge::getBridge();
-    if(bridge == nullptr) return;
-    bridge->setIsSender(isSender);
 }
 
 @end
