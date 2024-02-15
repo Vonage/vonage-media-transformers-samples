@@ -197,6 +197,13 @@ extern "C"{
         }
     }
 
+    void __stdcall hangupCS(){
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter postNotificationName:kHangupNotification
+                                        object:nil
+                                        userInfo:nil];
+    }
+
     bool __stdcall getUnityRendererCS(){
         return unityBridge::getBridge()->getUnityRenderer();
     }

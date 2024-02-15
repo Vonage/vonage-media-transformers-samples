@@ -8,6 +8,7 @@
 #import <memory>
 
 __attribute__((visibility("default"))) NSString *const kRoomNameAndRoleNotification = @"RoomNameAndRoleNotification";
+__attribute__((visibility("default"))) NSString *const kHangupNotification = @"HangupNotification";
 
 __attribute__ ((visibility("default")))
 @interface FrameworkLibAPI : NSObject

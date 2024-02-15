@@ -17,14 +17,6 @@
 
 #include "AppDelegate.h"
 
-// Note: Define SKIP_UNITY_INTEGRATION macro whenever
-//       you want this custom video renderer to skip
-//       using the Unity integration completely.
-//       Note this macro is different to the unityRenderingEnabled
-//       render flag that tells the instance to let
-//       Unity do the rendering instead of WebRTC.
-//#define SKIP_UNITY_INTEGRATION
-
 namespace vonage {
     int GetRotation(OTVideoOrientation rotation){
         switch (rotation) {
@@ -63,7 +55,6 @@ namespace vonage {
 @end
 
 @implementation Renderer {
-    BOOL _unityRenderingEnabled;
     UnityFramework* _unity;
     int64_t _current_timestamp;
 }
@@ -91,11 +82,10 @@ namespace vonage {
 
 #pragma mark - OTVideoRender
 
-- (instancetype)initWithUnityRenderingEnabled:(BOOL)unityRenderingEnabled unity:(nonnull UnityFramework *)unity {
+- (instancetype)initWithUnity:(nonnull UnityFramework *)unity {
     self = [super init];
     if(self){
         _current_timestamp = 0;
-        _unityRenderingEnabled = unityRenderingEnabled;
         _unity = unity;
     }
     return self;
@@ -109,8 +99,6 @@ namespace vonage {
         NSLog(@"[holo]: Renderer %p renderVideoFrame frame is null", self);
         return;
     }
-//    NSLog(@"[holo]: Renderer %p renderVideoFrame frame width is %u", self, frame.format.imageWidth);
-//    NSLog(@"[holo]: Renderer %p renderVideoFrame frame heigth is %u", self, frame.format.imageHeight);
     rtc::scoped_refptr<webrtc::VideoFrameBuffer> inputWebrtcVideoFrameBuffer = webrtc::I420Buffer::Copy(frame.format.imageWidth,
                                                                                                         frame.format.imageHeight,
                                                                                                         static_cast<uint8_t*>([frame.planes pointerAtIndex:0]),
@@ -123,12 +111,9 @@ namespace vonage {
         NSLog(@"[holo]: Renderer %p renderVideoFrame inputWebrtcVideoFrameBuffer is null", self);
         return;
     }
-
-#ifndef SKIP_UNITY_INTEGRATION
     uint32_t inputWidth = 0;
     uint32_t inputHeigth = 0;
     [FrameworkLibAPI getInputWidth:inputWidth height:inputHeigth];
-//    NSLog(@"[holo]: Renderer %p renderVideoFrame inputWidth is %u and inputHeigth is %u", self, inputWidth, inputHeigth);
     if ((inputWidth == 0) || (inputHeigth == 0)) {
         NSLog(@"[holo]: Renderer %p renderVideoFrame inputWidth is %u and inputHeigth is %u", self, inputWidth, inputHeigth);
         return;
@@ -157,75 +142,14 @@ namespace vonage {
         NSLog(@"[holo]: Renderer %p renderVideoFrame libyuv::I420ToARGB call failed", self);
         return;
     }
-    std::unique_ptr<uint8_t[]> depthData;
-    uint32_t depthDataSize = 0;
     NSData *data = [frame metadata];
-    if (data && data.bytes && (data.length > 0)) {
-//        NSLog(@"[holo]: Renderer %p renderVideoFrame frame augmented data ptr is %p and size is %lu", self, data.bytes, static_cast<size_t>(data.length));
-        Holographic::Compression::decompress(static_cast<const uint8_t*>(data.bytes), static_cast<uint32_t>(data.length), depthData, depthDataSize);
-    }
     [FrameworkLibAPI setInputBufferCpp:argbInData.get()
                                rgbSize:inputNumBytes
-                       augmentedBuffer:depthData.get()
-                         augmentedSize:depthDataSize
+                       augmentedBuffer:(uint32_t)data.length > 0 ? (uint8_t*)(data.bytes) : nullptr
+                         augmentedSize:(uint32_t)data.length
                               rotation:static_cast<uint32_t>(vonage::GetRotation([frame orientation]))];
     [_unity sendMessageToGOWithName:"ExampleBridge" functionName:"SetTexture" message:""];
-    if (_unityRenderingEnabled) {
-        // If Unity is in charge of rendering the app won't doit by using the WebRTC renderer so we bail out here.
-        return;
-    }
-    std::unique_ptr<uint8_t[]> argbOutputData;
-    uint32_t argbOutputDataSize = 0;
-    [FrameworkLibAPI getOutputBufferCpp:argbOutputData size:argbOutputDataSize];
-//    NSLog(@"[holo]: Renderer %p renderVideoFrame argbOutputData ptr is %p and argbOutputDataSize is %u", self, argbOutputData.get(), argbOutputDataSize);
-    if ((argbOutputData.get() == nullptr) || (argbOutputDataSize == 0)) {
-        NSLog(@"[holo]: Renderer %p renderVideoFrame argbOutputData ptr is %p and argbOutputDataSize is %u", self, argbOutputData.get(), argbOutputDataSize);
-        return;
-    }
-    uint32_t outputWidth = 0;
-    uint32_t outputHeigth = 0;
-    uint8_t outputRotation = 0;
-    [FrameworkLibAPI getOutputWidth:outputWidth height:outputHeigth rotation:outputRotation];
-//    NSLog(@"[holo]: Renderer %p renderVideoFrame outputWidth is %u and outputHeigth is %u", self, outputWidth, outputHeigth);
-    if ((outputWidth == 0) || (outputHeigth == 0)) {
-        NSLog(@"[holo]: Renderer %p renderVideoFrame outputWidth is %u and outputHeigth is %u", self, outputWidth, outputHeigth);
-        return;
-    }
-    rtc::scoped_refptr<webrtc::I420Buffer> outputWebrtcVideoFrameBuffer = webrtc::I420Buffer::Create(outputWidth, outputHeigth);
-    if (outputWebrtcVideoFrameBuffer.get() == nullptr) {
-        NSLog(@"[holo]: Renderer %p renderVideoFrame outputWebrtcVideoFrameBuffer is null", self);
-        return;
-    }
-    retval = libyuv::ARGBToI420(argbOutputData.get(),
-                                outputWidth * 4,
-                                outputWebrtcVideoFrameBuffer->MutableDataY(),
-                                outputWebrtcVideoFrameBuffer->StrideY(),
-                                outputWebrtcVideoFrameBuffer->MutableDataU(),
-                                outputWebrtcVideoFrameBuffer->StrideU(),
-                                outputWebrtcVideoFrameBuffer->MutableDataV(),
-                                outputWebrtcVideoFrameBuffer->StrideV(),
-                                outputWidth,
-                                outputHeigth);
-    if (retval) {
-        NSLog(@"[holo]: Renderer %p renderVideoFrame libyuv::ARGBToI420 call failed", self);
-        return;
-    }
-#endif
-
-    _current_timestamp += 1;
-    webrtc::VideoFrame outputWebrtcVideoFrame = webrtc::VideoFrame::Builder()
-#ifndef SKIP_UNITY_INTEGRATION
-        .set_rotation(vonage::GetRotation(outputRotation))
-        .set_video_frame_buffer(outputWebrtcVideoFrameBuffer)
-#else
-        .set_rotation(vonage::GetRotation(vonage::GetRotation([frame orientation])))
-        .set_video_frame_buffer(inputWebrtcVideoFrameBuffer)
-#endif
-        .set_timestamp_ms(_current_timestamp)
-        .build();
-    if (_videoView) {
-        [_videoView renderFrame:webrtc::NativeToObjCVideoFrame(outputWebrtcVideoFrame)];
-    }
+    return;
 }
 
 - (void)updateDelegate:(nullable id<RendererDelegate>)delegate {

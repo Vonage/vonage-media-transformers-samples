@@ -2,9 +2,7 @@
 
 #import <TargetConditionals.h>
 #import <AVFoundation/AVCaptureSession.h>
-#if !(TARGET_IPHONE_SIMULATOR)
 #import <UnityFramework/UnityFramework.h>
-#endif
 
 NSDictionary* appLaunchOpts;
 
