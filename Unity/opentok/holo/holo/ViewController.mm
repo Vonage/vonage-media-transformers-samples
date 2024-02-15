@@ -179,6 +179,7 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
     [super viewDidLoad];
     dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, /*relative_priority=*/0);
     self.opentokQueue = dispatch_queue_create(kOpenTokQueueLabel, qosAttribute);
+    [self.view setBackgroundColor:[UIColor blackColor]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -688,7 +689,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     if(_sender){
         dispatch_async(dispatch_get_main_queue(), ^{
             [self->_unityEventListner setSender:YES];
-            self->_localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+            self->_localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectMake(0, self.view.center.y - 320, 480, 640)];
             self->_capturer = [[Capturer alloc] initWithCapturePreset:AVCaptureSessionPreset640x480 andDelegate:self->_localVideoView];
             [self->_capturer startCaptureCompletionHandler:^(NSError * error) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
