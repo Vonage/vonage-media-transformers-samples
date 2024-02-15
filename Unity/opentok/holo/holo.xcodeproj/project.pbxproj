@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0AD1B0822B7D01600034533F /* phone-hangup-white.png in Resources */ = {isa = PBXBuildFile; fileRef = 0AD1B0812B7D01600034533F /* phone-hangup-white.png */; };
 		2652B78D629B047AF321A45D /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
 		9D595DD4116701BB26891604 /* Pods_holosim.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CF4DDABE63FA415E165FE0C3 /* Pods_holosim.framework */; };
 		B11318838E31AC3E3674C543 /* Pods_holo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98C133DA068FF28B3C2429D3 /* Pods_holo.framework */; };
@@ -50,6 +51,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0AD1B0812B7D01600034533F /* phone-hangup-white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "phone-hangup-white.png"; sourceTree = "<group>"; };
 		216AA2A62DA60522C5597CF0 /* Pods-holo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holo.release.xcconfig"; path = "Target Support Files/Pods-holo/Pods-holo.release.xcconfig"; sourceTree = "<group>"; };
 		98C133DA068FF28B3C2429D3 /* Pods_holo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_holo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B61C364C165EA6E46CE98C96 /* Pods-holosim.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holosim.debug.xcconfig"; path = "Target Support Files/Pods-holosim/Pods-holosim.debug.xcconfig"; sourceTree = "<group>"; };
@@ -102,6 +104,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0AD1B07E2B7CF4F40034533F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0AD1B0812B7D01600034533F /* phone-hangup-white.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		AA68DEBCA12E0959B459B55B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -128,6 +138,7 @@
 		FFD5ADF52B508A290022E578 = {
 			isa = PBXGroup;
 			children = (
+				0AD1B07E2B7CF4F40034533F /* Resources */,
 				FFD5AE002B508A290022E578 /* holo */,
 				FFD5ADFF2B508A290022E578 /* Products */,
 				AA68DEBCA12E0959B459B55B /* Pods */,
@@ -249,6 +260,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFD5AE112B508A2A0022E578 /* LaunchScreen.storyboard in Resources */,
+				0AD1B0822B7D01600034533F /* phone-hangup-white.png in Resources */,
 				FFD5AE0E2B508A2A0022E578 /* Assets.xcassets in Resources */,
 				FFD5AE0C2B508A290022E578 /* Main.storyboard in Resources */,
 			);
@@ -548,7 +560,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -600,7 +612,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

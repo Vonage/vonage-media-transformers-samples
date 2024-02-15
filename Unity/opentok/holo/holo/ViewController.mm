@@ -35,6 +35,7 @@ static NSString* const kHoloRoomServiceServerIP = @"3.19.223.109";
 static NSString* const kHoloRoomServiceURI = @"https://3.19.223.109:8080/room/%@/info";
 
 static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
+static const uint32_t kHangupButtonColor = 0xDC2D37;
 
 @interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate, OTPublisherKitRtcStatsReportDelegate, OTSubscriberKitRtcStatsReportDelegate>
 @property (nonatomic) OTSession *session;
@@ -51,6 +52,7 @@ static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
 @property (nonatomic) Capturer* capturer;
 @property (nonatomic) BOOL wasUnityPresented;
 @property(nonatomic) dispatch_queue_t opentokQueue;
+@property (strong) UIButton *hangupButton;
 @end
 
 @implementation ViewController {
@@ -67,6 +69,7 @@ static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
 @synthesize localVideoView = _localVideoView;
 @synthesize capturer = _capturer;
 @synthesize renderer = _renderer;
+@synthesize hangupButton = _hangupButton;
 
 +(NSBundle*) getUnityBundle {
     NSString* bundlePath = nil;
@@ -122,6 +125,16 @@ static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
 -(void)hangup{
     [self doOpentokUninit];
     [self uninitUnity];
+    if([NSThread isMainThread]){
+        dispatch_async(self->_opentokQueue, ^{
+            [self->_capturer stopCapture];
+            self->_capturer = nil;
+        });
+    }else{
+        [self->_capturer stopCapture];
+        self->_capturer = nil;
+    }
+    self->_renderer = nil;
 }
 
 #pragma mark - View lifecycle
@@ -219,9 +232,7 @@ static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
 }
 
 -(void) uninitUnity{
-    if (![self unityIsInitialized]) {
-        NSLog(@"Unity is not initialized. Initialize Unity first.");
-    } else {
+    if ([self unityIsInitialized]) {
         [self->_unityFramework unloadApplication];
         [ViewController unityFrameworkUnload];
     }
@@ -583,6 +594,34 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     });
 }
 
+-(void) addHangupButton {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self->_hangupButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        NSString* imagePath = [NSString stringWithFormat:@"%@/phone-hangup-white.png",[[NSBundle mainBundle] resourcePath]];
+        UIImage* hangupImage = [[UIImage alloc] initWithContentsOfFile:imagePath];
+        self->_hangupButton.frame = CGRectMake(self.view.center.x - hangupImage.size.width / 2, self.view.center.y * 1.7, hangupImage.size.width, hangupImage.size.height);
+        [[self->_hangupButton layer] setCornerRadius:(CGFloat)25];
+        [[self->_hangupButton layer] setBorderWidth:(CGFloat)1];
+        [[self->_hangupButton layer] setBorderColor:[UIColor whiteColor].CGColor];
+        [self->_hangupButton setImage:hangupImage forState:UIControlStateNormal];
+        CGFloat red =   CGFloat((kHangupButtonColor & 0xFF0000) >> 16) / 0xFF;
+        CGFloat green = CGFloat((kHangupButtonColor & 0x00FF00) >> 8) / 0xFF;
+        CGFloat blue =  CGFloat(kHangupButtonColor & 0x0000FF) / 0xFF;
+        CGFloat alpha = CGFloat(1.0);
+        [self->_hangupButton setBackgroundColor:[UIColor colorWithRed:red green:green blue:blue alpha:alpha]];
+        [self->_hangupButton addTarget:self action:@selector(hangupButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:self->_hangupButton];
+    });
+}
+
+- (void)hangupButtonTapped:(UIButton *)sender {
+    [self hangup];
+    [self initApp];
+    [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
+        self->_wasUnityPresented = YES;
+    }];
+}
+
 - (void)roomNameAndRoleNotification:(NSNotification *)notification {
     NSDictionary *userInfo = notification.userInfo;
     NSLog(@"Notification received with userInfo: %@", userInfo);
@@ -594,6 +633,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     if([userInfo objectForKey:@"roomName"]){
         _roomName = [userInfo valueForKey:@"roomName"] ;
     }
+    _roomName = @"1";
     
     if(_sender){
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -604,7 +644,10 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
                     if(!error){
                         [[NSNotificationCenter defaultCenter] removeObserver:self];
                         [self.view addSubview:self->_localVideoView];
+                        [[self unityFramework] unregisterFrameworkListener: self];
+                        self->_unityFramework = nil;
                         [self dismissViewControllerAnimated:YES completion:nil];
+                        [self addHangupButton];
                     }
                 });
             }];
