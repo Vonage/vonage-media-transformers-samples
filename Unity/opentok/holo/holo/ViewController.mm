@@ -37,11 +37,46 @@ static NSString* const kHoloRoomServiceURI = @"https://3.19.223.109:8080/room/%@
 static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
 static const uint32_t kHangupButtonColor = 0xDC2D37;
 
-@interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate, OTPublisherKitRtcStatsReportDelegate, OTSubscriberKitRtcStatsReportDelegate>
+@protocol UnityCallbackDelegate <NSObject>
+- (void)unityDidUnload:(BOOL)sender;
+- (void)unityDidQuit:(BOOL)sender;
+@end
+
+@interface UnityEventListner : NSObject<UnityFrameworkListener>
+-(instancetype)initWithDelegate:(id<UnityCallbackDelegate>)delegate;
+@property(nonatomic)BOOL sender;
+@end
+
+@interface UnityEventListner()
+@property(nonatomic, assign) id<UnityCallbackDelegate> _Nullable delegate;
+@end
+
+@implementation UnityEventListner
+
+- (instancetype)initWithDelegate:(id<UnityCallbackDelegate>)delegate{
+    self = [super init];
+    if(self){
+        self->_sender = NO;
+        self->_delegate = delegate;
+    }
+    return self;
+}
+
+- (void)unityDidUnload:(NSNotification*)notification {
+    [self->_delegate unityDidUnload:self->_sender];
+}
+
+- (void)unityDidQuit:(NSNotification*)notification {
+    [self->_delegate unityDidQuit:self->_sender];
+}
+
+@end
+
+@interface ViewController ()<OTSessionDelegate, OTSubscriberDelegate, OTPublisherDelegate, NSURLSessionDelegate, OTPublisherKitRtcStatsReportDelegate, OTSubscriberKitRtcStatsReportDelegate, UnityCallbackDelegate>
 @property (nonatomic) OTSession *session;
 @property (nonatomic) OTPublisher *publisher;
-@property(nonatomic) UnityFramework* unityFramework;
-@property(nonatomic) BOOL unityQuit;
+@property (nonatomic) UnityFramework* unityFramework;
+@property (nonatomic) BOOL unityQuit;
 @property (nonatomic) Renderer *renderer;
 @property (nonatomic) OTSubscriber *subscriber;
 @property (nonatomic) UILabel* publisherStatsLabel;
@@ -51,8 +86,9 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
 @property (nonatomic) __kindof UIView<RTC_OBJC_TYPE(RTCVideoRenderer)> *localVideoView;
 @property (nonatomic) Capturer* capturer;
 @property (nonatomic) BOOL wasUnityPresented;
-@property(nonatomic) dispatch_queue_t opentokQueue;
+@property (nonatomic) dispatch_queue_t opentokQueue;
 @property (strong) UIButton *hangupButton;
+@property (nonatomic) UnityEventListner* unityEventListner;
 @end
 
 @implementation ViewController {
@@ -113,6 +149,7 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
     self->_sender = NO;
     self->_unityQuit = NO;
     self->_wasUnityPresented = NO;
+    self->_unityEventListner = [[UnityEventListner alloc] initWithDelegate:self];
     if (@available(iOS 14.0, *)) {
         if([NSProcessInfo processInfo].isiOSAppOnMac){
             [self initUnity:NO];
@@ -124,17 +161,17 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
 
 -(void)hangup{
     [self doOpentokUninit];
-    [self uninitUnity];
-    if([NSThread isMainThread]){
-        dispatch_async(self->_opentokQueue, ^{
-            [self->_capturer stopCapture];
-            self->_capturer = nil;
-        });
-    }else{
-        [self->_capturer stopCapture];
-        self->_capturer = nil;
-    }
-    self->_renderer = nil;
+}
+
+-(void)afterSessionCleanup{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if(![self uninitUnity]){
+            [self initApp];
+            [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
+                self->_wasUnityPresented = YES;
+            }];
+        }
+    });
 }
 
 #pragma mark - View lifecycle
@@ -142,11 +179,13 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
     [super viewDidLoad];
     dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, /*relative_priority=*/0);
     self.opentokQueue = dispatch_queue_create(kOpenTokQueueLabel, qosAttribute);
-    [self initApp];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear: animated];
+    if(!self->_wasUnityPresented){
+        [self initApp];
+    }
     if(self->_sender){
         self->_publisherStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
         [self->_publisherStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
@@ -207,7 +246,7 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
                                                object:nil];
     
     [[self unityFramework] setDataBundleId: "com.unity3d.framework"];
-    [[self unityFramework] registerFrameworkListener: self];
+    [[self unityFramework] registerFrameworkListener: self->_unityEventListner];
     
     NSDictionary* appLaunchOpts = [[NSDictionary alloc] init];
     [[self unityFramework] runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
@@ -215,27 +254,33 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
     [FrameworkLibAPI setRole:isSender];
 }
 
-- (void)unityDidUnload:(NSNotification*)notification {
+- (void)unityDidUnload:(BOOL)sender {
     NSLog(@"unityDidUnload called");
-    [[self unityFramework] unregisterFrameworkListener: self];
+    [[self unityFramework] unregisterFrameworkListener: self->_unityEventListner];
     self->_unityFramework = nil;
+    if(!sender){
+        self->_wasUnityPresented = NO;
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self initApp];
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [self dismissViewControllerAnimated:YES completion:nil];
     });
 }
 
-- (void)unityDidQuit:(NSNotification*)notification {
+- (void)unityDidQuit:(BOOL)sender {
     NSLog(@"unityDidQuit called");
-    [[self unityFramework] unregisterFrameworkListener: self];
+    [[self unityFramework] unregisterFrameworkListener: self->_unityEventListner];
     self->_unityFramework = nil;
     self->_unityQuit = YES;
 }
 
--(void) uninitUnity{
+-(BOOL) uninitUnity{
     if ([self unityIsInitialized]) {
         [self->_unityFramework unloadApplication];
         [ViewController unityFrameworkUnload];
+        return YES;
     }
+    return NO;
 }
 
 #pragma mark - OpenTok local methods
@@ -292,8 +337,14 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
             [self->_session disconnect:&error];
             if(error){
                 NSLog(@"erro disconnect from session");
+                [self afterSessionCleanup];
             }
+        }else{
+            [self afterSessionCleanup];
         }
+        [self->_capturer stopCapture];
+        self->_capturer = nil;
+        self->_renderer = nil;
     });
 }
 
@@ -368,6 +419,7 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
         NSLog(@"sessionDidConnect (%@)", session.sessionId);
         ++self->_participantsNumber;
         dispatch_async(dispatch_get_main_queue(), ^{
+            [self->_hangupButton setEnabled:YES];
             [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:NO block:^(NSTimer * _Nonnull timer) {
                 if (self->_participantsNumber > MAX_PARTICIPANTS_PER_ROOM) {
                     [session disconnect:nil];
@@ -388,10 +440,7 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
 
 - (void)sessionDidDisconnect:(OTSession*)session
 {
-    dispatch_async(self->_opentokQueue, ^{
-        NSString* alertMessage = [NSString stringWithFormat:@"Session disconnected: (%@)", session.sessionId];
-        NSLog(@"sessionDidDisconnect (%@)", alertMessage);
-    });
+    [self afterSessionCleanup];
 }
 
 
@@ -610,16 +659,13 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         CGFloat alpha = CGFloat(1.0);
         [self->_hangupButton setBackgroundColor:[UIColor colorWithRed:red green:green blue:blue alpha:alpha]];
         [self->_hangupButton addTarget:self action:@selector(hangupButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self->_hangupButton setEnabled:NO];
         [self.view addSubview:self->_hangupButton];
     });
 }
 
 - (void)hangupButtonTapped:(UIButton *)sender {
     [self hangup];
-    [self initApp];
-    [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
-        self->_wasUnityPresented = YES;
-    }];
 }
 
 - (void)roomNameAndRoleNotification:(NSNotification *)notification {
@@ -637,22 +683,21 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     
     if(_sender){
         dispatch_async(dispatch_get_main_queue(), ^{
+            [self->_unityEventListner setSender:YES];
             self->_localVideoView = [[RTC_OBJC_TYPE(RTCMTLVideoView) alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
             self->_capturer = [[Capturer alloc] initWithCapturePreset:AVCaptureSessionPreset640x480 andDelegate:self->_localVideoView];
             [self->_capturer startCaptureCompletionHandler:^(NSError * error) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     if(!error){
-                        [[NSNotificationCenter defaultCenter] removeObserver:self];
                         [self.view addSubview:self->_localVideoView];
-                        [[self unityFramework] unregisterFrameworkListener: self];
-                        self->_unityFramework = nil;
-                        [self dismissViewControllerAnimated:YES completion:nil];
                         [self addHangupButton];
+                        [self uninitUnity];
                     }
                 });
             }];
         });
     }else{
+        [self->_unityEventListner setSender:NO];
         self->_subscriberStatsLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, 200, 300, 400)];
         [self->_subscriberStatsLabel setFont:[UIFont fontWithName: @"Arial-BoldMT" size:15.f]];
         [self->_subscriberStatsLabel setTextColor:[UIColor whiteColor]];
