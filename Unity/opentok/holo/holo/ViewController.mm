@@ -684,7 +684,6 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     if([userInfo objectForKey:@"roomName"]){
         _roomName = [userInfo valueForKey:@"roomName"] ;
     }
-    _roomName = @"1";
     
     if(_sender){
         dispatch_async(dispatch_get_main_queue(), ^{
