@@ -549,9 +549,14 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
 - (void)showAlert:(NSString *)string
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:@"OTError"
-                                                                         message:string
+        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                         message:[NSString stringWithFormat:@"%@\r\nThe app will be closed", string]
                                                                   preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            exit(0);
+        }];
+        [alertVC addAction:okAction];
         [self presentViewController:alertVC animated:YES completion:nil];
     });
 }
