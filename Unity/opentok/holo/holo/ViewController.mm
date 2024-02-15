@@ -164,6 +164,7 @@ extern bool _unityAppReady;
         [self->_subscriberStatsLabel removeFromSuperview];
         [self->_publisherStatsLabel removeFromSuperview];
         [self->_localVideoView removeFromSuperview];
+        [self->_hangupButton removeFromSuperview];
         if(![self uninitUnity]){
             [self initApp];
             [self showUnityWindow];
