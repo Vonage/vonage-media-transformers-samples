@@ -15,37 +15,13 @@ This sample application shows how to use insertable streams (video) in ios app t
 - Open the generated project `Unity-iPhone.xcodeproj`.
 - In file inspector select Data folder and set target membership to `UnityFramework`.
 - In file inspector select `Libraries/Plugins/iOS/NativeCallProxy.h` and set target membership to `UnityFramework` and `Public`.
-- In file inspector select `LifeCycleListener.h` change this code:
+- In file inspector select `UnityAppController.mm` change this code:
 ```
-void UnityRegisterLifeCycleListener(id<LifeCycleListener> obj);
-void UnityUnregisterLifeCycleListener(id<LifeCycleListener> obj);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern __attribute__((visibility("default"))) NSString* const kUnityDidUnload;
-extern __attribute__((visibility("default"))) NSString* const kUnityDidQuit;
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
+bool    _unityAppReady          = false;
 ```
 to this code:
 ```
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern __attribute__((visibility("default"))) void UnityRegisterLifeCycleListener(id<LifeCycleListener> obj);
-extern __attribute__((visibility("default"))) void UnityUnregisterLifeCycleListener(id<LifeCycleListener> obj);
-
-extern __attribute__((visibility("default"))) NSString* const kUnityDidUnload;
-extern __attribute__((visibility("default"))) NSString* const kUnityDidQuit;
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
+__attribute__((visibility("default"))) bool    _unityAppReady          = false;
 ```
 - In the project `build settings` for target `UnityFramework` set `c++ language` to `c++17`.
 - Open terminal, change directory to the directory containing `Unity-iPhone.xcodeproj` and run this command to build Unity framework:

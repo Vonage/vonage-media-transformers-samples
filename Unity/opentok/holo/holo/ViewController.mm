@@ -4,7 +4,7 @@
 
 #import <sdk/objc/components/renderer/metal/RTCMTLVideoView.h>
 
-#include <UnityFramework/NativeCallProxy.h>
+#import <UnityFramework/NativeCallProxy.h>
 
 #import "Capturer.h"
 #import "Renderer.h"
@@ -36,6 +36,8 @@ static NSString* const kHoloRoomServiceURI = @"https://3.19.223.109:8080/room/%@
 
 static const char* kOpenTokQueueLabel = "com.vonage.camera.video.session.queue";
 static const uint32_t kHangupButtonColor = 0xDC2D37;
+
+extern bool _unityAppReady;
 
 @protocol UnityCallbackDelegate <NSObject>
 - (void)unityDidUnload:(BOOL)sender;
@@ -161,11 +163,36 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
     dispatch_async(dispatch_get_main_queue(), ^{
         if(![self uninitUnity]){
             [self initApp];
+            [self showUnityWindow];
+        }
+    });
+}
+
+-(void) showUnityWindow{
+    ::printf("-> mini123 showUnityWindow\n");
+    if([NSThread isMainThread]){
+        if(_unityAppReady){
             [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
                 self->_wasUnityPresented = YES;
             }];
+        }else{
+            [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:NO block:^(NSTimer * _Nonnull timer) {
+                [self showUnityWindow];
+            }];
         }
-    });
+    }else{
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            if(_unityAppReady){
+                [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
+                    self->_wasUnityPresented = YES;
+                }];
+            }else{
+                [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:NO block:^(NSTimer * _Nonnull timer) {
+                    [self showUnityWindow];
+                }];
+            }
+        });
+    }
 }
 
 #pragma mark - View lifecycle
@@ -192,9 +219,7 @@ static const uint32_t kHangupButtonColor = 0xDC2D37;
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if(_wasUnityPresented == NO){
-        [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
-            self->_wasUnityPresented = YES;
-        }];
+        [self showUnityWindow];
     }
 }
 
