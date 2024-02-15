@@ -161,6 +161,9 @@ extern bool _unityAppReady;
 
 -(void)afterSessionCleanup{
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self->_subscriberStatsLabel removeFromSuperview];
+        [self->_publisherStatsLabel removeFromSuperview];
+        [self->_localVideoView removeFromSuperview];
         if(![self uninitUnity]){
             [self initApp];
             [self showUnityWindow];
