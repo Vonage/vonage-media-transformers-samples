@@ -169,7 +169,7 @@ extern bool _unityAppReady;
 }
 
 -(void) showUnityWindow{
-    ::printf("-> mini123 showUnityWindow\n");
+    NSLog(@"showUnityWindow");
     if([NSThread isMainThread]){
         if(_unityAppReady){
             [self presentViewController:[[[self unityFramework] appController] rootViewController] animated:YES completion:^{
