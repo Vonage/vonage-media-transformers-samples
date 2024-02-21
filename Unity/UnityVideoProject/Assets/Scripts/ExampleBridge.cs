@@ -45,7 +45,7 @@ public class ExampleBridge : MonoBehaviour
     private static extern void setOutputHeightCS(UInt32 height);
 
     [DllImport("__Internal")]
-    private static extern void setRoomNameAndRoleCS(byte[] roomName, bool isSender);
+    private static extern void setRoomNameAndRoleCS(byte[] roomName, bool isSender, bool enableLogs);
 
     [DllImport("__Internal")]
     private static extern void hangupCS();
@@ -94,9 +94,9 @@ public class ExampleBridge : MonoBehaviour
         };
     }
 
-    public void setRoomNameAndRole(string roomName, bool isSender)
+    public void setRoomNameAndRole(string roomName, bool isSender, bool enableLogs)
     {
-        setRoomNameAndRoleCS(Encoding.UTF8.GetBytes(roomName), isSender);
+        setRoomNameAndRoleCS(Encoding.UTF8.GetBytes(roomName), isSender, enableLogs);
     }
 
     public void hangup(){

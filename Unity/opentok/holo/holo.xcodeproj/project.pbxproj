@@ -61,7 +61,7 @@
 		FFD1CC132B581DF100AA8CC8 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		FFD1CC142B581DF100AA8CC8 /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logger.m; sourceTree = "<group>"; };
 		FFD1CC552B5949C500AA8CC8 /* AugmentedCompression.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AugmentedCompression.xcframework; path = "../Unity-iPhone/AugmentedCompression.xcframework"; sourceTree = "<group>"; };
-		FFD5ADFE2B508A290022E578 /* holo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = holo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFD5ADFE2B508A290022E578 /* Holographic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Holographic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD5AE012B508A290022E578 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FFD5AE022B508A290022E578 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		FFD5AE042B508A290022E578 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
@@ -149,7 +149,7 @@
 		FFD5ADFF2B508A290022E578 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FFD5ADFE2B508A290022E578 /* holo.app */,
+				FFD5ADFE2B508A290022E578 /* Holographic.app */,
 				FFFFC1E62B57D5FE00BEB84E /* holosim.app */,
 			);
 			name = Products;
@@ -199,7 +199,7 @@
 			);
 			name = holo;
 			productName = holo;
-			productReference = FFD5ADFE2B508A290022E578 /* holo.app */;
+			productReference = FFD5ADFE2B508A290022E578 /* Holographic.app */;
 			productType = "com.apple.product-type.application";
 		};
 		FFFFC1D12B57D5FE00BEB84E /* holosim */ = {
@@ -534,7 +534,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PR6C39UQ38;
+				DEVELOPMENT_TEAM = E37FZSUGQP;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -567,7 +567,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.holo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Holographic;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -586,7 +586,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PR6C39UQ38;
+				DEVELOPMENT_TEAM = E37FZSUGQP;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -619,7 +619,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.vonage.holo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Holographic;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;

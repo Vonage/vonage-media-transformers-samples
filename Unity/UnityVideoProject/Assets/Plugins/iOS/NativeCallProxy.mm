@@ -186,11 +186,11 @@ extern "C"{
         unityBridge::getBridge()->setOutputHeight(height);
     }
 
-    void __stdcall setRoomNameAndRoleCS(uint8_t* roomName, bool isSender){
+    void __stdcall setRoomNameAndRoleCS(uint8_t* roomName, bool isSender, bool enableLogs){
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         if(roomName != nullptr){
             NSString* nsRoomName = [NSString stringWithUTF8String:(char*)roomName];
-            NSDictionary *roomInfo = @{@"roomName": nsRoomName, @"isSender": @(isSender)};
+            NSDictionary *roomInfo = @{@"roomName": nsRoomName, @"isSender": @(isSender), @"enableLogs": @(enableLogs)};
             [notificationCenter postNotificationName:kRoomNameAndRoleNotification
                                                       object:nil
                                                     userInfo:roomInfo];
