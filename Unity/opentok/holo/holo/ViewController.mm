@@ -91,6 +91,7 @@ extern bool _unityAppReady;
 @property (nonatomic) dispatch_queue_t opentokQueue;
 @property (strong) UIButton *hangupButton;
 @property (nonatomic) UnityEventListner* unityEventListner;
+@property (nonatomic) BOOL enableLogs;
 @end
 
 @implementation ViewController {
@@ -108,6 +109,7 @@ extern bool _unityAppReady;
 @synthesize capturer = _capturer;
 @synthesize renderer = _renderer;
 @synthesize hangupButton = _hangupButton;
+@synthesize enableLogs = _enableLogs;
 
 +(NSBundle*) getUnityBundle {
     NSString* bundlePath = nil;
@@ -151,6 +153,7 @@ extern bool _unityAppReady;
     self->_sender = NO;
     self->_unityQuit = NO;
     self->_wasUnityPresented = NO;
+    self->_enableLogs = NO;
     self->_unityEventListner = [[UnityEventListner alloc] initWithDelegate:self];
     [self initUnity];
 }
@@ -629,9 +632,11 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         stats = [NSString stringWithFormat:@"Publisher: %@", [outboundStats length] > 0 ? outboundStats : @"NA"];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self->_publisherStatsLabel removeFromSuperview];
-            [self->_publisherStatsLabel setText:stats];
-            [self->_publisherStatsLabel setNumberOfLines:0];
-            [self->_localVideoView addSubview:self->_publisherStatsLabel];
+            if(self->_enableLogs){
+                [self->_publisherStatsLabel setText:stats];
+                [self->_publisherStatsLabel setNumberOfLines:0];
+                [self->_localVideoView addSubview:self->_publisherStatsLabel];
+            }
         });
     }
 }
@@ -665,9 +670,11 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     stats = [NSString stringWithFormat:@"Subscriber: %@\n", [inboundStats length] > 0 ? inboundStats : @"NA"];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_subscriberStatsLabel removeFromSuperview];
-        [self->_subscriberStatsLabel setText:stats];
-        [self->_subscriberStatsLabel setNumberOfLines:0];
-        [[[[self unityFramework] appController] rootView]addSubview:self->_subscriberStatsLabel];
+        if(self->_enableLogs){
+            [self->_subscriberStatsLabel setText:stats];
+            [self->_subscriberStatsLabel setNumberOfLines:0];
+            [[[[self unityFramework] appController] rootView]addSubview:self->_subscriberStatsLabel];
+        }
     });
 }
 
@@ -676,10 +683,8 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         self->_hangupButton = [UIButton buttonWithType:UIButtonTypeCustom];
         NSString* imagePath = [NSString stringWithFormat:@"%@/phone-hangup-white.png",[[NSBundle mainBundle] resourcePath]];
         UIImage* hangupImage = [[UIImage alloc] initWithContentsOfFile:imagePath];
-        self->_hangupButton.frame = CGRectMake(self.view.center.x - hangupImage.size.width / 2, self.view.center.y * 1.7, hangupImage.size.width, hangupImage.size.height);
-        [[self->_hangupButton layer] setCornerRadius:(CGFloat)25];
-        [[self->_hangupButton layer] setBorderWidth:(CGFloat)1];
-        [[self->_hangupButton layer] setBorderColor:[UIColor whiteColor].CGColor];
+        self->_hangupButton.frame = CGRectMake(self.view.center.x - hangupImage.size.width / 2, self.view.center.y * 1.7, hangupImage.size.width + 20, hangupImage.size.height + 20);
+        [[self->_hangupButton layer] setCornerRadius:(CGFloat)(hangupImage.size.width + 20)/2];
         [self->_hangupButton setImage:hangupImage forState:UIControlStateNormal];
         CGFloat red =   CGFloat((kHangupButtonColor & 0xFF0000) >> 16) / 0xFF;
         CGFloat green = CGFloat((kHangupButtonColor & 0x00FF00) >> 8) / 0xFF;
@@ -706,6 +711,10 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     
     if([userInfo objectForKey:@"roomName"]){
         _roomName = [userInfo valueForKey:@"roomName"] ;
+    }
+    
+    if([userInfo objectForKey:@"enableLogs"]){
+        _roomName = [userInfo valueForKey:@"enableLogs"] ;
     }
     
     if(_sender){
