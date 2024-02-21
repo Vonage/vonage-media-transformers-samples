@@ -714,7 +714,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     }
     
     if([userInfo objectForKey:@"enableLogs"]){
-        _roomName = [userInfo valueForKey:@"enableLogs"] ;
+        _enableLogs = [userInfo valueForKey:@"enableLogs"] ;
     }
     
     if(_sender){
