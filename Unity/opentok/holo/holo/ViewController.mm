@@ -678,13 +678,24 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     });
 }
 
++ (UIImage *)imageWithImage:(UIImage *)image convertToSize:(CGSize)size {
+    UIGraphicsBeginImageContext(size);
+    [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
+    UIImage *destImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return destImage;
+}
+
 -(void) addHangupButton {
     dispatch_async(dispatch_get_main_queue(), ^{
         self->_hangupButton = [UIButton buttonWithType:UIButtonTypeCustom];
         NSString* imagePath = [NSString stringWithFormat:@"%@/phone-hangup-white.png",[[NSBundle mainBundle] resourcePath]];
         UIImage* hangupImage = [[UIImage alloc] initWithContentsOfFile:imagePath];
-        self->_hangupButton.frame = CGRectMake(self.view.center.x - hangupImage.size.width / 2, self.view.center.y * 1.7, hangupImage.size.width + 20, hangupImage.size.height + 20);
-        [[self->_hangupButton layer] setCornerRadius:(CGFloat)(hangupImage.size.width + 20)/2];
+        hangupImage = [ViewController imageWithImage:hangupImage convertToSize:CGSizeMake(50, 50)];
+        CGFloat width = hangupImage.size.width + 15;
+        CGFloat height = hangupImage.size.height + 15;
+        self->_hangupButton.frame = CGRectMake(self.view.center.x - width / 2, self.view.center.y * 1.7, width, height);
+        [[self->_hangupButton layer] setCornerRadius:(CGFloat)width/2];
         [self->_hangupButton setImage:hangupImage forState:UIControlStateNormal];
         CGFloat red =   CGFloat((kHangupButtonColor & 0xFF0000) >> 16) / 0xFF;
         CGFloat green = CGFloat((kHangupButtonColor & 0x00FF00) >> 8) / 0xFF;
