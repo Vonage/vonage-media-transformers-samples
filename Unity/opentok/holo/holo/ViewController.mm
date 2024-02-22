@@ -545,7 +545,7 @@ extern bool _unityAppReady;
 # pragma mark - OTPublisher delegate callbacks
 - (void)publisher:(OTPublisherKit *)publisher streamCreated:(OTStream *)stream
 {
-    if (!_enableLogs) {
+    if (_enableLogs) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSTimer scheduledTimerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
                 dispatch_async(self->_opentokQueue, ^{
