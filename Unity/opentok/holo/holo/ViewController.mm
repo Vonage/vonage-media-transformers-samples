@@ -524,8 +524,11 @@ extern bool _unityAppReady;
 # pragma mark - OTSubscriber delegate callbacks
 - (void)subscriberDidConnectToStream:(OTSubscriberKit*)subscriber
 {
+    NSLog(@"subscriberDidConnectToStream (%@)", subscriber.stream.connection.connectionId);
+    if (!_enableLogs) {
+        return;
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"subscriberDidConnectToStream (%@)", subscriber.stream.connection.connectionId);
         assert(self->_subscriber == subscriber);
         [NSTimer scheduledTimerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
             dispatch_async(self->_opentokQueue, ^{
@@ -543,6 +546,9 @@ extern bool _unityAppReady;
 # pragma mark - OTPublisher delegate callbacks
 - (void)publisher:(OTPublisherKit *)publisher streamCreated:(OTStream *)stream
 {
+    if (!_enableLogs) {
+        return;
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSTimer scheduledTimerWithTimeInterval:3 repeats:YES block:^(NSTimer * _Nonnull timer) {
             dispatch_async(self->_opentokQueue, ^{
@@ -632,11 +638,9 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         stats = [NSString stringWithFormat:@"Publisher: %@", [outboundStats length] > 0 ? outboundStats : @"NA"];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self->_publisherStatsLabel removeFromSuperview];
-            if(self->_enableLogs){
-                [self->_publisherStatsLabel setText:stats];
-                [self->_publisherStatsLabel setNumberOfLines:0];
-                [self->_localVideoView addSubview:self->_publisherStatsLabel];
-            }
+            [self->_publisherStatsLabel setText:stats];
+            [self->_publisherStatsLabel setNumberOfLines:0];
+            [self->_localVideoView addSubview:self->_publisherStatsLabel];
         });
     }
 }
@@ -670,11 +674,9 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     stats = [NSString stringWithFormat:@"Subscriber: %@\n", [inboundStats length] > 0 ? inboundStats : @"NA"];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_subscriberStatsLabel removeFromSuperview];
-        if(self->_enableLogs){
-            [self->_subscriberStatsLabel setText:stats];
-            [self->_subscriberStatsLabel setNumberOfLines:0];
-            [[[[self unityFramework] appController] rootView]addSubview:self->_subscriberStatsLabel];
-        }
+        [self->_subscriberStatsLabel setText:stats];
+        [self->_subscriberStatsLabel setNumberOfLines:0];
+        [[[[self unityFramework] appController] rootView]addSubview:self->_subscriberStatsLabel];
     });
 }
 
@@ -714,7 +716,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
     }
     
     if([userInfo objectForKey:@"enableLogs"]){
-        _enableLogs = [userInfo valueForKey:@"enableLogs"] ;
+        _enableLogs = [[userInfo valueForKey:@"enableLogs"] boolValue];
     }
     
     if(_sender){
