@@ -10,6 +10,10 @@
       text-align: center;
     }
 
+    #version_tag {
+      text-align: end;
+    }
+
     vwc-top-app-bar img {
       margin-left: 16px
     }
@@ -127,9 +131,12 @@
             </div>
             <vwc-layout>
               <vwc-button connotation="cta" label="View code in GitHub" layout="filled" icon="open-line" trailingIcon
-                id="githubButton"></vwc-button>
+              id="githubButton"></vwc-button>
               <vwc-button connotation="cta" label="Use Vivid" layout="filled" icon="open-line" trailingIcon
-                id="vividButton"></vwc-button>
+              id="vividButton"></vwc-button>
+            </vwc-layout>
+            <vwc-layout>
+              <vwc-text id="version_tag" font-face="body-1"></vwc-text>
             </vwc-layout>
           </vwc-layout>
         </div>
