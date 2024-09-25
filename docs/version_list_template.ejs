@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vonage ML Transformers demo versions</title>
+</head>
+
+<body>
+  <table>
+    <tr>
+      <th>Version</th>
+    </tr>
+    <% versions.forEach(function(version, key) { %>
+      <tr>
+        <td>
+          <a href="<%= version %>/index.html"><%= version %></a>
+        </td>
+      </tr>
+      <% }); %>
+  </table>
+
+</body>
+</html>
