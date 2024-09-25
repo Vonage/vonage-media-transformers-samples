@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
-    "buildToDocs": "npm run build && node copyToDocs.js"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@vonage/ml-transformers": "5.1.3",
