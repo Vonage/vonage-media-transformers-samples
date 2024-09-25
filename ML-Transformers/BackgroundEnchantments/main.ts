@@ -10,6 +10,7 @@ import {
   WebglSelfieSegmentationType,
 } from "@vonage/ml-transformers";
 import { setVonageMetadata } from "@vonage/media-processor";
+import packageInfo from './package.json';
 
 const MEDIA_ASSETS_URI: string =
   "https://vonage-background-enchantments-sample.s3.amazonaws.com/";
@@ -45,7 +46,7 @@ type Optional<T> = T | undefined;
 function $<T = any>(s: string) {
   const element = document.getElementById(s);
   if (!element) throw `Unable to find element #${s}`;
-  return element as T;
+  return element as unknown as T;
 }
 
 async function main() {
@@ -116,6 +117,9 @@ async function main() {
   const vividButton = $("vividButton");
   const typeSelect = $("typeSelector");
   const segmentationSelect = $("segmentationSelector");
+  const versionTag = $("version_tag");
+
+  versionTag.innerText = `@vonage/ml-transformers version: ${packageInfo.dependencies['@vonage/ml-transformers']}`;
 
   cameraSwitch.addEventListener("change", async () => {
     const checked = cameraSwitch.checked;
