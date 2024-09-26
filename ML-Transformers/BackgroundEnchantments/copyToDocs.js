@@ -1,4 +1,3 @@
-const ejs = require('ejs');
 const fs   = require('fs');
 const packageInfo = require('./package.json');
 
