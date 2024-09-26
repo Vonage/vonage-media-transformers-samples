@@ -1,0 +1,14 @@
+{
+  "name": "github-pages",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build-pages": "node build.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "util to create index.html with list and links to demo versions",
+  "devDependencies": {
+    "ejs": "^3.1.10"
+  }
+}

@@ -10,7 +10,7 @@
       text-align: center;
     }
 
-    #version_tag {
+    .version {
       text-align: end;
     }
 
@@ -135,9 +135,11 @@
               <vwc-button connotation="cta" label="Use Vivid" layout="filled" icon="open-line" trailingIcon
               id="vividButton"></vwc-button>
             </vwc-layout>
-            <vwc-layout>
-              <vwc-text id="version_tag" font-face="body-1"></vwc-text>
-            </vwc-layout>
+            <div class="version">
+              <vwc-text id="version_tag" font-face="body-1">
+              </vwc-text>
+              <vwc-text font-face="body-1"><a href="/vonage-media-transformers-samples/ML-Transformers/BackgroundEnchantments/versions/index.html">See more versions</a></vwc-text>
+          </div>
           </vwc-layout>
         </div>
       </vwc-card>
