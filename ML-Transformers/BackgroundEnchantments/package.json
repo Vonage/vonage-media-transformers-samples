@@ -9,7 +9,7 @@
     "buildToDocs": "npm run build && node copyToDocs.js"
   },
   "dependencies": {
-    "@vonage/ml-transformers": "5.1.3",
+    "@vonage/ml-transformers": "5.2.0-alpha.0",
     "@vonage/vivid": "2.36.0"
   },
   "devDependencies": {

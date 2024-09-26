@@ -1,7 +1,7 @@
 # Background Effects Sample Application
 This sample application shows the result of applying some background visual effects by using the [@vonage/ml-transformers](https://www.npmjs.com/package/@vonage/ml-transformers) library.
 # Demo
-You can see a live demo of this sample running [here](https://vonage-background-enchantments-sample.s3.amazonaws.com/index.html)
+You can see a live demo of this sample running [here](https://vonage.github.io/vonage-media-transformers-samples/)
 # Building the application
 ## Configure the environment
     npm i
