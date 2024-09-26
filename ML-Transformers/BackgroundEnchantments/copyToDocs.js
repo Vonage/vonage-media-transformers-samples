@@ -4,7 +4,7 @@ const packageInfo = require('./package.json');
 
 const currentVersion = packageInfo.dependencies['@vonage/ml-transformers']
 
-const folderName = '../../docs/versions/' + currentVersion;
+const folderName = '../../docs/ML-Transformers/BackgroundEnchantments/versions/' + currentVersion;
 fs.mkdirSync(folderName,  { recursive: true });
 fs.cpSync('./dist', folderName, {recursive: true});
 fs.cpSync('./media', folderName + '/media', {recursive: true});
