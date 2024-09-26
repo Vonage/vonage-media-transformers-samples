@@ -13,7 +13,7 @@ import { setVonageMetadata } from "@vonage/media-processor";
 import packageInfo from './package.json';
 
 const MEDIA_ASSETS_URI: string =
-  "https://vonage-background-enchantments-sample.s3.amazonaws.com/";
+  "media/";
 const configs: { [key: string]: MediaProcessorConfig } = {
   blurLow: {
     transformerType: BackgroundTransformerType.BackgroundBlur,
