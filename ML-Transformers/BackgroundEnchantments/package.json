@@ -1,7 +1,7 @@
 {
-  "name": "example",
+  "name": "background-enchantments",
   "private": true,
-  "version": "0.0.1",
+  "version": "5.2.0-alpha.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
