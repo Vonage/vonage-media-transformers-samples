@@ -88,38 +88,26 @@
               <vwc-switch id="cameraswitch" style="justify-self: end;"></vwc-switch>
               <vwc-text font-face="subtitle-2" tight>Type</vwc-text>
               <vwc-select dense="" id="typeSelector">
-                <vwc-list-item disabled selected value="Choose_an_item">
-                  Type
+                <vwc-list-item selected value="virtual">
+                  Background Replacement
                 </vwc-list-item>
                 <vwc-list-item value="blurLow">
-                  Blur Low
+                  Background Blur Low
                 </vwc-list-item>
                 <vwc-list-item value="blurHigh">
-                  Blur High
-                </vwc-list-item>
-                <vwc-list-item value="virtual">
-                  Virtual
-                </vwc-list-item>
-                <vwc-list-item value="video">
-                  Video
-                </vwc-list-item>
-                <vwc-list-item value="silhouetteLow">
-                  Silhouette Low
-                </vwc-list-item>
-                <vwc-list-item value="silhouetteHigh">
-                  Silhouette High
+                  Background Blur High
                 </vwc-list-item>
               </vwc-select>
-              <vwc-text font-face="subtitle-2" tight>Segmentation</vwc-text>
-              <vwc-select dense="" id="segmentationSelector">
-                <vwc-list-item selected value="auto">
-                  Auto
+              <vwc-text font-face="subtitle-2" tight>Rendering</vwc-text>
+              <vwc-select dense="" id="renderingSelector">
+                <vwc-list-item selected value="canvas">
+                  CANVAS
                 </vwc-list-item>
                 <vwc-list-item value="fast">
-                  Fast
+                  WebGL+FAST
                 </vwc-list-item>
                 <vwc-list-item value="precise">
-                  Precise
+                  WebGL+PRECISE
                 </vwc-list-item>
               </vwc-select>
             </vwc-layout>
