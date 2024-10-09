@@ -5,6 +5,7 @@ import {
   createVonageMediaProcessor,
   isSupported,
   MediaProcessorConfig,
+  RenderingOptions,
   RenderingType,
   VonageMediaProcessor,
   WebglSelfieSegmentationType,
@@ -52,7 +53,7 @@ function $<T = any>(s: string) {
 async function main() {
   let source: CameraSource = new CameraSource();
   let config: Optional<MediaProcessorConfig>;
-  let selfieSegmentationType: Optional<WebglSelfieSegmentationType>;
+  let renderingOptions: RenderingOptions;
   let processor: VonageMediaProcessor;
 
   async function init() {
@@ -64,7 +65,6 @@ async function main() {
 
     setVonageMetadata({ appId: "test_app_id", sourceType: "video" as any });
 
-    cameraSwitch.disabled = true;
     try {
       await source.init();
     } catch (e) {
@@ -90,17 +90,35 @@ async function main() {
     source.stopMediaProcessorConnector();
   }
 
-  function getConfig(): Optional<MediaProcessorConfig> {
-    if (!config) return;
-
-    const finalConfig = { ...config };
-
-    if (selfieSegmentationType) {
-      finalConfig.renderingOptions = {
-        type: RenderingType.WEBGL,
-        selfieSegmentationType,
-      };
+  function getRenderingOptions() {
+    const segmentation = renderingSelect.value;
+    switch (segmentation) {
+      case "canvas":
+        return {
+          type: RenderingType.CANVAS
+        };
+      case "fast":
+        return {
+          type: RenderingType.WEBGL,
+          selfieSegmentationType: WebglSelfieSegmentationType.FAST,
+        };
+      case "precise":
+        return {
+          type: RenderingType.WEBGL,
+          selfieSegmentationType: WebglSelfieSegmentationType.PRECISE,
+        };
     }
+  }
+
+  function getConfig(): Optional<MediaProcessorConfig> {
+    const type = typeSelect.value;
+    const config = configs[type];
+    if (!configs[type]) throw `Undefined type [${type}]`;
+
+    const finalConfig = {
+      ...config,
+      renderingOptions: getRenderingOptions(),
+     };
 
     return finalConfig;
   }
@@ -116,7 +134,7 @@ async function main() {
   const githubButton = $("githubButton");
   const vividButton = $("vividButton");
   const typeSelect = $("typeSelector");
-  const segmentationSelect = $("segmentationSelector");
+  const renderingSelect = $("renderingSelector");
   const versionTag = $("version_tag");
 
   versionTag.innerText = `@vonage/ml-transformers version: ${packageInfo.dependencies['@vonage/ml-transformers']}`;
@@ -131,33 +149,12 @@ async function main() {
       disableProcessor();
     }
   });
-  cameraSwitch.addEventListener("click", () => {
-    if (cameraSwitch.disabled) {
-      $("disabledHover")?.show();
-    }
-  });
 
   typeSelect.addEventListener("change", () => {
-    const type = typeSelect.value;
-    if (!configs[type]) throw `Undefined type [${type}]`;
-    config = configs[type];
-    cameraSwitch.disabled = false;
     updateProcessor();
   });
 
-  segmentationSelect.addEventListener("change", () => {
-    const segmentation = segmentationSelect.value;
-    switch (segmentation) {
-      case "auto":
-        selfieSegmentationType = undefined;
-        break;
-      case "fast":
-        selfieSegmentationType = WebglSelfieSegmentationType.FAST;
-        break;
-      case "precise":
-        selfieSegmentationType = WebglSelfieSegmentationType.PRECISE;
-        break;
-    }
+  renderingSelect.addEventListener("change", () => {
     updateProcessor();
   });
 
