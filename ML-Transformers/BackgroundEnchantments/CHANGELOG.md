@@ -10,7 +10,7 @@ The versioning of this project is directly tied to the version of @vonage/ml-tra
 
 ### Changed
 
-- Upgrade @vonage/ml-transformers version 5.2.0-alpha.1. which enables a new selfie segmentation engine and adds a edge blur to canvas rendering.
+- Upgrade @vonage/ml-transformers version 5.2.0-alpha.1. which enables a new selfie segmentation engine and adds an edge blur to canvas rendering.
 
 ## 5.2.0-alpha.0 - 2024-09-27
 
