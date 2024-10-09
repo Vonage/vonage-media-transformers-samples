@@ -117,6 +117,7 @@ async function main() {
 
     const finalConfig = {
       ...config,
+      vonageSelfieSegmentationEngine: false,
       renderingOptions: getRenderingOptions(),
      };
 
