@@ -8,8 +8,10 @@ The versioning of this project is directly tied to the version of @vonage/ml-tra
 
 ## 5.2.0-alpha.3 - 2024-11-07
 
+### Changed
+
 - Upgrade @vonage/ml-transformers version 5.2.0-alpha.3. which includes the following:
-  - Improved rendering pipeline when in webGL when using WebGL PRECISE renderingOptions:
+  - Improved rendering pipeline when in webGL when using WebGL PRECISE renderingOptions
 
     ```ts
     renderingOptions: {
@@ -18,7 +20,14 @@ The versioning of this project is directly tied to the version of @vonage/ml-tra
     }
     ```
 
+### Fixed
+
+- Background resizing when using CANVAS renderer
+- Invalid timestamp crash when using Canvas as video source
+
 ## 5.2.0-alpha.2 - 2024-10-23
+
+### Changed
 
 - Upgrade @vonage/ml-transformers version 5.2.0-alpha.2. which includes the following:
   - improved flickering reduction when using `'vonageSelfieSegmentationEngine': false`
