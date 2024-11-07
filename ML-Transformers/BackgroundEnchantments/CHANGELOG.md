@@ -24,6 +24,7 @@ The versioning of this project is directly tied to the version of @vonage/ml-tra
 
 - Background resizing when using CANVAS renderer
 - Invalid timestamp crash when using Canvas as video source
+- Pipeline crash when changing WebGL renderer multiple times
 
 ## 5.2.0-alpha.2 - 2024-10-23
 
