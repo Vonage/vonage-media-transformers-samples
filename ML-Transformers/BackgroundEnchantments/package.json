@@ -1,7 +1,7 @@
 {
   "name": "background-enchantments",
   "private": true,
-  "version": "5.2.0-alpha.2",
+  "version": "5.2.0-alpha.3",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -9,7 +9,7 @@
     "buildToDocs": "npm run build && node copyToDocs.js"
   },
   "dependencies": {
-    "@vonage/ml-transformers": "5.2.0-alpha.2",
+    "@vonage/ml-transformers": "5.2.0-alpha.3",
     "@vonage/vivid": "2.36.0"
   },
   "devDependencies": {
