@@ -162,7 +162,7 @@ async function main() {
   githubButton.addEventListener("click", () => {
     window
       .open(
-        "https://github.com/Vonage/vonage-media-transformers-samples/tree/main/examples/mediapipe/BackgroundEnchantments",
+        "https://github.com/Vonage/vonage-media-transformers-samples/tree/main/ML-Transformers/BackgroundEnchantments",
         "_blank"
       )
       ?.focus();
