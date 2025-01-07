@@ -12,7 +12,15 @@ The versioning of this project is directly tied to the version of @vonage/ml-tra
 
 - Upgrade @vonage/ml-transformers to version 6.0.0-alpha.2. which includes the following:
   - internal change to use config option `mediapipeBaseAssetsUri` to fetch mediapipe assets when provided.
-  - remove mediapipe variables from global namespace
+    At this Uri the library expects the following:
+
+    ```bash
+    /task-vision.js
+    /wasm/vision_wasm_internal.js
+    /wasm/vision_wasm_internal.wasm
+    ```
+
+  - remove mediapipe variable TaskManager from global namespace
 
 ## 6.0.0-alpha.1 - 2024-12-19
 
