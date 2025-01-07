@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 The versioning of this project is directly tied to the version of @vonage/ml-transformers dependency
 
+## 6.0.0-alpha.2 - 2025-01-07
+
+### Changed
+
+- Upgrade @vonage/ml-transformers to version 6.0.0-alpha.2. which includes the following:
+  - internal change to use config option `mediapipeBaseAssetsUri` to fetch mediapipe assets when provided.
+  - remove mediapipe variables from global namespace
+
 ## 6.0.0-alpha.1 - 2024-12-19
 
 ### Changed
