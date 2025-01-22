@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 The versioning of this project is directly tied to the version of @vonage/ml-transformers dependency
 
+## 6.0.0 - 2025-01-22
+
+### Features
+
+- Improved segmentation quality
+
+### Changed
+
+- Changed MediaProcessorConfig option `mediapipeBaseAssetsUri`. This option allows you to set the path of the mediapipe assets to be used. At this Uri the library expects the following file routes to be available:
+
+```shell
+/task-vision.js
+/wasm/vision_wasm_internal.js
+/wasm/vision_wasm_internal.wasm
+```
+
+### Added
+
+- Added optional MediaProcessorConfig option `modelAssetUriPath`. This option allows you to set the url of the tflite model to be used. *However the library will used provided hosted assets by default so we do NOT recommend using it.*
+
+### Removed
+
+- Removed MediaProcessorConfig option `wasmAssetUriPath`, use `mediapipeBaseAssetsUri` instead to specify assets path if needed.
+- Removed MediaProcessorConfig option `tfliteAssetUriPath`, use `mediapipeBaseAssetsUri` instead to specify assets path if needed.
+
 ## 6.0.0-alpha.2 - 2025-01-07
 
 ### Changed
